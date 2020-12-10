@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -30,7 +31,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
-public class UpcomingMeetings extends AppCompatActivity implements View.OnClickListener {
+public class UpcomingMeetings extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
 
@@ -61,7 +62,7 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
         name = sharedPreferences.getString(Menu.NAME_KEY, "name");
         type = sharedPreferences.getString(Menu.TYPE_KEY, "student");
 
-        ProgressDialog newPd = ProgressDialog.show(this, "ôâéùåú ÷øåáåú", "îåøéã ðúåðéí...", true);
+        ProgressDialog newPd = ProgressDialog.show(this, "×¤×’×™×©×•×ª ×§×¨×•×‘×•×ª", "×ž×•×¨×™×“ × ×ª×•× ×™×...", true);
         pd = newPd;
         pd.setCancelable(false);
         pd.show();
@@ -78,18 +79,18 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
                         if(item.getName().contains(name)) {
                             downloadFile(item.getName());
                         }
+                        else if (type.equals("admin")) {
+                            downloadFile(item.getName());
+                        }
                     }
+                    if (listResult.getItems().isEmpty())
+                        Toast.makeText(this, "××™×Ÿ ×¤×’×™×©×•×ª ×§×¨×•×‘×•×ª!", Toast.LENGTH_LONG).show();
                     pd.dismiss();
                 })
                 .addOnFailureListener(e -> {
                     // Uh-oh, an error occurred!
                     Log.w("getMeetings", "onFailure: ", e);
                 });
-    }
-
-    @Override
-    public void onClick(View v) {
-
     }
 
     private void updateMeeting(String file) {
