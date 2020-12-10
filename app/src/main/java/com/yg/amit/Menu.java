@@ -17,6 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class Menu extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String AMIT_SP="AMIT";
+    public static final String NAME_KEY="name";
+    public static final String TYPE_KEY="key";
+
     private SharedPreferences sharedPreferences;
 
     private String name, type;
@@ -30,7 +34,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
         getSupportActionBar().hide();
 
-        sharedPreferences = getSharedPreferences("AMIT", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(AMIT_SP, MODE_PRIVATE);
 
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         btnUpcoming = (MaterialButton) findViewById(R.id.btnUpcoming);
@@ -42,8 +46,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         btnTeachers.setOnClickListener(this);
         btnAccount.setOnClickListener(this);
 
-        name = sharedPreferences.getString("name", "name");
-        type = sharedPreferences.getString("type", "student");
+        name = sharedPreferences.getString(NAME_KEY, "name");
+        type = sharedPreferences.getString(TYPE_KEY, "student");
 
         tvTitle.setText("שלום " + name);
 
