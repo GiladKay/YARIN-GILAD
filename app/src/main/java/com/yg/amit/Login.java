@@ -96,8 +96,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 editor = sharedPreferences.edit();
-                                editor.putString("type", (String) document.get("type"));
-                                editor.putString("name", (String) document.get("name"));
+                                editor.putString(Menu.TYPE_KEY, (String) document.get("type"));
+                                editor.putString(Menu.NAME_KEY, (String) document.get("name"));
                                 editor.commit();
 
                                 Intent i = new Intent(getBaseContext(), Menu.class);

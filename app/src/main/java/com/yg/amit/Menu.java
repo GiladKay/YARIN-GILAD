@@ -63,20 +63,37 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnAccount) {
+            // TODO add change password option
             new MaterialAlertDialogBuilder(this)
                     .setTitle("חשבון")
                     .setMessage("חשבון מחובר: " + name + ".")
                     .setNeutralButton("אוקיי", null)
-                    .setPositiveButton("התנתקות", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            FirebaseAuth.getInstance().signOut();
-                            Intent i = new Intent(getBaseContext(), Login.class);
-                            finish();
-                            startActivity(i);
-                        }
+                    .setPositiveButton("התנתקות", (dialog, which) -> {
+                        FirebaseAuth.getInstance().signOut();
+                        Intent i = new Intent(getBaseContext(), Login.class);
+                        finish();
+                        startActivity(i);
                     })
                     .setIcon(R.drawable.account).show();
         }
+        if (v.getId() == R.id.btnUpcoming) {
+            startActivity(new Intent(getBaseContext(), UpcomingMeetings.class));
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Exit App
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("יציאה")
+                .setMessage("האם לצאת מהאפליקציה?")
+                .setNegativeButton("לא", null)
+                .setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setIcon(R.drawable.error).show();
     }
 }
