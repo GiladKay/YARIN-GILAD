@@ -27,7 +27,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private TextView tvTitle;
     private Button btnUpcoming, btnClasses, btnTeachers, btnAccount;
 
-    public int kreg=9;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
