@@ -3,6 +3,7 @@ package com.yg.amit;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -42,6 +43,8 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
 
     private StorageReference mStorageRef;
 
+    private ProgressDialog pd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +61,11 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
         name = sharedPreferences.getString(Menu.NAME_KEY, "name");
         type = sharedPreferences.getString(Menu.TYPE_KEY, "student");
 
+        ProgressDialog newPd = ProgressDialog.show(this, "פגישות קרובות", "מוריד נתונים...", true);
+        pd = newPd;
+        pd.setCancelable(false);
+        pd.show();
+
         mStorageRef.child("Meetings").listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference prefix : listResult.getPrefixes()) {
@@ -71,6 +79,7 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
                             downloadFile(item.getName());
                         }
                     }
+                    pd.dismiss();
                 })
                 .addOnFailureListener(e -> {
                     // Uh-oh, an error occurred!
@@ -112,21 +121,10 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
                     updateMeeting(file);
-                    //pd.dismiss();
                 }).addOnFailureListener(exception -> {
                     // Handle failed download
                     Log.w("Download", "onFailure: Download failed", exception);
                 });
-    }
-
-    private void writeToFile(String data, Context context, String file) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file, Context.MODE_APPEND));
-            outputStreamWriter.append(data);
-            outputStreamWriter.close();
-        } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
     }
 
     private String readFromFile(Context context, String file) {
@@ -156,34 +154,5 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
         }
 
         return ret;
-    }
-
-    private void deleteFile(Context context, String file) {
-        try {
-            File inputStream = context.getFileStreamPath(file);
-            inputStream.delete();
-        } catch (Exception e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        }
-    }
-
-    private void uploadFile(String fileName) {
-        Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
-        StorageReference ref = mStorageRef.child("Meetings/"+fileName);
-
-        ref.putFile(file)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Log.d("Upload", "onSuccess: Upload succeeded");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        Log.w("Upload", "onSuccess: Upload failed", exception);
-                    }
-                });
     }
 }
