@@ -21,6 +21,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     public static final String NAME_KEY="name";
     public static final String TYPE_KEY="key";
 
+    public int jf=847;
     private SharedPreferences sharedPreferences;
 
     private String name, type;
