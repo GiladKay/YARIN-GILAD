@@ -19,7 +19,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     public static final String AMIT_SP = "AMIT";
     public static final String NAME_KEY = "name";
-    public static final String TYPE_KEY = "key";
+    public static final String TYPE_KEY = "type";
 
     private SharedPreferences sharedPreferences;
 
