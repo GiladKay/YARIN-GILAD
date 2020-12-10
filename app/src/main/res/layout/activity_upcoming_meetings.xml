@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorSecondary"
     android:orientation="vertical"
-    tools:context=".MeetingMenu">
+    tools:context=".UpcomingMeetings">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTitle"
@@ -19,16 +19,26 @@
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="5"
-        android:text="פגישות קרובות"
+        android:text="הפגישות הקרובות"
         android:textSize="40sp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="50dp"
         android:layout_marginBottom="50dp"
         android:textStyle="bold" />
 
-    <ListView
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvMeeting1"
         android:layout_width="match_parent"
-        android:layout_height="386dp" />
-
-
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/colorPrimary"
+        android:shadowColor="@color/black"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="5"
+        android:text="פגישה 1"
+        android:textSize="40sp"
+        android:layout_marginBottom="50dp"
+        android:textStyle="bold" />
 
 </LinearLayout>
