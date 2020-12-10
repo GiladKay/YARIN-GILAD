@@ -104,10 +104,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 finish();
                                 startActivity(i);
                             } else {
-                                Log.d("TAG", "No such document");
+                                Log.d("updateUI", "No such document");
                             }
                         } else {
-                            Log.d("TAG", "get failed with ", task.getException());
+                            Log.d("updateUI", "get failed with ", task.getException());
                         }
                     }
                 });

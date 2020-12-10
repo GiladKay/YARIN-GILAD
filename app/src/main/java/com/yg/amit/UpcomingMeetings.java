@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -31,29 +32,27 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
         getSupportActionBar().hide();
 
-        sharedPreferences = getSharedPreferences("AMIT", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         tvMeeting1 = (TextView) findViewById(R.id.tvMeeting1);
 
-        name = sharedPreferences.getString("name", "name");
-        type = sharedPreferences.getString("type", "student");
+        name = sharedPreferences.getString(Menu.NAME_KEY, "name");
+        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");
 
         mStorageRef.child("Meetings").listAll()
-                .addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                    @Override
-                    public void onSuccess(ListResult listResult) {
-                        for (StorageReference prefix : listResult.getPrefixes()) {
-                            // All the prefixes under listRef.
-                            // You may call listAll() recursively on them.
-                        }
+                .addOnSuccessListener(listResult -> {
+                    for (StorageReference prefix : listResult.getPrefixes()) {
+                        // All the prefixes under listRef.
+                        // You may call listAll() recursively on them.
+                    }
 
-                        for (StorageReference item : listResult.getItems()) {
-                            // All the items under listRef.
-                            if(item.getName().contains(name)) {
-                                tvMeeting1.setText(item.getName());
-                            }
+                    for (StorageReference item : listResult.getItems()) {
+                        // All the items under listRef.
+                        if(item.getName().contains(name)) {
+                            tvMeeting1.setText(item.getName());
+                            // TODO handel meetings
                         }
                     }
                 })
@@ -61,6 +60,7 @@ public class UpcomingMeetings extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Uh-oh, an error occurred!
+                        Log.w("getMeetings", "onFailure: ", e);
                     }
                 });
     }
