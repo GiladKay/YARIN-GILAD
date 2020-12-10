@@ -54,7 +54,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        sharedPreferences = getSharedPreferences("AMIT", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();

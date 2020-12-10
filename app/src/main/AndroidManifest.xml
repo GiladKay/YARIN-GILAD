@@ -9,7 +9,7 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AMIT">
-        <activity android:name=".MeetingMenu"></activity>
+        <activity android:name=".UpcomingMeetings"></activity>
         <activity android:name=".Menu" />
         <activity android:name=".Login">
             <intent-filter>
