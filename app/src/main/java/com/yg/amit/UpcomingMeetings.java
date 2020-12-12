@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
@@ -45,6 +46,7 @@ public class UpcomingMeetings extends AppCompatActivity {
     private StorageReference mStorageRef;
 
     private ProgressDialog pd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,5 +157,12 @@ public class UpcomingMeetings extends AppCompatActivity {
         }
 
         return ret;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getBaseContext(), Menu.class));
+        finish();
     }
 }

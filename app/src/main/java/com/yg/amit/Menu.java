@@ -62,23 +62,35 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btnAccount) {
-            // TODO add change password option
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle("חשבון")
-                    .setMessage("חשבון מחובר: " + name + ".")
-                    .setNeutralButton("אוקיי", null)
-                    .setPositiveButton("התנתקות", (dialog, which) -> {
-                        FirebaseAuth.getInstance().signOut();
-                        Intent i = new Intent(getBaseContext(), Login.class);
-                        finish();
-                        startActivity(i);
-                    })
-                    .setIcon(R.drawable.account).show();
+        switch (v.getId()){
+            case(R.id.btnAccount):
+                // TODO add change password option
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("חשבון")
+                        .setMessage("חשבון מחובר: " + name + ".")
+                        .setNeutralButton("אוקיי", null)
+                        .setPositiveButton("התנתקות", (dialog, which) -> {
+                            FirebaseAuth.getInstance().signOut();
+                            Intent i = new Intent(getBaseContext(), Login.class);
+                            finish();
+                            startActivity(i);
+                        })
+                        .setIcon(R.drawable.account).show();
+                break;
+            case(R.id.btnUpcoming):
+                startActivity(new Intent(getBaseContext(), UpcomingMeetings.class));
+                finish();
+                break;
+            case(R.id.btnClasses):
+                startActivity(new Intent(getBaseContext(), ClassesActivity.class));
+                finish();
+                break;
+            case(R.id.btnTeachers):
+                //TODO
+                break;
+
         }
-        if (v.getId() == R.id.btnUpcoming) {
-            startActivity(new Intent(getBaseContext(), UpcomingMeetings.class));
-        }
+
     }
 
     @Override

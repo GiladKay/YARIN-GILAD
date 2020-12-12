@@ -36,6 +36,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextInputLayout ipEmail, ipPassword;
     private TextInputEditText edtEmail, edtPassword;
     private MaterialButton btnNext, btnCancel;
+    public static final String TAG="TAG";
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -104,10 +105,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                                 finish();
                                 startActivity(i);
                             } else {
-                                Log.d("updateUI", "No such document");
+                                Log.d("TAG", "No such document");
                             }
                         } else {
-                            Log.d("updateUI", "get failed with ", task.getException());
+                            Log.d("TAG", "get failed with ", task.getException());
                         }
                     }
                 });

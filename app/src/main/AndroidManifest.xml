@@ -8,8 +8,12 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AMIT">
-        <activity android:name=".UpcomingMeetings"></activity>
+        android:theme="@style/Theme.AMIT"
+        android:screenOrientation="portrait">
+
+        <activity android:name=".StudentsActivity"></activity>
+        <activity android:name=".ClassesActivity" />
+        <activity android:name=".UpcomingMeetings" />
         <activity android:name=".Menu" />
         <activity android:name=".Login">
             <intent-filter>
