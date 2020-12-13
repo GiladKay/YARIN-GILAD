@@ -47,7 +47,6 @@ public class UpcomingMeetings extends AppCompatActivity {
 
     private ProgressDialog pd;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -15,8 +15,8 @@ import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity {
 
-    ListView lvS;//list view for students
-    TextView tvTitle; //title of the activity
+    ListView lvS;       //list view for students
+    TextView tvTitle;   //title of the activity
     ArrayList<Student> studentList;
 
     @Override
