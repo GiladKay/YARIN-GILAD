@@ -157,11 +157,4 @@ public class UpcomingMeetings extends AppCompatActivity {
 
         return ret;
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(getBaseContext(), Menu.class));
-        finish();
-    }
 }

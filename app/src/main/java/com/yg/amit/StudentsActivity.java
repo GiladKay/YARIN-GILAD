@@ -15,8 +15,8 @@ import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity {
 
-    ListView lvS;       //list view for students
-    TextView tvTitle;   //title of the activity
+    ListView lvS;       // listView for students
+    TextView tvTitle;   // Title of the activity
     ArrayList<Student> studentList;
 
     @Override
@@ -51,12 +51,5 @@ public class StudentsActivity extends AppCompatActivity {
                 //TODO creates a dialog where you set up a meeting with a student and see stats about him
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(getBaseContext(), ClassesActivity.class));
-        finish();
     }
 }

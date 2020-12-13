@@ -62,8 +62,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case(R.id.btnAccount):
+        switch (v.getId()) {
+            case (R.id.btnAccount):
                 // TODO add change password option
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("חשבון")
@@ -77,15 +77,13 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                         })
                         .setIcon(R.drawable.account).show();
                 break;
-            case(R.id.btnUpcoming):
+            case (R.id.btnUpcoming):
                 startActivity(new Intent(getBaseContext(), UpcomingMeetings.class));
-                finish();
                 break;
-            case(R.id.btnClasses):
+            case (R.id.btnClasses):
                 startActivity(new Intent(getBaseContext(), ClassesActivity.class));
-                finish();
                 break;
-            case(R.id.btnTeachers):
+            case (R.id.btnTeachers):
                 //TODO
                 break;
 

@@ -34,7 +34,7 @@ public class StudentAdapter extends ArrayAdapter<Student> {
 
         Student temp=objects.get(position);
         tvName.setText(temp.getName());
-        tvMeetingC.setText(""+temp.getMeetingCount());
+        tvMeetingC.setText(temp.getMeetingCount() + "/2");
 
         return view;
     }
