@@ -46,7 +46,7 @@ public class MeetingAdapter extends ArrayAdapter<Meeting> {
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater layoutInflater = ((Activity) context).getLayoutInflater();
-        View view = layoutInflater.inflate(R.layout.meeting_layout, parent, false);
+        View view = layoutInflater.inflate(R.layout.meeting_layout, parent, true);
 
         sharedPreferences = context.getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
