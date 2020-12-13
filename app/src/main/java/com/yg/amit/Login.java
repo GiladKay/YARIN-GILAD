@@ -97,18 +97,18 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 editor = sharedPreferences.edit();
-                                editor.putString(Menu.TYPE_KEY, (String) document.get("type"));
-                                editor.putString(Menu.NAME_KEY, (String) document.get("name"));
+                                editor.putString(Menu.TYPE_KEY, (String) document.get(Menu.TYPE_KEY));
+                                editor.putString(Menu.NAME_KEY, (String) document.get(Menu.NAME_KEY));
                                 editor.commit();
 
                                 Intent i = new Intent(getBaseContext(), Menu.class);
                                 finish();
                                 startActivity(i);
                             } else {
-                                Log.d("TAG", "No such document");
+                                Log.d(TAG, "No such document");
                             }
                         } else {
-                            Log.d("TAG", "get failed with ", task.getException());
+                            Log.d(TAG, "get failed with ", task.getException());
                         }
                     }
                 });
