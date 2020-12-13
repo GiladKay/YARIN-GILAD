@@ -16,8 +16,8 @@ import java.util.ArrayList;
 
 public class ClassesActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    ListView lvClass;           //ListView for Classes
-    ArrayList<String> classes;  // Array list for the listView
+    private ListView lvClass;           //ListView for Classes
+    private ArrayList<String> classes;  // Array list for the listView
     public static final String CLASS_NAME_KEY = "class";
 
     @Override

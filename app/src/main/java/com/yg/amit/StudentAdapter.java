@@ -15,8 +15,8 @@ import java.util.List;
 
 public class StudentAdapter extends ArrayAdapter<Student> {
 
-    Context context;
-    List<Student> objects;
+    private Context context;
+    private List<Student> objects;
 
   public StudentAdapter(Context context,List<Student> objects){
       super(context,R.layout.student_layout,objects);

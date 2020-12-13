@@ -15,9 +15,9 @@ import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity {
 
-    ListView lvS;       // listView for students
-    TextView tvTitle;   // Title of the activity
-    ArrayList<Student> studentList;
+    private ListView lvS;       // listView for students
+    private TextView tvTitle;   // Title of the activity
+    private ArrayList<Student> studentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

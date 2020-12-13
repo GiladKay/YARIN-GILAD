@@ -29,8 +29,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class MeetingAdapter extends ArrayAdapter<Meeting> {
 
-    Context context;
-    List<Meeting> objects;
+    private Context context;
+    private List<Meeting> objects;
 
     private SharedPreferences sharedPreferences;
     private String type;
