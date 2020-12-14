@@ -101,39 +101,58 @@
 
     </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/ipDate"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="תאריך"
-        app:startIconDrawable="@drawable/ic_date"
-        app:errorEnabled="true">
+        android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edtDate"
-            android:layout_width="match_parent"
+
+        <TextView
+            android:id="@+id/tvDate2"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="number|number|number"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:hint="תאריך"
+            android:textColorHint="@color/cardview_light_background"
+            android:textColor="@color/cardview_light_background"
+            android:background="@color/colorPrimary"
+            android:fontFamily="sans-serif"
+            android:shadowRadius="5"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textAlignment="viewEnd"
+            android:gravity="end"
+            android:clickable="true"></TextView>
+    </LinearLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/ipTime"
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:hint="שעה"
-        app:startIconDrawable="@drawable/ic_time"
-        app:errorEnabled="true">
+        android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edtTime"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvTime2"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:inputType="time"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_weight="1"
+            android:layout_margin="4dp"
+            android:hint="שעה"
+            android:textColorHint="@color/cardview_light_background"
+            android:textColor="@color/cardview_light_background"
+            android:background="@color/colorPrimary"
+            android:fontFamily="sans-serif"
+            android:shadowRadius="5"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textAlignment="viewEnd"
+            android:gravity="end"
+            android:clickable="true">
+        </TextView>
+    </LinearLayout>
+
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCreate"
