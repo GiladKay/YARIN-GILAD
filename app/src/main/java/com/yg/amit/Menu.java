@@ -32,7 +32,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
-        getSupportActionBar().hide();
 
         sharedPreferences = getSharedPreferences(AMIT_SP, MODE_PRIVATE);
 

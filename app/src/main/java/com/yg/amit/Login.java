@@ -49,7 +49,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
-        getSupportActionBar().hide();
 
         // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();

@@ -51,7 +51,6 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
-        getSupportActionBar().hide();
 
         Bundle extras = getIntent().getExtras();
         String className= extras.getString(ClassesActivity.CLASS_NAME_KEY);

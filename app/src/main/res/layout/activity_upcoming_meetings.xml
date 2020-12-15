@@ -8,6 +8,9 @@
     android:orientation="vertical"
     tools:context=".UpcomingMeetings">
 
+    <include android:id="@+id/toolbar3"
+        layout="@layout/toolbar"></include>
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
@@ -21,8 +24,8 @@
         android:shadowRadius="5"
         android:text="הפגישות הקרובות"
         android:textSize="40sp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:textStyle="bold" />
 
     <ListView

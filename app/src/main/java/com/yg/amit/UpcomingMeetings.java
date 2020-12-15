@@ -1,7 +1,9 @@
 package com.yg.amit;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,8 +11,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -48,11 +52,32 @@ public class UpcomingMeetings extends AppCompatActivity {
     private ProgressDialog pd;
 
     @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id= item.getItemId();
+
+        switch (id){
+            case R.id.something:
+                //TODO whatever you want to do
+                break;
+            case R.id.somethingElse:
+                //same
+                break;
+
+        }
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upcoming_meetings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
-        getSupportActionBar().hide();
 
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
@@ -92,6 +117,11 @@ public class UpcomingMeetings extends AppCompatActivity {
                     // Uh-oh, an error occurred!
                     Log.w("getMeetings", "onFailure: ", e);
                 });
+
+
+        Toolbar toolbar=findViewById(R.id.toolbar3);
+        setSupportActionBar(toolbar);
+
     }
 
     private void updateMeeting(String file) {

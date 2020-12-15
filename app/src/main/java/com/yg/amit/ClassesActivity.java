@@ -25,7 +25,6 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_classes);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
-        getSupportActionBar().hide();
 
 
         lvClass = (ListView) findViewById(R.id.lvClasses);
