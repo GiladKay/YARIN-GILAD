@@ -84,7 +84,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 startActivity(new Intent(getBaseContext(), ClassesActivity.class));
                 break;
             case (R.id.btnTeachers):
-                //TODO
+                startActivity(new Intent(getBaseContext(), TeacherActivity.class));
                 break;
 
         }

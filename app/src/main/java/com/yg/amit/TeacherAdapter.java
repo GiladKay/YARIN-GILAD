@@ -14,16 +14,16 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-public class StudentAdapter extends ArrayAdapter<Student> {
+public class TeacherAdapter extends ArrayAdapter<Teacher> {
 
     private Context context;
-    private List<Student> objects;
+    private List<Teacher> objects;
 
-  public StudentAdapter(Context context,List<Student> objects){
-      super(context,R.layout.student_layout,objects);
-      this.context=context;
-      this.objects=objects;
-  }
+    public TeacherAdapter(Context context,List<Teacher> objects){
+        super(context,R.layout.student_layout,objects);
+        this.context=context;
+        this.objects=objects;
+    }
 
 
 
@@ -35,14 +35,10 @@ public class StudentAdapter extends ArrayAdapter<Student> {
         TextView tvMeetingC=(TextView)view.findViewById(R.id.tvMCount);
 
 
-        Student temp=objects.get(position);
+        Teacher temp=objects.get(position);
         tvName.setText(temp.getName());
-        tvMeetingC.setText(temp.getMeetingCount() + "/2");
+        tvMeetingC.setText(temp.getMeetCount()+"");
 
-        if(objects.get(position).getMeetingCount()>=2){
-            tvName.setTextColor(Color.GRAY);
-            tvMeetingC.setTextColor(Color.GRAY);
-        }
         return view;
     }
 }

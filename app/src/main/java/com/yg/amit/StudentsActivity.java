@@ -155,13 +155,18 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
                 btnCreate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
                         String time=tvTime.getText().toString();
                         String Date=tvDate.getText().toString();
+                        if(!time.isEmpty()&&!Date.isEmpty()) {
                             //TODO create a meeting in a file with the date and time and sent email
                             //TODO add one to the students meeting count(update in file) and update list accordingly- lvS.setAdapter(adapter);
-                        Toast.makeText(getApplicationContext(),"time: "+time+ "Date: "+Date,Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
                             arrMeeting.hide();
-
+                        }
+                        else{
+                            Toast.makeText(getApplicationContext(), " יש למלא את כל השדות" + Date, Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
 
