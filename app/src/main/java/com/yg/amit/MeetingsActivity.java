@@ -1,31 +1,18 @@
 package com.yg.amit;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,10 +20,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
-public class UpcomingMeetings extends AppCompatActivity {
+public class MeetingsActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
 
@@ -54,7 +40,7 @@ public class UpcomingMeetings extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upcoming_meetings);
+        setContentView(R.layout.activity_meetings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
@@ -66,7 +52,7 @@ public class UpcomingMeetings extends AppCompatActivity {
         name = sharedPreferences.getString(Menu.NAME_KEY, "name");
         type = sharedPreferences.getString(Menu.TYPE_KEY, "student");
 
-        ProgressDialog newPd = ProgressDialog.show(this, "פגישות קרובות", "מוריד נתונים...", true);
+        ProgressDialog newPd = ProgressDialog.show(this, "פגישות", "מוריד נתונים...", true);
         pd = newPd;
         pd.setCancelable(false);
         pd.show();
@@ -87,8 +73,10 @@ public class UpcomingMeetings extends AppCompatActivity {
                             downloadFile(item.getName());
                         }
                     }
+
                     if (listResult.getItems().isEmpty())
                         Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
+
                     pd.dismiss();
                 })
                 .addOnFailureListener(e -> {

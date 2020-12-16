@@ -8,7 +8,6 @@
     android:orientation="vertical"
     tools:context=".ClassesActivity">
 
-
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
@@ -22,12 +21,9 @@
         android:shadowRadius="5"
         android:text="רשימת כיתות"
         android:textSize="40sp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:textStyle="bold" />
-
-
-
 
     <ListView
         android:id="@+id/lvClasses"

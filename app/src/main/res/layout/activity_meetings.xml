@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorSecondary"
     android:orientation="vertical"
-    tools:context=".UpcomingMeetings">
+    tools:context=".MeetingsActivity">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTitle"
@@ -19,7 +19,7 @@
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="5"
-        android:text="הפגישות הקרובות"
+        android:text="פגישות"
         android:textSize="40sp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"

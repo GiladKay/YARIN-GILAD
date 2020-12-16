@@ -35,6 +35,8 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
 
     private StorageReference mStorageRef;
 
+    private ProgressDialog pd;
+
     public static final String CLASS_NAME_KEY = "class";
 
     @Override
@@ -46,6 +48,11 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         lvClass = (ListView) findViewById(R.id.lvClasses);
+
+        ProgressDialog newPd = ProgressDialog.show(this, "כיתות", "מוריד נתונים...", true);
+        pd = newPd;
+        pd.setCancelable(false);
+        pd.show();
 
         downloadFile("Classes.txt");
     }
@@ -75,6 +82,8 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         lvClass.setAdapter(cAdapter);
 
         lvClass.setOnItemClickListener(this);
+
+        pd.dismiss();
     }
 
     private void downloadFile(String file) {

@@ -7,13 +7,12 @@
         android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:roundIcon="@drawable/logo"
-        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/Theme.AMIT">
         <activity android:name=".TeacherActivity"></activity>
         <activity android:name=".StudentsActivity" />
         <activity android:name=".ClassesActivity" />
-        <activity android:name=".UpcomingMeetings" />
+        <activity android:name=".MeetingsActivity" />
         <activity android:name=".Menu" />
         <activity android:name=".Login">
             <intent-filter>

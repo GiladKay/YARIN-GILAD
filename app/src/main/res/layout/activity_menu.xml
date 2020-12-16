@@ -40,7 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="הפגישות הקרובות"
+        android:text="פגישות"
         android:textSize="30sp"
         android:fontFamily="sans-serif"
         android:textStyle="bold"/>
