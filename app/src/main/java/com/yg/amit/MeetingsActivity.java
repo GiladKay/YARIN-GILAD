@@ -66,10 +66,9 @@ public class MeetingsActivity extends AppCompatActivity {
 
                     for (StorageReference item : listResult.getItems()) {
                         // All the items under listRef.
-                        if(item.getName().contains(name)) {
+                        if (item.getName().contains(name)) {
                             downloadFile(item.getName());
-                        }
-                        else if (type.equals("admin")) {
+                        } else if (type.equals("admin")) {
                             downloadFile(item.getName());
                         }
                     }
@@ -87,18 +86,18 @@ public class MeetingsActivity extends AppCompatActivity {
 
     private void updateMeeting(String file) {
         data = readFromFile(this, file);
-        Log.d("TAG", "updateMeeting: "+data);
+        Log.d("TAG", "updateMeeting: " + data);
 
         meetingList = new ArrayList<Meeting>();
 
         Meeting meeting = new Meeting("name", "1.1.1", "00:00");
 
-        if(type.equals("student"))
+        if (type.equals("student"))
             meeting = new Meeting(data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);
-        if(type.equals("teacher"))
+        if (type.equals("teacher"))
             meeting = new Meeting(data.split("&&")[0], data.split("&&")[2], data.split("&&")[3]);
-        if(type.equals("admin"))
-            meeting = new Meeting(data.split("&&")[0]+" - "+data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);
+        if (type.equals("admin"))
+            meeting = new Meeting(data.split("&&")[0] + " - " + data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);
 
         meetingList.add(meeting);
 
@@ -107,17 +106,17 @@ public class MeetingsActivity extends AppCompatActivity {
     }
 
     private void downloadFile(String file) {
-        File localFile = new File(getFilesDir()+"/"+file);
+        File localFile = new File(getFilesDir() + "/" + file);
 
-        mStorageRef.child("Meetings/"+file).getFile(localFile)
+        mStorageRef.child("Meetings/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
                     updateMeeting(file);
                 }).addOnFailureListener(exception -> {
-                    // Handle failed download
-                    Log.w("Download", "onFailure: Download failed", exception);
-                });
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
     }
 
     private String readFromFile(Context context, String file) {

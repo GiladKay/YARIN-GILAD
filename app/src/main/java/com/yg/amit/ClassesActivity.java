@@ -68,16 +68,15 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
 
     private void updateClasses(String file) {
         data = readFromFile(this, file);
-        Log.d("TAG", "updateMeeting: "+data);
+        Log.d("TAG", "updateMeeting: " + data);
 
         classList = new ArrayList<Class>();
 
-        for (int i = 0; i < data.split("&&").length - 1; i++)
-        {
+        for (int i = 0; i < data.split("&&").length - 1; i++) {
             classList.add(new Class(data.split("&&")[i]));
         }
 
-        ClassAdapter cAdapter = new ClassAdapter(this,0, 0, classList);
+        ClassAdapter cAdapter = new ClassAdapter(this, 0, 0, classList);
 
         lvClass.setAdapter(cAdapter);
 
@@ -87,9 +86,9 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
     }
 
     private void downloadFile(String file) {
-        File localFile = new File(getFilesDir()+"/"+file);
+        File localFile = new File(getFilesDir() + "/" + file);
 
-        mStorageRef.child("Classes/"+file).getFile(localFile)
+        mStorageRef.child("Classes/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");

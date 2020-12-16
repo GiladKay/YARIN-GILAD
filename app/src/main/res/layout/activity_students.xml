@@ -13,52 +13,55 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:fontFamily="sans-serif"
+        android:text="שם כיתה"
         android:textColor="@color/colorPrimary"
         android:shadowColor="@color/black"
         android:shadowDx="5"
         android:shadowDy="5"
         android:shadowRadius="5"
         android:textSize="40sp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:textStyle="bold" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitle1"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:fontFamily="sans-serif"
+            android:layout_weight="1"
+            android:paddingRight="5dp"
             android:textColor="@color/colorPrimary"
             android:shadowColor="@color/black"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="5"
-            android:textSize="20sp"
+            android:textSize="30sp"
             android:textStyle="bold"
-            android:text="מספר מפגשים" />
+            android:text="פגישות" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitle2"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:fontFamily="sans-serif"
+            android:layout_weight="1"
+            android:paddingRight="5dp"
             android:textColor="@color/colorPrimary"
             android:shadowColor="@color/black"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="5"
-            android:textSize="20sp"
+            android:textSize="30sp"
             android:textStyle="bold"
             android:text="שם" />
+
     </LinearLayout>
 
     <ListView
