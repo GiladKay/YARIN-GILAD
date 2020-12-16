@@ -52,28 +52,6 @@ public class UpcomingMeetings extends AppCompatActivity {
     private ProgressDialog pd;
 
     @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        getMenuInflater().inflate(R.menu.menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id= item.getItemId();
-
-        switch (id){
-            case R.id.something:
-                //TODO whatever you want to do
-                break;
-            case R.id.somethingElse:
-                //same
-                break;
-
-        }
-        return true;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upcoming_meetings);
@@ -117,11 +95,6 @@ public class UpcomingMeetings extends AppCompatActivity {
                     // Uh-oh, an error occurred!
                     Log.w("getMeetings", "onFailure: ", e);
                 });
-
-
-        Toolbar toolbar=findViewById(R.id.toolbar3);
-        setSupportActionBar(toolbar);
-
     }
 
     private void updateMeeting(String file) {

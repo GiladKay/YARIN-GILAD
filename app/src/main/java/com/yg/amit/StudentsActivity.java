@@ -164,7 +164,7 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
                             arrMeeting.hide();
                         }
                         else{
-                            Toast.makeText(getApplicationContext(), " ιω μξμΰ ΰϊ λμ δωγεϊ" + Date, Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Χ™Χ© ΧΧΧΧ ΧΧª Χ›Χ Χ”Χ©Χ“Χ•Χª " + Date, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
