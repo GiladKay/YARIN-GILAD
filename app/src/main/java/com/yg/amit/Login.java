@@ -60,7 +60,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             new Handler().postDelayed(() -> {
-                updateUI(currentUser);
+                Intent i = new Intent(getBaseContext(), Menu.class);
+                finish();
+                startActivity(i);
             }, 2000);
         } else {
             login = new Dialog(this);

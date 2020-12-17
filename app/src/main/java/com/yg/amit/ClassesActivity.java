@@ -68,7 +68,7 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
 
     private void updateClasses(String file) {
         data = readFromFile(this, file);
-        Log.d("TAG", "updateMeeting: " + data);
+        Log.d("TAG", "updateClasses: " + data);
 
         classList = new ArrayList<Class>();
 

@@ -4,8 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -21,16 +22,20 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,10 +45,16 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
     private MaterialButton btnCreate;
 
     private ListView lvS;       // listView for students
-    private TextView tvTitle;   // Title of the activity
+    private StudentAdapter studentAdapter;
     private ArrayList<Student> studentList;
+    private String data;
 
+    private TextView tvTitle;   // Title of the activity
     private TextView tvSName, tvMeetCount;
+
+    private ProgressDialog pd;
+
+    private StorageReference mStorageRef;
 
     int tHour, tMinute;
 
@@ -55,6 +66,8 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
 
         Bundle extras = getIntent().getExtras();
         String className = extras.getString(ClassesActivity.CLASS_NAME_KEY);
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         arrMeeting = new Dialog(this);
         arrMeeting.setContentView(R.layout.meeting_arrangement_dialog);
@@ -129,16 +142,50 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
 
         tvTitle.setText(className);
 
+        ProgressDialog newPd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
+        pd = newPd;
+        pd.setCancelable(false);
+        pd.show();
+
+        mStorageRef.child("Classes").listAll()
+                .addOnSuccessListener(listResult -> {
+                    for (StorageReference prefix : listResult.getPrefixes()) {
+                        // All the prefixes under listRef.
+                        // You may call listAll() recursively on them.
+                    }
+
+                    for (StorageReference item : listResult.getItems()) {
+                        // All the items under listRef.
+                        if (item.getName().contains(className))
+                            downloadFile(item.getName());
+                    }
+
+                    pd.dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    // Uh-oh, an error occurred!
+                    Log.w("getClass", "onFailure: ", e);
+                });
+    }
+
+    @Override
+    public void onClick(View view) {
+
+    }
+
+    private void updateClass(String file) {
+        data = readFromFile(this, file);
+        Log.d("TAG", "updateClass: " + data);
+
         studentList = new ArrayList<Student>();
 
-        //TODO create students from file that has the same name as String className
-        studentList.add(new Student("bob", 1));
-        studentList.add(new Student("jon", 0));
-        studentList.add(new Student("lennon", 0));
-        studentList.add(new Student("yarin", 2));
+        for (int i = 0; i < data.split("&&").length - 1; i++) {
+            studentList.add(new Student(data.split("&&")[i].split("==")[0],
+                    Integer.parseInt(data.split("&&")[i].split("==")[1])));
+        }
 
-        StudentAdapter adapter = new StudentAdapter(this, 0, 0, studentList);
-        lvS.setAdapter(adapter);
+        StudentAdapter studentAdapter = new StudentAdapter(this, 0, 0, studentList);
+        lvS.setAdapter(studentAdapter);
 
         lvS.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -171,9 +218,46 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
         });
     }
 
+    private void downloadFile(String file) {
+        File localFile = new File(getFilesDir() + "/" + file);
 
-    @Override
-    public void onClick(View view) {
+        mStorageRef.child("Classes/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    updateClass(file);
+                }).addOnFailureListener(exception -> {
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
+    }
 
+    private String readFromFile(Context context, String file) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(file);
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString).append("\n");
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
     }
 }
