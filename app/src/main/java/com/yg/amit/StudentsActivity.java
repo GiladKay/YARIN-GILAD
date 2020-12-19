@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class StudentsActivity extends AppCompatActivity implements View.OnClickListener {
+public class StudentsActivity extends AppCompatActivity {
 
     private Dialog arrMeeting;  //dialog for arranging a meeting
     private TextView tvDate, tvTime;
@@ -168,11 +169,6 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    @Override
-    public void onClick(View view) {
-
-    }
-
     private void updateClass(String file) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateClass: " + data);
@@ -190,8 +186,6 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
         lvS.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //TODO make the edit text force the user to enter date with dd/mm/yy format and time with mm/hh format
-                //TODO make sure fields are not left empty
                 tvSName.setText(studentList.get(i).getName() + " ");
                 tvMeetCount.setText(studentList.get(i).getMeetingCount() + "/2 ");
 
@@ -259,5 +253,12 @@ public class StudentsActivity extends AppCompatActivity implements View.OnClickL
         }
 
         return ret;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getBaseContext(), Menu.class));
+        finish();
     }
 }

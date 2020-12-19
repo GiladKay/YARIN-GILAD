@@ -127,4 +127,11 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
 
         return ret;
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getBaseContext(), Menu.class));
+        finish();
+    }
 }
