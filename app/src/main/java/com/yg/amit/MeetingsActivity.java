@@ -102,9 +102,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
                     for (StorageReference item : listResult.getItems()) {
                         // All the items under listRef.
-                        if (item.getName().contains(name)) {
-                            downloadFile(item.getName());
-                        } else if (type.equals("admin")) {
+                        if (item.getName().contains(name) || type.equals("admin")) {
                             downloadFile(item.getName());
                         }
                     }
