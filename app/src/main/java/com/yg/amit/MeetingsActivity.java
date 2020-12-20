@@ -2,15 +2,27 @@ package com.yg.amit;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -20,7 +32,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MeetingsActivity extends AppCompatActivity {
 
@@ -32,16 +48,36 @@ public class MeetingsActivity extends AppCompatActivity {
     private ListView lv;
     private MeetingAdapter meetingAdapter;
     private String data;
+    private Dialog editMeet;
+    private MaterialButton btnEdit;
+
+    private TextView tvTitle;   // Title of the activity
+    private TextView tvSName, tvMeetCount,tvDiaTitle;
+    private TextView tvDate, tvTime;
+
 
     private StorageReference mStorageRef;
 
     private ProgressDialog pd;
+
+    private int tHour, tMinute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
+
+        editMeet = new Dialog(this);
+        editMeet.setContentView(R.layout.meeting_arrangement_dialog);
+
+        tvMeetCount = (TextView) editMeet.findViewById(R.id.tvMeetings);
+        tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
+        tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
+
+        tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);
+        tvDate = (TextView) editMeet.findViewById(R.id.tvDate2);
+        btnEdit = (MaterialButton) editMeet.findViewById(R.id.btnCreate);
 
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
@@ -82,6 +118,103 @@ public class MeetingsActivity extends AppCompatActivity {
                     // Uh-oh, an error occurred!
                     Log.w("getMeetings", "onFailure: ", e);
                 });
+
+        if (!type.equals("student")) {//if user is teacher or admin
+
+
+            DatePickerDialog.OnDateSetListener mDateSetListener;
+
+            mDateSetListener=new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+
+                    Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
+
+                    String date = day + "/" + month + "/" + year;
+                    tvDate.setText(date);
+                }
+            };
+
+            tvDate.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    DatePickerDialog dialog = new DatePickerDialog(
+                            MeetingsActivity.this,
+                            android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                            mDateSetListener,
+                            Integer.parseInt(tvDate.getText().toString().substring(6,10)),Integer.parseInt(tvDate.getText().toString().substring(3,5)), Integer.parseInt(tvDate.getText().toString().substring(0,2)));
+
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialog.show();
+                }
+            });
+
+            tvTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    TimePickerDialog timePickerDialog = new TimePickerDialog(
+                            MeetingsActivity.this,
+                            new TimePickerDialog.OnTimeSetListener() {
+                                @Override
+                                public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                                    tHour = i;
+                                    tMinute = i1;
+                                    String time = i + ":" + i1;
+                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+                                    try {
+                                        Date date = simpleDateFormat.parse(time);
+                                        tvTime.setText(simpleDateFormat.format(date));
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }, 24, 0, true);
+                    timePickerDialog.updateTime(tHour, tMinute);
+                    timePickerDialog.show();
+
+                }
+            });
+
+
+
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    tvSName.setText(meetingList.get(i).getPerson());
+                    tvDate.setText(meetingList.get(i).getDate());
+                    tvTime.setText(meetingList.get(i).getTime());
+                    tvDiaTitle.setText(("ערוך פגישה"));
+
+                    TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
+                    num1.setText("");
+                    TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
+                    num2.setText("");
+
+                    btnEdit.setText("שמור שינויים");
+                    btnEdit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            String time = tvTime.getText().toString();
+                            String Date = tvDate.getText().toString();
+                            if (!time.isEmpty() && !Date.isEmpty()) {
+                                //TODO change the meeting in file accordingly
+                                //TODO update list accordingly- lv.setAdapter(adapter);
+                                Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
+                                editMeet.hide();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+                    editMeet.show();
+                }
+            });
+
+        }
     }
 
     private void updateMeeting(String file) {
@@ -146,5 +279,13 @@ public class MeetingsActivity extends AppCompatActivity {
         }
 
         return ret;
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getBaseContext(), Menu.class));
+        finish();
     }
 }

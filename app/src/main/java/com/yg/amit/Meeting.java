@@ -6,7 +6,7 @@ public class Meeting {
 
     public Meeting(String person, String date, String time) {
         this.person = person;
-        this.date = date;
+        this.date = date.substring(0,date.length()-2)+ "20" +date.substring(date.length()-2); //format must include the thousand and hundreds digits ie, insert 20 into 2021
         this.time = time;
     }
 

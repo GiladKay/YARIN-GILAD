@@ -48,12 +48,12 @@ public class MeetingAdapter extends ArrayAdapter<Meeting> {
         LayoutInflater layoutInflater = ((Activity) context).getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.meeting_layout, parent, false);
 
-        sharedPreferences = context.getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
         TextView tvPerson = (TextView) view.findViewById(R.id.tvPerson);
         TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
-        Button btnMore = (Button) view.findViewById(R.id.btnMore);
+
+
 
         Meeting temp = objects.get(position);
 
@@ -61,14 +61,7 @@ public class MeetingAdapter extends ArrayAdapter<Meeting> {
         tvDate.setText(temp.getDate());
         tvTime.setText(temp.getTime());
 
-        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");
 
-        if (type.equals("student"))
-            btnMore.setVisibility(View.GONE);
-        else {
-            // TODO move to a meeting activity
-            //context.startActivity(new Intent(context, <ACTIVITY>));
-        }
 
         return view;
     }

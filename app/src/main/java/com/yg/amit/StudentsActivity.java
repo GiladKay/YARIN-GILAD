@@ -42,7 +42,6 @@ public class StudentsActivity extends AppCompatActivity {
 
     private Dialog arrMeeting;  //dialog for arranging a meeting
     private TextView tvDate, tvTime;
-    private Button btnDate, btnTime;
     private MaterialButton btnCreate;
 
     private ListView lvS;       // listView for students
@@ -57,7 +56,7 @@ public class StudentsActivity extends AppCompatActivity {
 
     private StorageReference mStorageRef;
 
-    int tHour, tMinute;
+    private int tHour, tMinute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
