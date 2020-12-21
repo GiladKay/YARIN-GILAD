@@ -257,7 +257,7 @@ public class StudentsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(getBaseContext(), Menu.class));
+        startActivity(new Intent(getBaseContext(), ClassesActivity.class));
         finish();
     }
 }

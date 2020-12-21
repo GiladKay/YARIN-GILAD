@@ -105,6 +105,7 @@ public class MeetingsActivity extends AppCompatActivity {
                         if (item.getName().contains(name) || type.equals("admin")) {
                             downloadFile(item.getName());
                         }
+
                     }
 
                     if (listResult.getItems().isEmpty())
