@@ -47,7 +47,7 @@ public class StudentsActivity extends AppCompatActivity {
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
     private ArrayList<Student> studentList;
-    private String data;
+    private String data;       //String containing data from the chosen class file
 
     private TextView tvTitle;   // Title of the activity
     private TextView tvSName, tvMeetCount;
@@ -65,21 +65,50 @@ public class StudentsActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
         Bundle extras = getIntent().getExtras();
-        String className = extras.getString(ClassesActivity.CLASS_NAME_KEY);
+        String className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        arrMeeting = new Dialog(this);
+        arrMeeting = new Dialog(this);                               //Initializing meeting arrangement dialog
         arrMeeting.setContentView(R.layout.meeting_arrangement_dialog);
 
         tvMeetCount = (TextView) arrMeeting.findViewById(R.id.tvMeetings);
         tvSName = (TextView) arrMeeting.findViewById(R.id.tvStudentName);
-
         tvTime = (TextView) arrMeeting.findViewById(R.id.tvTime2);
         tvDate = (TextView) arrMeeting.findViewById(R.id.tvDate2);
+        btnCreate = (MaterialButton) arrMeeting.findViewById(R.id.btnCreate);
 
+        lvS = (ListView) findViewById(R.id.lvStudents);
+        tvTitle = (TextView) findViewById(R.id.tvClassTitle);
+
+        tvTitle.setText(className);
+
+        pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
+        pd.setCancelable(false);
+        pd.show();
+
+        mStorageRef.child("Classes").listAll()
+                .addOnSuccessListener(listResult -> {
+                    for (StorageReference prefix : listResult.getPrefixes()) {
+                        // All the prefixes under listRef.
+                        // You may call listAll() recursively on them.
+                    }
+
+                    for (StorageReference item : listResult.getItems()) {
+                        // All the items under listRef.
+                        if (item.getName().contains(className))   //locating the file that has the same name as the class we clicked on
+                            downloadFile(item.getName());
+                    }
+
+                    pd.dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    // Uh-oh, an error occurred!
+                    Log.w("getClass", "onFailure: ", e);
+                });
+
+        // all the listeners used for the time and date arrangement in a new meeting
         DatePickerDialog.OnDateSetListener mDateSetListener;
-
         mDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
@@ -91,10 +120,10 @@ public class StudentsActivity extends AppCompatActivity {
             }
         };
 
-        tvDate.setOnClickListener(new View.OnClickListener() {
+        tvDate.setOnClickListener(new View.OnClickListener() {         //Dialog for the user to choose a date for the meeting
             @Override
             public void onClick(View view) {
-                Calendar cal = Calendar.getInstance();
+                Calendar cal = Calendar.getInstance(); //get the date of the current day
                 int year = cal.get(Calendar.YEAR);
                 int month = cal.get(Calendar.MONTH);
                 int day = cal.get(Calendar.DAY_OF_MONTH);
@@ -104,22 +133,23 @@ public class StudentsActivity extends AppCompatActivity {
                         android.R.style.Theme_Holo_Light_Dialog_MinWidth,
                         mDateSetListener,
                         year, month, day);
+
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
             }
         });
 
-        tvTime.setOnClickListener(new View.OnClickListener() {
+        tvTime.setOnClickListener(new View.OnClickListener() {         //Dialog for the user to choose a time for the meeting
             @Override
             public void onClick(View view) {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(
                         StudentsActivity.this,
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
-                            public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                                tHour = i;
-                                tMinute = i1;
-                                String time = i + ":" + i1;
+                            public void onTimeSet(TimePicker timePicker, int hour, int min) {
+                                tHour = hour;
+                                tMinute = min;
+                                String time = hour + ":" + min;
                                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
                                 try {
                                     Date date = simpleDateFormat.parse(time);
@@ -135,39 +165,31 @@ public class StudentsActivity extends AppCompatActivity {
             }
         });
 
-        btnCreate = (MaterialButton) arrMeeting.findViewById(R.id.btnCreate);
-
-        lvS = (ListView) findViewById(R.id.lvStudents);
-        tvTitle = (TextView) findViewById(R.id.tvClassTitle);
-
-        tvTitle.setText(className);
-
-        ProgressDialog newPd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
-        pd = newPd;
-        pd.setCancelable(false);
-        pd.show();
-
-        mStorageRef.child("Classes").listAll()
-                .addOnSuccessListener(listResult -> {
-                    for (StorageReference prefix : listResult.getPrefixes()) {
-                        // All the prefixes under listRef.
-                        // You may call listAll() recursively on them.
-                    }
-
-                    for (StorageReference item : listResult.getItems()) {
-                        // All the items under listRef.
-                        if (item.getName().contains(className))
-                            downloadFile(item.getName());
-                    }
-
-                    pd.dismiss();
-                })
-                .addOnFailureListener(e -> {
-                    // Uh-oh, an error occurred!
-                    Log.w("getClass", "onFailure: ", e);
-                });
     }
 
+    /**
+     * method used to download data files from firebase
+     * @param file- String containing the name of the file with all the students
+     */
+    private void downloadFile(String file) {
+        File localFile = new File(getFilesDir() + "/" + file);
+
+        mStorageRef.child("Classes/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    updateClass(file);
+                }).addOnFailureListener(exception -> {
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
+    }
+
+    /**
+     * Initializes the studentList and fills it with all the Students read from the appropriate file
+     * sets an Item listener so that when a student is clicked, the meeting arrangement dialog is shown
+     * @param file- name of the class file
+     */
     private void updateClass(String file) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateClass: " + data);
@@ -179,7 +201,7 @@ public class StudentsActivity extends AppCompatActivity {
                     Integer.parseInt(data.split("&&")[i].split("==")[1])));
         }
 
-        StudentAdapter studentAdapter = new StudentAdapter(this, 0, 0, studentList);
+        studentAdapter = new StudentAdapter(this, 0, 0, studentList);
         lvS.setAdapter(studentAdapter);
 
         lvS.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -211,20 +233,12 @@ public class StudentsActivity extends AppCompatActivity {
         });
     }
 
-    private void downloadFile(String file) {
-        File localFile = new File(getFilesDir() + "/" + file);
-
-        mStorageRef.child("Classes/" + file).getFile(localFile)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Successfully downloaded data to local file
-                    Log.d("Download", "onSuccess: Download succeeded");
-                    updateClass(file);
-                }).addOnFailureListener(exception -> {
-            // Handle failed download
-            Log.w("Download", "onFailure: Download failed", exception);
-        });
-    }
-
+    /**
+     * reads and outputs the contents of the now local Class file
+     * @param context-this
+     * @param file- name of the class file
+     * @return a String containing all the data from the file
+     */
     private String readFromFile(Context context, String file) {
 
         String ret = "";

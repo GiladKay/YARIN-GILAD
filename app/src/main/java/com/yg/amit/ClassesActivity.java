@@ -30,14 +30,13 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
 
     private ListView lvClass;               //ListView for Classes
     private ArrayList<Class> classList;     // Array list for the listView
-    private ClassAdapter classAdapter;
-    private String data;
+    private String data;                    // String containing data from the classes file
 
     private StorageReference mStorageRef;
 
     private ProgressDialog pd;
 
-    public static final String CLASS_NAME_KEY = "class";
+    public static final String CLASS_NAME_KEY = "class";// key for the Intent Extra that contains the class name
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +56,28 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         downloadFile("Classes.txt");
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        String classname = classList.get(i).getClassName();
+    /**
+     * method used to download data files from firebase
+     * @param file- String containing the name of the file with all the classes
+     */
+    private void downloadFile(String file) {
+        File localFile = new File(getFilesDir() + "/" + file); //locate the file using the file String for the path
 
-        Intent intent = new Intent(getBaseContext(), StudentsActivity.class);
-        intent.putExtra(CLASS_NAME_KEY, classname);
-        startActivity(intent);
+        mStorageRef.child("Classes/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    updateClasses(file);
+                }).addOnFailureListener(exception -> {
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
     }
 
+    /**
+     * Initializes the classList and fills it with all the classes read from Classes.txt
+     * @param file-"Classes.txt"
+     */
     private void updateClasses(String file) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateClasses: " + data);
@@ -85,20 +97,12 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         pd.dismiss();
     }
 
-    private void downloadFile(String file) {
-        File localFile = new File(getFilesDir() + "/" + file);
-
-        mStorageRef.child("Classes/" + file).getFile(localFile)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Successfully downloaded data to local file
-                    Log.d("Download", "onSuccess: Download succeeded");
-                    updateClasses(file);
-                }).addOnFailureListener(exception -> {
-            // Handle failed download
-            Log.w("Download", "onFailure: Download failed", exception);
-        });
-    }
-
+    /**
+     * reads and outputs the contents of the now local "Classes.txt" file
+     * @param context-this
+     * @param file- "Classes.txt"
+     * @return a String containing all the data from the file
+     */
     private String readFromFile(Context context, String file) {
 
         String ret = "";
@@ -126,6 +130,17 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         }
 
         return ret;
+    }
+
+
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        String classname = classList.get(i).getClassName(); //inserts into classname the class name that was clicked in the listView
+
+        Intent intent = new Intent(getBaseContext(), StudentsActivity.class);
+        intent.putExtra(CLASS_NAME_KEY, classname);// place the class name in an Extra that will be sent to StudentsActivity
+        startActivity(intent);
     }
 
     @Override

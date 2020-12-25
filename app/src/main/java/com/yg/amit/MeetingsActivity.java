@@ -52,6 +52,7 @@ public class MeetingsActivity extends AppCompatActivity {
     private MaterialButton btnEdit;
 
     private TextView tvTitle;   // Title of the activity
+
     private TextView tvSName, tvMeetCount,tvDiaTitle;
     private TextView tvDate, tvTime;
 
@@ -68,13 +69,11 @@ public class MeetingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_meetings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
-        editMeet = new Dialog(this);
+        editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
         editMeet.setContentView(R.layout.meeting_arrangement_dialog);
-
         tvMeetCount = (TextView) editMeet.findViewById(R.id.tvMeetings);
         tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
         tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
-
         tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);
         tvDate = (TextView) editMeet.findViewById(R.id.tvDate2);
         btnEdit = (MaterialButton) editMeet.findViewById(R.id.btnCreate);
@@ -83,13 +82,14 @@ public class MeetingsActivity extends AppCompatActivity {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
+        meetingList = new ArrayList<Meeting>();
+
         lv = (ListView) findViewById(R.id.lv);
 
-        name = sharedPreferences.getString(Menu.NAME_KEY, "name");
-        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");
+        name = sharedPreferences.getString(Menu.NAME_KEY, "name");            //getting the users name
+        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");         // confirming the user type (student,teacher,admin)
 
-        ProgressDialog newPd = ProgressDialog.show(this, "פגישות", "מוריד נתונים...", true);
-        pd = newPd;
+        pd = ProgressDialog.show(this, "פגישות", "מוריד נתונים...", true);
         pd.setCancelable(false);
         pd.show();
 
@@ -102,7 +102,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
                     for (StorageReference item : listResult.getItems()) {
                         // All the items under listRef.
-                        if (item.getName().contains(name) || type.equals("admin")) {
+                        if (item.getName().contains(name) || type.equals("admin")) { // if the meeting as connected to the user (contains his name) or if the user is an admin
                             downloadFile(item.getName());
                         }
 
@@ -118,8 +118,7 @@ public class MeetingsActivity extends AppCompatActivity {
                     Log.w("getMeetings", "onFailure: ", e);
                 });
 
-        if (!type.equals("student")) {//if user is teacher or admin
-
+        if (!type.equals("student")) {//if user is teacher or admin he may edit the meeting
 
             DatePickerDialog.OnDateSetListener mDateSetListener;
 
@@ -184,7 +183,7 @@ public class MeetingsActivity extends AppCompatActivity {
                     tvSName.setText(meetingList.get(i).getPerson());
                     tvDate.setText(meetingList.get(i).getDate());
                     tvTime.setText(meetingList.get(i).getTime());
-                    tvDiaTitle.setText(("ערוך פגישה"));
+                    tvDiaTitle.setText((" ערוך פגישה"));
 
                     TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
                     num1.setText("");
@@ -209,6 +208,20 @@ public class MeetingsActivity extends AppCompatActivity {
                         }
                     });
 
+                    if(type.equals("teacher")){
+                        MaterialButton done =(MaterialButton)editMeet.findViewById(R.id.btnMeetingDone);
+                        done.setVisibility(View.VISIBLE);
+                        done.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                //TODO open dialog that contains an EditText for writing a mashov on the meeting
+                                //TODO remove meeting from teacher and students feed, add the mashov to the meeting's file, and move it to a location where we will store all the meetings that were done
+                                //TODO add one to the meeting count of the teacher
+
+                            }
+                        });
+                    }
+
                     editMeet.show();
                 }
             });
@@ -216,27 +229,10 @@ public class MeetingsActivity extends AppCompatActivity {
         }
     }
 
-    private void updateMeeting(String file) {
-        data = readFromFile(this, file);
-        Log.d("TAG", "updateMeeting: " + data);
-
-        meetingList = new ArrayList<Meeting>();
-
-        Meeting meeting = new Meeting("name", "1.1.1", "00:00");
-
-        if (type.equals("student"))
-            meeting = new Meeting(data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);
-        if (type.equals("teacher"))
-            meeting = new Meeting(data.split("&&")[0], data.split("&&")[2], data.split("&&")[3]);
-        if (type.equals("admin"))
-            meeting = new Meeting(data.split("&&")[0] + " - " + data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);
-
-        meetingList.add(meeting);
-
-        meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
-        lv.setAdapter(meetingAdapter);
-    }
-
+    /**
+     * method used to download data files from firebase
+     * @param file- String containing the name of the file with all the meeting information
+     */
     private void downloadFile(String file) {
         File localFile = new File(getFilesDir() + "/" + file);
 
@@ -251,6 +247,36 @@ public class MeetingsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Initializes the meetingList and fills it with all the meetings read from the appropriate file
+     * @param file- name of the meeting file
+     */
+    private void updateMeeting(String file) {
+        data = readFromFile(this, file);
+        Log.d("TAG", "updateMeeting: " + data);
+
+        Meeting meeting;
+
+        if (type.equals("student"))
+            meeting = new Meeting(data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]); //show time, date, and name of teacher
+        else if (type.equals("teacher"))
+            meeting = new Meeting(data.split("&&")[0], data.split("&&")[2], data.split("&&")[3]);//show time, date , and name of student
+        else //if (type.equals("admin"))
+            meeting = new Meeting(data.split("&&")[0] + " - " + data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]); //show all
+
+        meetingList.add(meeting);
+
+        meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
+        lv.setAdapter(meetingAdapter);
+    }
+
+
+    /**
+     * reads and outputs the contents of the now local meeting file
+     * @param context-this
+     * @param file- name of the meeting file
+     * @return String containing all the data from the file
+     */
     private String readFromFile(Context context, String file) {
 
         String ret = "";

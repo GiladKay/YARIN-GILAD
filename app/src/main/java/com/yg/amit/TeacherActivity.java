@@ -53,7 +53,29 @@ public class TeacherActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * method used to download data files from firebase
+     * @param file- String containing the name of the file with all the teachers
+     */
+    private void downloadFile(String file) {
+        File localFile = new File(getFilesDir() + "/" + file);
 
+        mStorageRef.child("Classes/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    updateClasses(file);
+                }).addOnFailureListener(exception -> {
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
+    }
+
+
+    /**
+     * Initializes the teacherList and fills it with all the Teachers read from the teacher file
+     * @param file- name of the teacher file
+     */
     private void updateClasses(String file) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateClasses: " + data);
@@ -79,20 +101,12 @@ public class TeacherActivity extends AppCompatActivity {
         pd.dismiss();
     }
 
-    private void downloadFile(String file) {
-        File localFile = new File(getFilesDir() + "/" + file);
-
-        mStorageRef.child("Classes/" + file).getFile(localFile)
-                .addOnSuccessListener(taskSnapshot -> {
-                    // Successfully downloaded data to local file
-                    Log.d("Download", "onSuccess: Download succeeded");
-                    updateClasses(file);
-                }).addOnFailureListener(exception -> {
-            // Handle failed download
-            Log.w("Download", "onFailure: Download failed", exception);
-        });
-    }
-
+    /**
+     * reads and outputs the contents of the now local list of teachers file
+     * @param context-this
+     * @param file- name of the class file
+     * @return a String containing all the data from the file
+     */
     private String readFromFile(Context context, String file) {
 
         String ret = "";
