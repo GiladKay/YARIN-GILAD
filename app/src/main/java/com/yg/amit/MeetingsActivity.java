@@ -118,7 +118,7 @@ public class MeetingsActivity extends AppCompatActivity {
                     Log.w("getMeetings", "onFailure: ", e);
                 });
 
-        if (!type.equals("student")) {//if user is teacher or admin he may edit the meeting
+        if (type.equals("teacher")) {//if user is of type teacher he may edit the meeting
 
             DatePickerDialog.OnDateSetListener mDateSetListener;
 
@@ -176,40 +176,39 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
 
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        tvSName.setText(meetingList.get(i).getPerson());
+                        tvDate.setText(meetingList.get(i).getDate());
+                        tvTime.setText(meetingList.get(i).getTime());
+                        tvDiaTitle.setText((" ערוך פגישה"));
 
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    tvSName.setText(meetingList.get(i).getPerson());
-                    tvDate.setText(meetingList.get(i).getDate());
-                    tvTime.setText(meetingList.get(i).getTime());
-                    tvDiaTitle.setText((" ערוך פגישה"));
+                        TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
+                        num1.setText("");
+                        TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
+                        num2.setText("");
 
-                    TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
-                    num1.setText("");
-                    TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
-                    num2.setText("");
+                        btnEdit.setText("שמור שינויים");
+                        btnEdit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
 
-                    btnEdit.setText("שמור שינויים");
-                    btnEdit.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                            String time = tvTime.getText().toString();
-                            String Date = tvDate.getText().toString();
-                            if (!time.isEmpty() && !Date.isEmpty()) {
-                                //TODO change the meeting in file accordingly
-                                //TODO update list accordingly- lv.setAdapter(adapter);
-                                Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
-                                editMeet.hide();
-                            } else {
-                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
+                                String time = tvTime.getText().toString();
+                                String Date = tvDate.getText().toString();
+                                if (!time.isEmpty() && !Date.isEmpty()) {
+                                    //TODO change the meeting in file accordingly
+                                    //TODO update list accordingly- lv.setAdapter(adapter);
+                                    Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
+                                    editMeet.hide();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
+                                }
                             }
-                        }
-                    });
+                        });
 
-                    if(type.equals("teacher")){
-                        MaterialButton done =(MaterialButton)editMeet.findViewById(R.id.btnMeetingDone);
+
+                        MaterialButton done = (MaterialButton) editMeet.findViewById(R.id.btnMeetingDone);
                         done.setVisibility(View.VISIBLE);
                         done.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -220,14 +219,14 @@ public class MeetingsActivity extends AppCompatActivity {
 
                             }
                         });
+
+
+                        editMeet.show();
                     }
-
-                    editMeet.show();
-                }
-            });
-
+                });
+            }
         }
-    }
+
 
     /**
      * method used to download data files from firebase

@@ -1,5 +1,6 @@
 package com.yg.amit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -11,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,16 +24,25 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,12 +60,16 @@ public class StudentsActivity extends AppCompatActivity {
     private ArrayList<Student> studentList;
     private String data;       //String containing data from the chosen class file
 
+    private boolean hasBeenEdited=false; // remembers if an edit to the students has occurred
+
     private TextView tvTitle;   // Title of the activity
     private TextView tvSName, tvMeetCount;
 
     private ProgressDialog pd;
 
     private StorageReference mStorageRef;
+
+    private String className;
 
     private int tHour, tMinute;
 
@@ -65,7 +80,7 @@ public class StudentsActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
         Bundle extras = getIntent().getExtras();
-        String className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
+        className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -204,31 +219,41 @@ public class StudentsActivity extends AppCompatActivity {
         studentAdapter = new StudentAdapter(this, 0, 0, studentList);
         lvS.setAdapter(studentAdapter);
 
+
         lvS.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                tvSName.setText(studentList.get(i).getName() + " ");
-                tvMeetCount.setText(studentList.get(i).getMeetingCount() + "/2 ");
 
-                btnCreate.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+                if(studentList.get(i).getMeetingCount()<2 ) {//TODO add premession only for teachers
+                    tvSName.setText(studentList.get(i).getName() + " ");
+                    tvMeetCount.setText(studentList.get(i).getMeetingCount() + "/2 ");
 
-                        String time = tvTime.getText().toString();
-                        String Date = tvDate.getText().toString();
-                        if (!time.isEmpty() && !Date.isEmpty()) {
-                            //TODO create a meeting in a file with the date and time and sent email
-                            //TODO add one to the students meeting count(update in file) and update list accordingly- lvS.setAdapter(adapter);
-                            Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
-                            arrMeeting.hide();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
+                    btnCreate.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                            String time = tvTime.getText().toString();
+                            String Date = tvDate.getText().toString();
+                            if (!time.isEmpty() && !Date.isEmpty()) {
+                                //TODO create a meeting in a file with the date and time and send an email to the student
+
+                                studentList.get(i).incMeetingCount();
+                                hasBeenEdited = true;
+                                lvS.setAdapter(studentAdapter);
+
+
+
+                                Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
+                                arrMeeting.hide();
+                            } else {
+                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
+                            }
                         }
-                    }
-                });
+                    });
 
-                arrMeeting.show();
+                    arrMeeting.show();
 
+                }
             }
         });
     }
@@ -266,6 +291,61 @@ public class StudentsActivity extends AppCompatActivity {
         }
 
         return ret;
+    }
+
+
+
+    private void uploadFile(String fileName) {
+        Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
+        StorageReference riversRef = mStorageRef.child("Classes/"+ fileName);
+
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("Upload", "onSuccess: Upload succeeded");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Log.w("Upload", "onSuccess: Upload failed", exception);
+                    }
+                });
+    }
+
+    private void writeToFile(Context context, String file) {
+
+        String data="";
+        for(Student student:studentList){
+            data+=student.getName()+"=="+student.getMeetingCount()+"&&" ;
+        }
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file,MODE_PRIVATE)); // APPEND OR PRIVATE
+            outputStreamWriter.append(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private void deleteFile(Context context, String file) {
+        try {
+            File inputStream = context.getFileStreamPath(file);
+            inputStream.delete();
+        } catch (Exception e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        className+=".txt";
+        if(hasBeenEdited){
+            writeToFile(this,className);
+            uploadFile(className);
+        }
     }
 
     @Override
