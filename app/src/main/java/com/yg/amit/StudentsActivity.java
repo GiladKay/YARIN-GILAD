@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -69,6 +70,10 @@ public class StudentsActivity extends AppCompatActivity {
 
     private StorageReference mStorageRef;
 
+    private SharedPreferences sp;
+    private String name;
+    private String type;
+
     private String className;
 
     private int tHour, tMinute;
@@ -81,6 +86,10 @@ public class StudentsActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
+
+        sp=getSharedPreferences(Menu.AMIT_SP,MODE_PRIVATE);
+        name=sp.getString(Menu.NAME_KEY,"name");
+        type=sp.getString(Menu.TYPE_KEY,"student");
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -224,7 +233,8 @@ public class StudentsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                if(studentList.get(i).getMeetingCount()<2 ) {//TODO add premession only for teachers
+                if(studentList.get(i).getMeetingCount()<2&&type.equals("teacher") ) {
+
                     tvSName.setText(studentList.get(i).getName() + " ");
                     tvMeetCount.setText(studentList.get(i).getMeetingCount() + "/2 ");
 
@@ -235,13 +245,13 @@ public class StudentsActivity extends AppCompatActivity {
                             String time = tvTime.getText().toString();
                             String Date = tvDate.getText().toString();
                             if (!time.isEmpty() && !Date.isEmpty()) {
-                                //TODO create a meeting in a file with the date and time and send an email to the student
+                                //TODO send an email to the student
 
                                 studentList.get(i).incMeetingCount();
                                 hasBeenEdited = true;
                                 lvS.setAdapter(studentAdapter);
 
-
+                                createMeeting(studentList.get(i).getName(),time,Date);
 
                                 Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
                                 arrMeeting.hide();
@@ -295,9 +305,9 @@ public class StudentsActivity extends AppCompatActivity {
 
 
 
-    private void uploadFile(String fileName) {
+    private void uploadFile(String fileName,String path) {
         Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
-        StorageReference riversRef = mStorageRef.child("Classes/"+ fileName);
+        StorageReference riversRef = mStorageRef.child(path+ fileName);
 
         riversRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -315,12 +325,9 @@ public class StudentsActivity extends AppCompatActivity {
                 });
     }
 
-    private void writeToFile(Context context, String file) {
+    private void writeToFile(String data,Context context, String file) {
 
-        String data="";
-        for(Student student:studentList){
-            data+=student.getName()+"=="+student.getMeetingCount()+"&&" ;
-        }
+
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file,MODE_PRIVATE)); // APPEND OR PRIVATE
             outputStreamWriter.append(data);
@@ -330,21 +337,26 @@ public class StudentsActivity extends AppCompatActivity {
         }
     }
 
-    private void deleteFile(Context context, String file) {
-        try {
-            File inputStream = context.getFileStreamPath(file);
-            inputStream.delete();
-        } catch (Exception e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        }
-    }
+     private void createMeeting(String studentName,String time,String Date){
+        writeToFile(studentName+"&&"+name+"&&"+Date+"&&"+time+"&&",this,name+" - "+studentName+".txt");
+        uploadFile(name+ " - "+studentName+".txt","Meetings/Upcoming/");
+     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        className+=".txt";
-        if(hasBeenEdited){
-            writeToFile(this,className);
-            uploadFile(className);
+
+        if(hasBeenEdited){//if a meetings was booked
+
+            String data="";
+            for(Student student:studentList){
+                data+=student.getName()+"=="+student.getMeetingCount()+"&&" ;
+            }
+            className+=".txt";
+            writeToFile(data,this,className);//update the meeting counter
+            uploadFile(className,"Classes/");//
+
+
         }
     }
 

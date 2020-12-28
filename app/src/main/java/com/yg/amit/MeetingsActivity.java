@@ -71,6 +71,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
         editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
         editMeet.setContentView(R.layout.meeting_arrangement_dialog);
+        editMeet.setCanceledOnTouchOutside(true);
         tvMeetCount = (TextView) editMeet.findViewById(R.id.tvMeetings);
         tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
         tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
@@ -93,7 +94,7 @@ public class MeetingsActivity extends AppCompatActivity {
         pd.setCancelable(false);
         pd.show();
 
-        mStorageRef.child("Meetings").listAll()
+        mStorageRef.child("Meetings/Upcoming").listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference prefix : listResult.getPrefixes()) {
                         // All the prefixes under listRef.
@@ -235,7 +236,7 @@ public class MeetingsActivity extends AppCompatActivity {
     private void downloadFile(String file) {
         File localFile = new File(getFilesDir() + "/" + file);
 
-        mStorageRef.child("Meetings/" + file).getFile(localFile)
+        mStorageRef.child("Meetings/Upcoming/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
@@ -244,6 +245,7 @@ public class MeetingsActivity extends AppCompatActivity {
             // Handle failed download
             Log.w("Download", "onFailure: Download failed", exception);
         });
+
     }
 
     /**
