@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -57,6 +58,11 @@ public class MeetingsActivity extends AppCompatActivity {
     private Dialog editMeet;
     private MaterialButton btnEdit;
 
+    private Dialog sendMashov;
+    private EditText ETM;//edit text mashov
+    private MaterialButton btnSend;
+
+
     private TextView tvTitle;   // Title of the activity
 
     private TextView tvSName, tvMeetCount,tvDiaTitle;
@@ -87,6 +93,12 @@ public class MeetingsActivity extends AppCompatActivity {
         tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);
         tvDate = (TextView) editMeet.findViewById(R.id.tvDate2);
         btnEdit = (MaterialButton) editMeet.findViewById(R.id.btnCreate);
+
+        sendMashov=new Dialog(this);
+        sendMashov.setContentView(R.layout.mashov_dialog);
+        ETM=(EditText)sendMashov.findViewById(R.id.ETMashov);
+        btnSend=(MaterialButton)sendMashov.findViewById(R.id.btnSend);
+
 
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
@@ -241,7 +253,41 @@ public class MeetingsActivity extends AppCompatActivity {
                         done.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                //TODO open dialog that contains an EditText for writing a mashov on the meeting
+                                sendMashov.getWindow().setLayout(700,900);
+                                sendMashov.show();
+
+                                btnSend.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        String mashov=ETM.getText().toString();
+
+                                        String fileName=meetingList.get(i).getTeacher()+" - "+meetingList.get(i).getStudent()+".txt";
+
+                                        StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/"+fileName);
+
+                                        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // File deleted successfully
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                // Uh-oh, an error occurred!
+                                            }
+                                        });
+
+                                        writeToFile(mashov,getApplicationContext(),fileName);//update the meeting counter
+                                        uploadFile(fileName,"Meetings/Done/");//
+
+                                        Toast.makeText(getApplicationContext(),"המשוב על הפגישה עם "+meetingList.get(i).getStudent()+" נשלח בהצלחה",Toast.LENGTH_LONG).show();
+                                        meetingList.remove(i);
+                                        lv.setAdapter(meetingAdapter);
+                                        sendMashov.hide();
+                                        editMeet.hide();
+                                    }
+                                });
+
                                 //TODO remove meeting from teacher and students feed, add the mashov to the meeting's file, and move it to a location where we will store all the meetings that were done
                                 //TODO add one to the meeting count of the teacher
 
@@ -343,7 +389,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
     private void uploadFile(String fileName,String path) {
         Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
-        StorageReference riversRef = mStorageRef.child(path+ fileName);
+        StorageReference riversRef = mStorageRef.child(path + fileName);
 
         riversRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -360,6 +406,7 @@ public class MeetingsActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 
     @Override

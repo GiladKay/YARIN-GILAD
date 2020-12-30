@@ -261,7 +261,7 @@ public class StudentsActivity extends AppCompatActivity {
 
                                 createMeeting(studentList.get(i).getName(),time,Date);
 
-                                Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "פגישה עם "+studentList.get(i).getName()+" בתאריך: "+Date+ " בשעה: "+time, Toast.LENGTH_LONG).show();
                                 arrMeeting.hide();
                             } else {
                                 Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();

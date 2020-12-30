@@ -3,7 +3,8 @@ package com.yg.amit;
 public class Teacher {
     private String name;
     private int meetCount;
-    //TODO add teacher stats
+
+
     public Teacher(String name,int meetCount){
         this.name=name;
         this.meetCount=meetCount;
