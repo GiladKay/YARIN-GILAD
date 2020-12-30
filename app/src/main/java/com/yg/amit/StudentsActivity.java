@@ -139,7 +139,15 @@ public class StudentsActivity extends AppCompatActivity {
                 month = month + 1;
                 Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
 
-                String date = day + "/" + month + "/" + year;
+                String d=""+day;
+                if(day<10){
+                    d="0"+day;
+                }
+                String m=""+month;
+                if(month<10){
+                    m="0"+month;
+                }
+                String date = d + "/" + m + "/" + year;
                 tvDate.setText(date);
             }
         };
@@ -348,6 +356,7 @@ public class StudentsActivity extends AppCompatActivity {
 
         if(hasBeenEdited){//if a meetings was booked
 
+            //update the number of meetings a student has in file
             String data="";
             for(Student student:studentList){
                 data+=student.getName()+"=="+student.getMeetingCount()+"&&" ;

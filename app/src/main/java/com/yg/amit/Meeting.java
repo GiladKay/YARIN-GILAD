@@ -2,21 +2,22 @@ package com.yg.amit;
 
 public class Meeting {
 
-    private String person, date, time;
+    private String teacher,student, date, time;
 
-    public Meeting(String person, String date, String time) {
-        this.person = person;
+    public Meeting(String student,String teacher, String date, String time) {
+        this.teacher=teacher;
+        this.student=student;
         this.date = date;
         this.time = time;
     }
 
-    public String getPerson() {
-        return person;
-    }
+    public String getTeacher() { return teacher; }
 
-    public void setPerson(String person) {
-        this.person = person;
-    }
+    public void setTeacher(String teacher) { this.teacher = teacher; }
+
+    public String getStudent() { return student; }
+
+    public void setStudent(String student) { this.student = student; }
 
     public String getDate() {
         return date;

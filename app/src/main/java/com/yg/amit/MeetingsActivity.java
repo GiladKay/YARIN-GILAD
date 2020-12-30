@@ -1,5 +1,6 @@
 package com.yg.amit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -12,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -22,9 +24,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +62,7 @@ public class MeetingsActivity extends AppCompatActivity {
     private TextView tvSName, tvMeetCount,tvDiaTitle;
     private TextView tvDate, tvTime;
 
+    private boolean hasBeenEdited;
 
     private StorageReference mStorageRef;
 
@@ -68,6 +75,8 @@ public class MeetingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
+
+        hasBeenEdited=false;
 
         editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
         editMeet.setContentView(R.layout.meeting_arrangement_dialog);
@@ -126,10 +135,19 @@ public class MeetingsActivity extends AppCompatActivity {
             mDateSetListener=new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-
+                    month = month + 1;
                     Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
 
-                    String date = day + "/" + month + "/" + year;
+                    String d=""+day;
+                    if(day<10){
+                        d="0"+day;
+                    }
+                    String m=""+month;
+                    if(month<10){
+                        m="0"+month;
+                    }
+                    String date = d + "/" + m + "/" + year;
+
                     tvDate.setText(date);
                 }
             };
@@ -180,7 +198,7 @@ public class MeetingsActivity extends AppCompatActivity {
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        tvSName.setText(meetingList.get(i).getPerson());
+                        tvSName.setText(meetingList.get(i).getStudent());
                         tvDate.setText(meetingList.get(i).getDate());
                         tvTime.setText(meetingList.get(i).getTime());
                         tvDiaTitle.setText((" ערוך פגישה"));
@@ -197,14 +215,23 @@ public class MeetingsActivity extends AppCompatActivity {
 
                                 String time = tvTime.getText().toString();
                                 String Date = tvDate.getText().toString();
-                                if (!time.isEmpty() && !Date.isEmpty()) {
-                                    //TODO change the meeting in file accordingly
-                                    //TODO update list accordingly- lv.setAdapter(adapter);
-                                    Toast.makeText(getApplicationContext(), "time: " + time + "Date: " + Date, Toast.LENGTH_LONG).show();
+
+
+                                Meeting meeting=meetingList.get(i);
+
+                                meeting.setDate(Date);
+                                meeting.setTime(time);
+                                lv.setAdapter(meetingAdapter);
+
+                                String data=meeting.getStudent()+"&&"+meeting.getTeacher()+"&&"+Date+"&&"+time+"&&";
+
+                                String fileName=meeting.getTeacher()+" - "+meeting.getStudent()+".txt";
+                                writeToFile(data,getApplicationContext(),fileName);//update the meeting counter
+                                uploadFile(fileName,"Meetings/Upcoming/");//
+
+                                Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + Date, Toast.LENGTH_LONG).show();
                                     editMeet.hide();
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
-                                }
+
                             }
                         });
 
@@ -256,14 +283,7 @@ public class MeetingsActivity extends AppCompatActivity {
         data = readFromFile(this, file);
         Log.d("TAG", "updateMeeting: " + data);
 
-        Meeting meeting;
-
-        if (type.equals("student"))
-            meeting = new Meeting(data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]); //show time, date, and name of teacher
-        else if (type.equals("teacher"))
-            meeting = new Meeting(data.split("&&")[0], data.split("&&")[2], data.split("&&")[3]);//show time, date , and name of student
-        else //if (type.equals("admin"))
-            meeting = new Meeting(data.split("&&")[0] + " - " + data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]); //show all
+        Meeting meeting = new Meeting(data.split("&&")[0],data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);//show time, date , and name of student
 
         meetingList.add(meeting);
 
@@ -305,6 +325,40 @@ public class MeetingsActivity extends AppCompatActivity {
         }
 
         return ret;
+    }
+
+
+
+    private void writeToFile(String data,Context context, String file) {
+
+
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file,MODE_PRIVATE)); // APPEND OR PRIVATE
+            outputStreamWriter.append(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private void uploadFile(String fileName,String path) {
+        Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
+        StorageReference riversRef = mStorageRef.child(path+ fileName);
+
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("Upload", "onSuccess: Upload succeeded");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Log.w("Upload", "onSuccess: Upload failed", exception);
+                    }
+                });
     }
 
 
