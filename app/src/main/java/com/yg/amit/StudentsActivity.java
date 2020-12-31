@@ -346,8 +346,8 @@ public class StudentsActivity extends AppCompatActivity {
     }
 
      private void createMeeting(String studentName,String time,String Date){
-        writeToFile(studentName+"&&"+name+"&&"+Date+"&&"+time+"&&",this,name+" - "+studentName+".txt");
-        uploadFile(name+ " - "+studentName+".txt","Meetings/Upcoming/");
+        writeToFile(studentName+"&&"+name+"&&"+Date+"&&"+time+"&&",this,studentName+" - "+name+".txt");
+        uploadFile(studentName+" - "+name+".txt","Meetings/Upcoming/");
      }
 
     @Override

@@ -84,32 +84,34 @@ public class MeetingsActivity extends AppCompatActivity {
 
         hasBeenEdited=false;
 
-        editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
-        editMeet.setContentView(R.layout.meeting_arrangement_dialog);
-        editMeet.setCanceledOnTouchOutside(true);
-        tvMeetCount = (TextView) editMeet.findViewById(R.id.tvMeetings);
-        tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
-        tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
-        tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);
-        tvDate = (TextView) editMeet.findViewById(R.id.tvDate2);
-        btnEdit = (MaterialButton) editMeet.findViewById(R.id.btnCreate);
-
-        sendMashov=new Dialog(this);
-        sendMashov.setContentView(R.layout.mashov_dialog);
-        ETM=(EditText)sendMashov.findViewById(R.id.ETMashov);
-        btnSend=(MaterialButton)sendMashov.findViewById(R.id.btnSend);
-
 
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
+
+        name = sharedPreferences.getString(Menu.NAME_KEY, "name");            //getting the users name
+        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");         // confirming the user type (student,teacher,admin)
+
+
+            editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
+            editMeet.setContentView(R.layout.meeting_arrangement_dialog);
+            editMeet.setCanceledOnTouchOutside(true);
+            tvMeetCount = (TextView) editMeet.findViewById(R.id.tvMeetings);
+            tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
+            tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
+            tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);
+            tvDate = (TextView) editMeet.findViewById(R.id.tvDate2);
+            btnEdit = (MaterialButton) editMeet.findViewById(R.id.btnCreate);
+
+            sendMashov = new Dialog(this);
+            sendMashov.setContentView(R.layout.mashov_dialog);
+            ETM = (EditText) sendMashov.findViewById(R.id.ETMashov);
+            btnSend = (MaterialButton) sendMashov.findViewById(R.id.btnSend);
+
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         meetingList = new ArrayList<Meeting>();
 
         lv = (ListView) findViewById(R.id.lv);
-
-        name = sharedPreferences.getString(Menu.NAME_KEY, "name");            //getting the users name
-        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");         // confirming the user type (student,teacher,admin)
 
         pd = ProgressDialog.show(this, "פגישות", "מוריד נתונים...", true);
         pd.setCancelable(false);
@@ -144,19 +146,19 @@ public class MeetingsActivity extends AppCompatActivity {
 
             DatePickerDialog.OnDateSetListener mDateSetListener;
 
-            mDateSetListener=new DatePickerDialog.OnDateSetListener() {
+            mDateSetListener = new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                     month = month + 1;
                     Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
 
-                    String d=""+day;
-                    if(day<10){
-                        d="0"+day;
+                    String d = "" + day;
+                    if (day < 10) {
+                        d = "0" + day;
                     }
-                    String m=""+month;
-                    if(month<10){
-                        m="0"+month;
+                    String m = "" + month;
+                    if (month < 10) {
+                        m = "0" + month;
                     }
                     String date = d + "/" + m + "/" + year;
 
@@ -172,7 +174,7 @@ public class MeetingsActivity extends AppCompatActivity {
                             MeetingsActivity.this,
                             android.R.style.Theme_Holo_Light_Dialog_MinWidth,
                             mDateSetListener,
-                            Integer.parseInt(tvDate.getText().toString().substring(6,10)),Integer.parseInt(tvDate.getText().toString().substring(3,5)), Integer.parseInt(tvDate.getText().toString().substring(0,2)));
+                            Integer.parseInt(tvDate.getText().toString().substring(6, 10)), Integer.parseInt(tvDate.getText().toString().substring(3, 5)), Integer.parseInt(tvDate.getText().toString().substring(0, 2)));
 
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialog.show();
@@ -204,12 +206,14 @@ public class MeetingsActivity extends AppCompatActivity {
 
                 }
             });
-
+        }
 
 
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+
                         tvSName.setText(meetingList.get(i).getStudent());
                         tvDate.setText(meetingList.get(i).getDate());
                         tvTime.setText(meetingList.get(i).getTime());
@@ -221,6 +225,15 @@ public class MeetingsActivity extends AppCompatActivity {
                         num2.setText("");
 
                         btnEdit.setText("שמור שינויים");
+
+                        if(!type.equals("teacher")){
+                            btnEdit.setVisibility(View.GONE);
+                            tvDiaTitle.setText(" פגישה");
+                            editMeet.getWindow().setLayout(600,900);
+                        }
+                        if(type.equals("student"))
+                            tvSName.setText(meetingList.get(i).getTeacher());
+
                         btnEdit.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -237,7 +250,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
                                 String data=meeting.getStudent()+"&&"+meeting.getTeacher()+"&&"+Date+"&&"+time+"&&";
 
-                                String fileName=meeting.getTeacher()+" - "+meeting.getStudent()+".txt";
+                                String fileName=meeting.getStudent()+" - "+meeting.getTeacher()+".txt";
                                 writeToFile(data,getApplicationContext(),fileName);//update the meeting counter
                                 uploadFile(fileName,"Meetings/Upcoming/");//
 
@@ -249,7 +262,8 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
                         MaterialButton done = (MaterialButton) editMeet.findViewById(R.id.btnMeetingDone);
-                        done.setVisibility(View.VISIBLE);
+                        if(type.equals("teacher"))
+                            done.setVisibility(View.VISIBLE);
                         done.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -261,7 +275,7 @@ public class MeetingsActivity extends AppCompatActivity {
                                     public void onClick(View view) {
                                         String mashov=ETM.getText().toString();
 
-                                        String fileName=meetingList.get(i).getTeacher()+" - "+meetingList.get(i).getStudent()+".txt";
+                                        String fileName=meetingList.get(i).getStudent()+" - "+meetingList.get(i).getTeacher()+".txt";
 
                                         StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/"+fileName);
 
@@ -288,7 +302,6 @@ public class MeetingsActivity extends AppCompatActivity {
                                     }
                                 });
 
-                                //TODO remove meeting from teacher and students feed, add the mashov to the meeting's file, and move it to a location where we will store all the meetings that were done
                                 //TODO add one to the meeting count of the teacher
 
                             }
@@ -299,7 +312,7 @@ public class MeetingsActivity extends AppCompatActivity {
                     }
                 });
             }
-        }
+
 
 
     /**
