@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -44,16 +45,19 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class MeetingsActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPreferences;
 
+    private Context context;
     private String name, type;
 
     private ArrayList<Meeting> meetingList;
+    private ArrayAdapter<Meeting> meetingAdapter;
+
     private ListView lv;
-    private MeetingAdapter meetingAdapter;
     private String data;
     private Dialog editMeet;
     private MaterialButton btnEdit;
@@ -84,6 +88,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
         hasBeenEdited=false;
 
+        context=this;
 
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
@@ -111,13 +116,15 @@ public class MeetingsActivity extends AppCompatActivity {
 
         meetingList = new ArrayList<Meeting>();
 
+
         lv = (ListView) findViewById(R.id.lv);
 
         pd = ProgressDialog.show(this, "פגישות", "מוריד נתונים...", true);
         pd.setCancelable(false);
         pd.show();
 
-        mStorageRef.child("Meetings/Upcoming").listAll()
+
+        mStorageRef.child("Meetings/").child("Upcoming/").listAll()
                 .addOnSuccessListener(listResult -> {
                     for (StorageReference prefix : listResult.getPrefixes()) {
                         // All the prefixes under listRef.
@@ -126,14 +133,18 @@ public class MeetingsActivity extends AppCompatActivity {
 
                     for (StorageReference item : listResult.getItems()) {
                         // All the items under listRef.
-                        if (item.getName().contains(name) || type.equals("admin")) { // if the meeting as connected to the user (contains his name) or if the user is an admin
-                            downloadFile(item.getName());
-                        }
+                        if(item.getName().contains(name)||type.equals("admin"))
+                        meetingList.add(new Meeting(item.getName().split("&")[0],item.getName().split("&")[1].replace(".txt",""),"0","0"));
+
+                        meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
+                        lv.setAdapter(meetingAdapter);
 
                     }
 
                     if (listResult.getItems().isEmpty())
                         Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
+
+
 
                     pd.dismiss();
                 })
@@ -141,6 +152,9 @@ public class MeetingsActivity extends AppCompatActivity {
                     // Uh-oh, an error occurred!
                     Log.w("getMeetings", "onFailure: ", e);
                 });
+
+
+
 
         if (type.equals("teacher")) {//if user is of type teacher he may edit the meeting
 
@@ -210,29 +224,17 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+                        pd = ProgressDialog.show(context, "פגישה", "מוריד נתונים...", true);
+                        pd.setCancelable(false);
+                        pd.show();
+                        downloadFile(meetingList.get(i).getFileName(),i);
 
-                        tvSName.setText(meetingList.get(i).getStudent());
-                        tvDate.setText(meetingList.get(i).getDate());
-                        tvTime.setText(meetingList.get(i).getTime());
-                        tvDiaTitle.setText((" ערוך פגישה"));
 
-                        TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
-                        num1.setText("");
-                        TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
-                        num2.setText("");
-
-                        btnEdit.setText("שמור שינויים");
-
-                        if(!type.equals("teacher")){
-                            btnEdit.setVisibility(View.GONE);
-                            tvDiaTitle.setText(" פגישה");
-                            editMeet.getWindow().setLayout(600,900);
-                        }
-                        if(type.equals("student"))
-                            tvSName.setText(meetingList.get(i).getTeacher());
+                        //TODO add a button that adds the meeting to the users calendar when pressed
 
                         btnEdit.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -246,11 +248,11 @@ public class MeetingsActivity extends AppCompatActivity {
 
                                 meeting.setDate(Date);
                                 meeting.setTime(time);
-                                lv.setAdapter(meetingAdapter);
+                                //lv.setAdapter(meetingAdapter);
 
                                 String data=meeting.getStudent()+"&&"+meeting.getTeacher()+"&&"+Date+"&&"+time+"&&";
 
-                                String fileName=meeting.getStudent()+" - "+meeting.getTeacher()+".txt";
+                                String fileName=meeting.getStudent()+"&"+meeting.getTeacher()+".txt";
                                 writeToFile(data,getApplicationContext(),fileName);//update the meeting counter
                                 uploadFile(fileName,"Meetings/Upcoming/");//
 
@@ -275,7 +277,7 @@ public class MeetingsActivity extends AppCompatActivity {
                                     public void onClick(View view) {
                                         String mashov=ETM.getText().toString();
 
-                                        String fileName=meetingList.get(i).getStudent()+" - "+meetingList.get(i).getTeacher()+".txt";
+                                        String fileName=meetingList.get(i).getStudent()+"&"+meetingList.get(i).getTeacher()+".txt";
 
                                         StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/"+fileName);
 
@@ -296,7 +298,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
                                         Toast.makeText(getApplicationContext(),"המשוב על הפגישה עם "+meetingList.get(i).getStudent()+" נשלח בהצלחה",Toast.LENGTH_LONG).show();
                                         meetingList.remove(i);
-                                        lv.setAdapter(meetingAdapter);
+                                      //  lv.setAdapter(meetingAdapter);
                                         sendMashov.hide();
                                         editMeet.hide();
                                     }
@@ -308,7 +310,6 @@ public class MeetingsActivity extends AppCompatActivity {
                         });
 
 
-                        editMeet.show();
                     }
                 });
             }
@@ -319,14 +320,14 @@ public class MeetingsActivity extends AppCompatActivity {
      * method used to download data files from firebase
      * @param file- String containing the name of the file with all the meeting information
      */
-    private void downloadFile(String file) {
+    private void downloadFile(String file ,int i) {
         File localFile = new File(getFilesDir() + "/" + file);
 
         mStorageRef.child("Meetings/Upcoming/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
-                    updateMeeting(file);
+                    updateMeeting(file,i);
                 }).addOnFailureListener(exception -> {
             // Handle failed download
             Log.w("Download", "onFailure: Download failed", exception);
@@ -338,16 +339,39 @@ public class MeetingsActivity extends AppCompatActivity {
      * Initializes the meetingList and fills it with all the meetings read from the appropriate file
      * @param file- name of the meeting file
      */
-    private void updateMeeting(String file) {
+    private void updateMeeting(String file,int i) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateMeeting: " + data);
 
         Meeting meeting = new Meeting(data.split("&&")[0],data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]);//show time, date , and name of student
 
-        meetingList.add(meeting);
 
-        meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
-        lv.setAdapter(meetingAdapter);
+        meetingList.set(i,meeting);
+
+        tvSName.setText(meetingList.get(i).getStudent());
+        tvDate.setText(meetingList.get(i).getDate());
+        tvTime.setText(meetingList.get(i).getTime());
+        tvDiaTitle.setText((" ערוך פגישה"));
+
+        TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
+        num1.setText("");
+        TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
+        num2.setText("");
+
+        btnEdit.setText("שמור שינויים");
+
+        if(!type.equals("teacher")){
+            btnEdit.setVisibility(View.GONE);
+            tvDiaTitle.setText(" פגישה");
+            editMeet.getWindow().setLayout(600,900);
+        }
+        if(type.equals("student"))
+            tvSName.setText(meetingList.get(i).getTeacher());
+
+        pd.dismiss();
+        editMeet.show();
+       // meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
+       // lv.setAdapter(meetingAdapter);
     }
 
 

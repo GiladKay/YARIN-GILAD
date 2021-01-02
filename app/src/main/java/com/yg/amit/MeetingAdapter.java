@@ -50,8 +50,6 @@ public class MeetingAdapter extends ArrayAdapter<Meeting> {
 
 
         TextView tvPerson = (TextView) view.findViewById(R.id.tvPerson);
-        TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
-        TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
 
 
 
@@ -67,8 +65,6 @@ public class MeetingAdapter extends ArrayAdapter<Meeting> {
         else
             tvPerson.setText(temp.getStudent()+" - "+temp.getTeacher());
 
-        tvDate.setText(temp.getDate());
-        tvTime.setText(temp.getTime());
 
 
 

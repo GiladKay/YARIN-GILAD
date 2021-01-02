@@ -70,7 +70,7 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
                     }
 
                     if (listResult.getItems().isEmpty())
-                        Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "אין כיתות", Toast.LENGTH_LONG).show();
 
                     ClassAdapter cAdapter = new ClassAdapter(this, 0, 0, classList);
 

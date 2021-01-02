@@ -13,11 +13,12 @@ public class Meeting {
 
     public String getTeacher() { return teacher; }
 
-    public void setTeacher(String teacher) { this.teacher = teacher; }
 
     public String getStudent() { return student; }
 
-    public void setStudent(String student) { this.student = student; }
+    public String getFileName(){
+        return student+"&"+teacher+".txt";
+    }
 
     public String getDate() {
         return date;
