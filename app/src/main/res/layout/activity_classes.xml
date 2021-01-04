@@ -4,31 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorSecondary"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".ClassesActivity">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/colorPrimary"
-        android:shadowColor="@color/black"
-        android:shadowDx="5"
-        android:shadowDy="5"
-        android:shadowRadius="5"
-        android:text="רשימת כיתות"
-        android:textSize="40sp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:textStyle="bold" />
+    <include
+        android:id="@+id/toolbar3"
+        layout="@layout/toolbar"
+        ></include>
+
+
 
     <ListView
         android:id="@+id/lvClasses"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="20dp" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>

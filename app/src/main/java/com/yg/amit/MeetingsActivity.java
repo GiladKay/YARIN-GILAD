@@ -2,6 +2,7 @@ package com.yg.amit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -16,6 +17,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -67,12 +69,10 @@ public class MeetingsActivity extends AppCompatActivity {
     private MaterialButton btnSend;
 
 
-    private TextView tvTitle;   // Title of the activity
 
-    private TextView tvSName, tvMeetCount,tvDiaTitle;
+    private TextView tvSName,tvDiaTitle;
     private TextView tvDate, tvTime;
 
-    private boolean hasBeenEdited;
 
     private StorageReference mStorageRef;
 
@@ -80,13 +80,54 @@ public class MeetingsActivity extends AppCompatActivity {
 
     private int tHour, tMinute;
 
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.student_menu,menu);
+
+        if(type.equals("admin"))
+            menu.findItem(R.id.sAndTMashov).setVisible(true);
+        if(!type.equals("teacher"))
+            menu.findItem(R.id.tMashov).setVisible(true);
+        if(!type.equals("student"))
+            menu.findItem(R.id.upcoming).setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id= item.getItemId();
+
+        switch (id){
+            case R.id.upcoming:
+                lv.setAdapter(meetingAdapter);
+                break;
+            case R.id.tMashov:
+                //TODO list all meetings with teacher mashov only (Done directory)
+                break;
+            case R.id.sAndTMashov:
+                //TODO list all meetings with teacher and student mashov (Finish Directory)
+                break;
+
+            case R.id.exit:
+                finish();
+                break;
+
+        }
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meetings);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
-        hasBeenEdited=false;
+
+        Toolbar toolbar=findViewById(R.id.toolbar3);
+        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("פגישות");
+        setSupportActionBar(toolbar);
 
         context=this;
 
@@ -99,7 +140,6 @@ public class MeetingsActivity extends AppCompatActivity {
             editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
             editMeet.setContentView(R.layout.meeting_arrangement_dialog);
             editMeet.setCanceledOnTouchOutside(true);
-            tvMeetCount = (TextView) editMeet.findViewById(R.id.tvMeetings);
             tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
             tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
             tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);

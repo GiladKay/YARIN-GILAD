@@ -2,6 +2,7 @@ package com.yg.amit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -63,7 +64,6 @@ public class StudentsActivity extends AppCompatActivity {
 
     private boolean hasBeenEdited=false; // remembers if an edit to the students has occurred
 
-    private TextView tvTitle;   // Title of the activity
     private TextView tvSName, tvMeetCount;
 
     private ProgressDialog pd;
@@ -103,9 +103,7 @@ public class StudentsActivity extends AppCompatActivity {
         btnCreate = (MaterialButton) arrMeeting.findViewById(R.id.btnCreate);
 
         lvS = (ListView) findViewById(R.id.lvStudents);
-        tvTitle = (TextView) findViewById(R.id.tvClassTitle);
 
-        tvTitle.setText(className);
 
         pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
         pd.setCancelable(false);
@@ -196,6 +194,12 @@ public class StudentsActivity extends AppCompatActivity {
 
             }
         });
+
+
+        Toolbar toolbar=findViewById(R.id.toolbar3);
+        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("כיתה "+className);
+        setSupportActionBar(toolbar);
 
     }
 

@@ -4,34 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorSecondary"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".TeacherActivity">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tv4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:fontFamily="sans-serif"
-        android:textColor="@color/colorPrimary"
-        android:shadowColor="@color/black"
-        android:shadowDx="5"
-        android:shadowDy="5"
-        android:shadowRadius="5"
-        android:textSize="40sp"
-        android:text="מורים"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="50dp"
-        android:textStyle="bold" />
-
+    <include
+        android:id="@+id/toolbar3"
+        layout="@layout/toolbar"
+        ></include>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginRight="15dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitle8"
@@ -40,9 +28,6 @@
             android:layout_weight="1"
             android:paddingRight="5dp"
             android:textColor="@color/colorPrimary"
-            android:shadowColor="@color/black"
-            android:shadowDx="5"
-            android:shadowDy="5"
             android:shadowRadius="5"
             android:textSize="25sp"
             android:textStyle="bold"
@@ -55,10 +40,6 @@
             android:layout_weight="1"
             android:paddingRight="5dp"
             android:textColor="@color/colorPrimary"
-            android:shadowColor="@color/black"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
             android:textSize="25sp"
             android:textStyle="bold"
             android:text="שם" />
@@ -68,6 +49,6 @@
         android:id="@+id/lvTeachers"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp" />
+        android:layout_marginRight="15dp"/>
 
 </LinearLayout>

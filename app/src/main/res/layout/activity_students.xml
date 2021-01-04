@@ -4,33 +4,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorSecondary"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".StudentsActivity">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvClassTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="שם כיתה"
-        android:textColor="@color/colorPrimary"
-        android:shadowColor="@color/black"
-        android:shadowDx="5"
-        android:shadowDy="5"
-        android:shadowRadius="5"
-        android:textSize="40sp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:textStyle="bold" />
+    <include
+        android:id="@+id/toolbar3"
+        layout="@layout/toolbar"
+        ></include>
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp">
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="15dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitle1"
@@ -39,10 +29,6 @@
             android:layout_weight="3"
             android:paddingRight="5dp"
             android:textColor="@color/colorPrimary"
-            android:shadowColor="@color/black"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="5"
             android:textSize="30sp"
             android:textStyle="bold"
             android:text="פגישות" />
@@ -54,10 +40,8 @@
             android:layout_weight="2"
             android:paddingRight="5dp"
             android:textColor="@color/colorPrimary"
-            android:shadowColor="@color/black"
-            android:shadowDx="5"
-            android:shadowDy="5"
             android:shadowRadius="5"
+            android:layout_marginRight="10dp"
             android:textSize="30sp"
             android:textStyle="bold"
             android:text="שם" />
@@ -68,6 +52,6 @@
         android:id="@+id/lvStudents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp" />
+        android:layout_marginRight="15dp"/>
 
 </LinearLayout>

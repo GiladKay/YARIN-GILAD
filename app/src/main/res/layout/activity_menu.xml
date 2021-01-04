@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorSecondary"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".Menu">
 
-    <Button
-        android:id="@+id/btnAccount"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/account" />
+    <include
+        android:id="@+id/toolbar3"
+        layout="@layout/toolbar"
+        ></include>
+
+
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvTitle"
@@ -22,15 +21,15 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:fontFamily="sans-serif"
-        android:textColor="@color/colorPrimary"
-        android:shadowColor="@color/black"
-        android:shadowDx="5"
-        android:shadowDy="5"
-        android:shadowRadius="5"
+        android:textColor="@color/white"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:shadowRadius="10"
         android:text="שלום תלמיד"
         android:textSize="40sp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="50dp"
+        android:background="#FF3A3A"
         android:textStyle="bold" />
 
     <com.google.android.material.button.MaterialButton
@@ -38,11 +37,12 @@
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:text="פגישות"
+        android:paddingTop="10dp"
+        android:paddingBottom="20dp"
         android:textSize="30sp"
         android:fontFamily="sans-serif"
+        android:backgroundTint="#251EFF"
         android:textStyle="bold"/>
 
     <com.google.android.material.button.MaterialButton
@@ -50,10 +50,11 @@
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="15dp"
         android:text="כיתות"
         android:textSize="30sp"
+        android:backgroundTint="#15DC65"
         android:fontFamily="sans-serif"
         android:textStyle="bold"/>
 
@@ -62,10 +63,12 @@
         style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:text="מורים"
+        android:paddingTop="10dp"
+        android:paddingBottom="15dp"
         android:textSize="30sp"
+
+        android:backgroundTint="#07A5FF"
         android:fontFamily="sans-serif"
         android:textStyle="bold"/>
 

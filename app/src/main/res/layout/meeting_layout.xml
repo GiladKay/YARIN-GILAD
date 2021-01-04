@@ -18,14 +18,12 @@
             android:layout_weight="1"
             android:layout_marginRight="10dp"
             android:paddingRight="5dp"
-            android:shadowColor="@color/black"
-            android:shadowDx="4"
-            android:shadowDy="4"
             android:shadowRadius="5"
             android:text="דוגמה"
-            android:textColor="@color/colorPrimary"
-            android:textSize="30sp"
-            android:paddingBottom="15dp"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:paddingBottom="10dp"
+            android:paddingTop="15dp"
             android:textStyle="bold" />
 
     </LinearLayout>

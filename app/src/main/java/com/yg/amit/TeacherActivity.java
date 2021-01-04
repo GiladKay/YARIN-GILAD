@@ -1,6 +1,8 @@
 package com.yg.amit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -8,9 +10,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -34,11 +38,28 @@ public class TeacherActivity extends AppCompatActivity {
     private ProgressDialog pd;
     private String data;
 
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.student_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        finish();
+        return true;
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
+
+        Toolbar toolbar=findViewById(R.id.toolbar3);
+        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("מורים");
+        setSupportActionBar(toolbar);
 
         lvT=(ListView)findViewById(R.id.lvTeachers);
 
@@ -48,6 +69,8 @@ public class TeacherActivity extends AppCompatActivity {
         pd = newPd;
         pd.setCancelable(false);
         pd.show();
+
+
 
         downloadFile("Teachers.txt");
 

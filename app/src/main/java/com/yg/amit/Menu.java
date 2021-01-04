@@ -1,12 +1,15 @@
 package com.yg.amit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -28,10 +31,30 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private Button btnUpcoming, btnClasses, btnTeachers, btnAccount;
 
     @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.student_menu,menu);
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        finish();
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
+
+        Toolbar toolbar=findViewById(R.id.toolbar3);
+        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("תפריט ");
+        toolbar.findViewById(R.id.btnAccount).setVisibility(View.VISIBLE);
+        setSupportActionBar(toolbar);
 
         sharedPreferences = getSharedPreferences(AMIT_SP, MODE_PRIVATE);
 
