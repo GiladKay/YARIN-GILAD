@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -59,6 +60,8 @@ public class MeetingsActivity extends AppCompatActivity {
     private ArrayList<Meeting> meetingList;
     private ArrayAdapter<Meeting> meetingAdapter;
 
+    private ArrayList<Meeting> doneList;
+
     private ListView lv;
     private String data;
     private Dialog editMeet;
@@ -69,6 +72,10 @@ public class MeetingsActivity extends AppCompatActivity {
     private MaterialButton btnSend;
 
 
+    private int mode;
+    public static final int MODE_UPCOMING=0;
+    public static final int MODE_DONE=1;
+    public static final int MODE_FINISHED=2;
 
     private TextView tvSName,tvDiaTitle;
     private TextView tvDate, tvTime;
@@ -87,10 +94,10 @@ public class MeetingsActivity extends AppCompatActivity {
 
         if(type.equals("admin"))
             menu.findItem(R.id.sAndTMashov).setVisible(true);
-        if(!type.equals("teacher"))
+        if(!type.equals("teacher")) {
             menu.findItem(R.id.tMashov).setVisible(true);
-        if(!type.equals("student"))
             menu.findItem(R.id.upcoming).setVisible(true);
+        }
         return true;
     }
 
@@ -101,12 +108,20 @@ public class MeetingsActivity extends AppCompatActivity {
         switch (id){
             case R.id.upcoming:
                 lv.setAdapter(meetingAdapter);
+                if(meetingList.isEmpty())
+                    Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
+                mode=MODE_UPCOMING;
                 break;
             case R.id.tMashov:
-                //TODO list all meetings with teacher mashov only (Done directory)
+                MeetingAdapter meetingAdapter=new MeetingAdapter(context,0,0,doneList);
+                lv.setAdapter(meetingAdapter);
+                if(doneList.isEmpty())
+                    Toast.makeText(this, "אין פגישות שצריכות משוב", Toast.LENGTH_LONG).show();
+                mode=MODE_DONE;
                 break;
             case R.id.sAndTMashov:
                 //TODO list all meetings with teacher and student mashov (Finish Directory)
+                mode=MODE_FINISHED;
                 break;
 
             case R.id.exit:
@@ -131,6 +146,8 @@ public class MeetingsActivity extends AppCompatActivity {
 
         context=this;
 
+        mode=MODE_UPCOMING;
+
         sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
 
         name = sharedPreferences.getString(Menu.NAME_KEY, "name");            //getting the users name
@@ -140,6 +157,8 @@ public class MeetingsActivity extends AppCompatActivity {
             editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
             editMeet.setContentView(R.layout.meeting_arrangement_dialog);
             editMeet.setCanceledOnTouchOutside(true);
+            editMeet.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+
             tvSName = (TextView) editMeet.findViewById(R.id.tvStudentName);
             tvDiaTitle = (TextView) editMeet.findViewById(R.id.tvTitle3);
             tvTime = (TextView) editMeet.findViewById(R.id.tvTime2);
@@ -154,7 +173,8 @@ public class MeetingsActivity extends AppCompatActivity {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        meetingList = new ArrayList<Meeting>();
+        meetingList = new ArrayList<>();
+        doneList = new ArrayList<>();
 
 
         lv = (ListView) findViewById(R.id.lv);
@@ -181,7 +201,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
                     }
 
-                    if (listResult.getItems().isEmpty())
+                    if (meetingList.isEmpty())
                         Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
 
 
@@ -193,6 +213,29 @@ public class MeetingsActivity extends AppCompatActivity {
                     Log.w("getMeetings", "onFailure: ", e);
                 });
 
+        mStorageRef.child("Meetings/").child("Done/").listAll()
+                .addOnSuccessListener(listResult -> {
+                    for (StorageReference prefix : listResult.getPrefixes()) {
+                        // All the prefixes under listRef.
+                        // You may call listAll() recursively on them.
+                    }
+
+                    for (StorageReference item : listResult.getItems()) {
+                        // All the items under listRef.
+                        if(item.getName().contains(name)||type.equals("admin"))
+                            doneList.add(new Meeting(item.getName().split("&")[0],item.getName().split("&")[1].replace(".txt",""),"0","0"));
+
+
+                    }
+
+
+
+                    pd.dismiss();
+                })
+                .addOnFailureListener(e -> {
+                    // Uh-oh, an error occurred!
+                    Log.w("getMeetings", "onFailure: ", e);
+                });
 
 
 
@@ -271,7 +314,23 @@ public class MeetingsActivity extends AppCompatActivity {
                         pd = ProgressDialog.show(context, "פגישה", "מוריד נתונים...", true);
                         pd.setCancelable(false);
                         pd.show();
-                        downloadFile(meetingList.get(i).getFileName(),i);
+
+                        if(mode==MODE_UPCOMING) {
+                            if(type.equals("student"))
+                            btnEdit.setVisibility(View.GONE);
+                            downloadUpcomingFile(meetingList.get(i).getFileName(), i);
+                        }
+
+                        if(mode==MODE_DONE) {
+                            if(type.equals("student")) {
+                                MaterialButton btndone = editMeet.findViewById(R.id.btnMeetingDone);
+                                btndone.setText("כתוב משוב");
+                            }
+                            downloadDoneFile(doneList.get(i).getFileName(), i);
+                        }
+                        if(mode==MODE_FINISHED){
+
+                        }
 
 
                         //TODO add a button that adds the meeting to the users calendar when pressed
@@ -309,7 +368,7 @@ public class MeetingsActivity extends AppCompatActivity {
                         done.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                sendMashov.getWindow().setLayout(700,900);
+                                sendMashov.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
                                 sendMashov.show();
 
                                 btnSend.setOnClickListener(new View.OnClickListener() {
@@ -317,27 +376,58 @@ public class MeetingsActivity extends AppCompatActivity {
                                     public void onClick(View view) {
                                         String mashov=ETM.getText().toString();
 
-                                        String fileName=meetingList.get(i).getStudent()+"&"+meetingList.get(i).getTeacher()+".txt";
+                                        mashov.replace("&&"," ");
 
-                                        StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/"+fileName);
+                                        if(type.equals("teacher")) {
+                                            String fileName = meetingList.get(i).getStudent() + "&" + meetingList.get(i).getTeacher() + ".txt";
 
-                                        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void aVoid) {
-                                                // File deleted successfully
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception exception) {
-                                                // Uh-oh, an error occurred!
-                                            }
-                                        });
+                                            StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + fileName);
 
-                                        writeToFile(mashov,getApplicationContext(),fileName);//update the meeting counter
-                                        uploadFile(fileName,"Meetings/Done/");//
+                                            desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // File deleted successfully
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    // Uh-oh, an error occurred!
+                                                }
+                                            });
 
-                                        Toast.makeText(getApplicationContext(),"המשוב על הפגישה עם "+meetingList.get(i).getStudent()+" נשלח בהצלחה",Toast.LENGTH_LONG).show();
-                                        meetingList.remove(i);
+                                            String fileText = meetingList.get(i).getStudent() + "&&" + meetingList.get(i).getTeacher() + "&&"  + meetingList.get(i).getDate()+"&&"+ meetingList.get(i).getTime() + "&&" + mashov + "&&";
+                                            writeToFile(fileText, getApplicationContext(), fileName);//update the meeting counter
+                                            uploadFile(fileName, "Meetings/Done/");//
+
+                                            Toast.makeText(getApplicationContext(), "המשוב על הפגישה עם " + meetingList.get(i).getStudent() + " נשלח בהצלחה", Toast.LENGTH_LONG).show();
+                                            meetingList.remove(i);
+
+                                        }
+
+                                        if(type.equals("student")){
+                                            String fileName = doneList.get(i).getStudent() + "&" + doneList.get(i).getTeacher() + ".txt";
+
+                                            StorageReference desertRef = mStorageRef.child("Meetings/Done/" + fileName);
+
+                                            desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    // File deleted successfully
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception exception) {
+                                                    // Uh-oh, an error occurred!
+                                                }
+                                            });
+
+                                            String fileText = doneList.get(i).getStudent() + "&&" + doneList.get(i).getTeacher() +"&&" + mashov + "&&"+doneList.get(i).getMashov()+"&&";
+                                            writeToFile(fileText, getApplicationContext(), fileName);//update the meeting counter
+                                            uploadFile(fileName, "Meetings/Finished/");//
+
+                                            Toast.makeText(getApplicationContext(), "המשוב על הפגישה עם " + doneList.get(i).getTeacher() + " נשלח בהצלחה", Toast.LENGTH_LONG).show();
+                                            doneList.remove(i);
+                                        }
                                       //  lv.setAdapter(meetingAdapter);
                                         sendMashov.hide();
                                         editMeet.hide();
@@ -360,14 +450,14 @@ public class MeetingsActivity extends AppCompatActivity {
      * method used to download data files from firebase
      * @param file- String containing the name of the file with all the meeting information
      */
-    private void downloadFile(String file ,int i) {
+    private void downloadUpcomingFile(String file ,int i) {
         File localFile = new File(getFilesDir() + "/" + file);
 
         mStorageRef.child("Meetings/Upcoming/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
-                    updateMeeting(file,i);
+                    updateUpcomingMeeting(file,i);
                 }).addOnFailureListener(exception -> {
             // Handle failed download
             Log.w("Download", "onFailure: Download failed", exception);
@@ -379,7 +469,7 @@ public class MeetingsActivity extends AppCompatActivity {
      * Initializes the meetingList and fills it with all the meetings read from the appropriate file
      * @param file- name of the meeting file
      */
-    private void updateMeeting(String file,int i) {
+    private void updateUpcomingMeeting(String file,int i) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateMeeting: " + data);
 
@@ -405,8 +495,10 @@ public class MeetingsActivity extends AppCompatActivity {
             tvDiaTitle.setText(" פגישה");
             editMeet.getWindow().setLayout(600,900);
         }
-        if(type.equals("student"))
+        if(type.equals("student")) {
+            btnEdit.setVisibility(View.GONE);
             tvSName.setText(meetingList.get(i).getTeacher());
+        }
 
         pd.dismiss();
         editMeet.show();
@@ -485,6 +577,61 @@ public class MeetingsActivity extends AppCompatActivity {
     }
 
 
+
+    private void downloadDoneFile(String file ,int i) {
+        File localFile = new File(getFilesDir() + "/" + file);
+
+        mStorageRef.child("Meetings/Done/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    updateDoneMeeting(file,i);
+                }).addOnFailureListener(exception -> {
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
+
+    }
+
+    private void updateDoneMeeting(String file,int i) {
+        data = readFromFile(this, file);
+        Log.d("TAG", "updateMeeting: " + data);
+
+        Meeting meeting = new Meeting(data.split("&&")[0],data.split("&&")[1], data.split("&&")[2], data.split("&&")[3],data.split("&&")[4]);//show time, date , and name of student
+
+
+        doneList.set(i,meeting);
+
+        tvSName.setText(doneList.get(i).getStudent());
+        tvDate.setText(doneList.get(i).getDate());
+        tvTime.setText(doneList.get(i).getTime());
+
+
+        tvDiaTitle.setText((" הוסף משוב"));
+
+        TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
+        num1.setText("");
+        TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
+        num2.setText("");
+
+        btnEdit.setVisibility(View.GONE);
+        if(type.equals("admin")){
+            tvDiaTitle.setText(" משוב מורה");
+            TextView tvMashov=editMeet.findViewById(R.id.disTMashov);
+            tvMashov.setVisibility(View.VISIBLE);
+            tvMashov.setText(doneList.get(i).getMashov());
+        }
+        if(type.equals("student")) {
+            tvSName.setText(doneList.get(i).getTeacher());
+            MaterialButton btndone=editMeet.findViewById(R.id.btnMeetingDone);
+            btndone.setVisibility(View.VISIBLE);
+        }
+
+        pd.dismiss();
+        editMeet.show();
+        // meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
+        // lv.setAdapter(meetingAdapter);
+    }
 
     @Override
     public void onBackPressed() {

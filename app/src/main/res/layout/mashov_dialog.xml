@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BABF24">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:ems="10"
             android:gravity="start|top"
             android:inputType="textMultiLine"
-            android:background="@color/white"/>
+            android:background="#D4D4D4"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSend"

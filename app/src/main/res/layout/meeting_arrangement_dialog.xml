@@ -156,6 +156,17 @@
         </TextView>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/disTMashov"
+        android:layout_width="match_parent"
+        android:layout_height="247dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:background="@color/white"
+        android:textColor="@color/black"
+        android:textSize="27sp"
+        android:visibility="gone"/>
 
 <LinearLayout
     android:layout_width="match_parent"
