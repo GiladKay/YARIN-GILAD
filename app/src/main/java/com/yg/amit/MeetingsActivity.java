@@ -3,6 +3,7 @@ package com.yg.amit;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.widget.NestedScrollView;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -25,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -61,6 +63,10 @@ public class MeetingsActivity extends AppCompatActivity {
     private ArrayAdapter<Meeting> meetingAdapter;
 
     private ArrayList<Meeting> doneList;
+    private MeetingAdapter doneAdapter;
+
+    private ArrayList<Meeting> finishedList;
+    private MeetingAdapter finishedAdapter;
 
     private ListView lv;
     private String data;
@@ -113,14 +119,15 @@ public class MeetingsActivity extends AppCompatActivity {
                 mode=MODE_UPCOMING;
                 break;
             case R.id.tMashov:
-                MeetingAdapter meetingAdapter=new MeetingAdapter(context,0,0,doneList);
-                lv.setAdapter(meetingAdapter);
+                lv.setAdapter(doneAdapter);
                 if(doneList.isEmpty())
                     Toast.makeText(this, "אין פגישות שצריכות משוב", Toast.LENGTH_LONG).show();
                 mode=MODE_DONE;
                 break;
             case R.id.sAndTMashov:
-                //TODO list all meetings with teacher and student mashov (Finish Directory)
+                lv.setAdapter(finishedAdapter);
+                if(finishedList.isEmpty())
+                    Toast.makeText(this, "אין פגישות עם משוב מורה-תלמיד", Toast.LENGTH_LONG).show();
                 mode=MODE_FINISHED;
                 break;
 
@@ -175,6 +182,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
         meetingList = new ArrayList<>();
         doneList = new ArrayList<>();
+        finishedList = new ArrayList<>();
 
 
         lv = (ListView) findViewById(R.id.lv);
@@ -213,29 +221,53 @@ public class MeetingsActivity extends AppCompatActivity {
                     Log.w("getMeetings", "onFailure: ", e);
                 });
 
-        mStorageRef.child("Meetings/").child("Done/").listAll()
-                .addOnSuccessListener(listResult -> {
-                    for (StorageReference prefix : listResult.getPrefixes()) {
-                        // All the prefixes under listRef.
-                        // You may call listAll() recursively on them.
-                    }
+        if(!type.equals("teacher")) {
+            mStorageRef.child("Meetings/").child("Done/").listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference prefix : listResult.getPrefixes()) {
+                            // All the prefixes under listRef.
+                            // You may call listAll() recursively on them.
+                        }
 
-                    for (StorageReference item : listResult.getItems()) {
-                        // All the items under listRef.
-                        if(item.getName().contains(name)||type.equals("admin"))
-                            doneList.add(new Meeting(item.getName().split("&")[0],item.getName().split("&")[1].replace(".txt",""),"0","0"));
-
-
-                    }
+                        for (StorageReference item : listResult.getItems()) {
+                            // All the items under listRef.
+                            if (item.getName().contains(name) || type.equals("admin"))
+                                doneList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
 
 
+                            doneAdapter=new MeetingAdapter(context,0,0,doneList);
+                        }
 
-                    pd.dismiss();
-                })
-                .addOnFailureListener(e -> {
-                    // Uh-oh, an error occurred!
-                    Log.w("getMeetings", "onFailure: ", e);
-                });
+                    })
+                    .addOnFailureListener(e -> {
+                        // Uh-oh, an error occurred!
+                        Log.w("getMeetings", "onFailure: ", e);
+                    });
+        }
+
+
+        if(type.equals("admin")) {
+            mStorageRef.child("Meetings/").child("Finished/").listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference prefix : listResult.getPrefixes()) {
+                            // All the prefixes under listRef.
+                            // You may call listAll() recursively on them.
+                        }
+
+                        for (StorageReference item : listResult.getItems()) {
+                            // All the items under listRef.
+                            finishedList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
+
+                            finishedAdapter=new MeetingAdapter(context,0,0,finishedList);
+                        }
+
+                    })
+                    .addOnFailureListener(e -> {
+                        // Uh-oh, an error occurred!
+                        Log.w("getMeetings", "onFailure: ", e);
+                    });
+        }
+
 
 
 
@@ -315,21 +347,25 @@ public class MeetingsActivity extends AppCompatActivity {
                         pd.setCancelable(false);
                         pd.show();
 
+                        editMeet.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
                         if(mode==MODE_UPCOMING) {
                             if(type.equals("student"))
-                            btnEdit.setVisibility(View.GONE);
+                                btnEdit.setVisibility(View.GONE);
+                            else
+                                btnEdit.setVisibility(View.VISIBLE);
                             downloadUpcomingFile(meetingList.get(i).getFileName(), i);
                         }
 
                         if(mode==MODE_DONE) {
                             if(type.equals("student")) {
-                                MaterialButton btndone = editMeet.findViewById(R.id.btnMeetingDone);
-                                btndone.setText("כתוב משוב");
+                                MaterialButton btnDone = editMeet.findViewById(R.id.btnMeetingDone);
+                                btnDone.setText("כתוב משוב");
                             }
                             downloadDoneFile(doneList.get(i).getFileName(), i);
                         }
                         if(mode==MODE_FINISHED){
 
+                            downloadDoneFile(finishedList.get(i).getFileName(),i);
                         }
 
 
@@ -421,7 +457,7 @@ public class MeetingsActivity extends AppCompatActivity {
                                                 }
                                             });
 
-                                            String fileText = doneList.get(i).getStudent() + "&&" + doneList.get(i).getTeacher() +"&&" + mashov + "&&"+doneList.get(i).getMashov()+"&&";
+                                            String fileText = doneList.get(i).getStudent() + "&&" + doneList.get(i).getTeacher() +"&&" + doneList.get(i).getDate()+"&&"+ mashov + "&&"+doneList.get(i).getMashov()+"&&";
                                             writeToFile(fileText, getApplicationContext(), fileName);//update the meeting counter
                                             uploadFile(fileName, "Meetings/Finished/");//
 
@@ -480,13 +516,20 @@ public class MeetingsActivity extends AppCompatActivity {
 
         tvSName.setText(meetingList.get(i).getStudent());
         tvDate.setText(meetingList.get(i).getDate());
+        tvTime.setVisibility(View.VISIBLE);
         tvTime.setText(meetingList.get(i).getTime());
         tvDiaTitle.setText((" ערוך פגישה"));
 
         TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
-        num1.setText("");
+        num1.setVisibility(View.GONE);
         TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
-        num2.setText("");
+        num2.setVisibility(View.GONE);
+
+        editMeet.findViewById(R.id.text8).setVisibility(View.GONE);
+        editMeet.findViewById(R.id.text10).setVisibility(View.GONE);
+        editMeet.findViewById(R.id.SV1).setVisibility(View.GONE);
+        editMeet.findViewById(R.id.SV2).setVisibility(View.GONE);
+
 
         btnEdit.setText("שמור שינויים");
 
@@ -581,6 +624,7 @@ public class MeetingsActivity extends AppCompatActivity {
     private void downloadDoneFile(String file ,int i) {
         File localFile = new File(getFilesDir() + "/" + file);
 
+        if(mode==MODE_DONE)
         mStorageRef.child("Meetings/Done/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
@@ -591,42 +635,92 @@ public class MeetingsActivity extends AppCompatActivity {
             Log.w("Download", "onFailure: Download failed", exception);
         });
 
+        if(mode==MODE_FINISHED)
+            mStorageRef.child("Meetings/Finished/" + file).getFile(localFile)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        // Successfully downloaded data to local file
+                        Log.d("Download", "onSuccess: Download succeeded");
+                        updateDoneMeeting(file,i);
+                    }).addOnFailureListener(exception -> {
+                // Handle failed download
+                Log.w("Download", "onFailure: Download failed", exception);
+            });
+
     }
 
     private void updateDoneMeeting(String file,int i) {
         data = readFromFile(this, file);
         Log.d("TAG", "updateMeeting: " + data);
 
-        Meeting meeting = new Meeting(data.split("&&")[0],data.split("&&")[1], data.split("&&")[2], data.split("&&")[3],data.split("&&")[4]);//show time, date , and name of student
+
+        if(mode==MODE_DONE) {
+            Meeting meeting = new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2], data.split("&&")[3], data.split("&&")[4]);//show time, date , and name of student
+
+            doneList.set(i, meeting);
+
+            tvSName.setText(doneList.get(i).getStudent());
+            tvDate.setText(doneList.get(i).getDate());
+            tvTime.setVisibility(View.VISIBLE);
+            tvTime.setText(doneList.get(i).getTime());
 
 
-        doneList.set(i,meeting);
+            tvDiaTitle.setText((" הוסף משוב"));
 
-        tvSName.setText(doneList.get(i).getStudent());
-        tvDate.setText(doneList.get(i).getDate());
-        tvTime.setText(doneList.get(i).getTime());
+            editMeet.findViewById(R.id.text3).setVisibility(View.GONE);
+            editMeet.findViewById(R.id.tvMeetings).setVisibility(View.GONE);
 
 
-        tvDiaTitle.setText((" הוסף משוב"));
+            editMeet.findViewById(R.id.text8).setVisibility(View.VISIBLE);
+            editMeet.findViewById(R.id.text10).setVisibility(View.GONE);
 
-        TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
-        num1.setText("");
-        TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
-        num2.setText("");
-
-        btnEdit.setVisibility(View.GONE);
-        if(type.equals("admin")){
-            tvDiaTitle.setText(" משוב מורה");
-            TextView tvMashov=editMeet.findViewById(R.id.disTMashov);
-            tvMashov.setVisibility(View.VISIBLE);
-            tvMashov.setText(doneList.get(i).getMashov());
+            btnEdit.setVisibility(View.GONE);
+            if (type.equals("admin")) {
+                tvDiaTitle.setText(" משוב מורה");
+                TextView tvMashov = editMeet.findViewById(R.id.disTMashov);
+                editMeet.findViewById(R.id.SV1).setVisibility(View.VISIBLE);
+                tvMashov.setText(doneList.get(i).getMashov());
+            }
+            editMeet.findViewById(R.id.SV2).setVisibility(View.GONE);
+            if (type.equals("student")) {
+                tvSName.setText(doneList.get(i).getTeacher());
+                MaterialButton btndone = editMeet.findViewById(R.id.btnMeetingDone);
+                btndone.setVisibility(View.VISIBLE);
+            }
         }
-        if(type.equals("student")) {
-            tvSName.setText(doneList.get(i).getTeacher());
-            MaterialButton btndone=editMeet.findViewById(R.id.btnMeetingDone);
-            btndone.setVisibility(View.VISIBLE);
-        }
 
+
+        if(mode==MODE_FINISHED) {
+            Meeting meeting = new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2],      "0"    , data.split("&&")[3],data.split("&&")[4]);//show time, date , and name of student
+
+            finishedList.set(i, meeting);
+
+            tvSName.setText(finishedList.get(i).getStudent());
+            tvDate.setText(finishedList.get(i).getDate());
+            tvTime.setVisibility(View.GONE);
+
+
+            tvDiaTitle.setText((" משוב"));
+
+            TextView num1 = (TextView) editMeet.findViewById(R.id.text3);
+            num1.setVisibility(View.GONE);
+            TextView num2 = (TextView) editMeet.findViewById(R.id.tvMeetings);
+            num2.setVisibility(View.GONE);
+
+            btnEdit.setVisibility(View.GONE);
+            btnSend.setVisibility(View.GONE);
+
+            editMeet.findViewById(R.id.text8).setVisibility(View.VISIBLE);
+            editMeet.findViewById(R.id.text10).setVisibility(View.VISIBLE);
+
+            TextView tvMashov = editMeet.findViewById(R.id.disTMashov);
+            editMeet.findViewById(R.id.SV2).setVisibility(View.VISIBLE);
+            tvMashov.setText(finishedList.get(i).getMashov());
+
+            TextView tvSMashov = editMeet.findViewById(R.id.disSMashov);
+            editMeet.findViewById(R.id.SV1).setVisibility(View.VISIBLE);
+            tvSMashov.setText(finishedList.get(i).getSmashov());
+
+        }
         pd.dismiss();
         editMeet.show();
         // meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);

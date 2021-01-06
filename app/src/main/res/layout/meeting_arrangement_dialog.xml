@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="#D4D4D4">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -156,18 +156,67 @@
         </TextView>
     </LinearLayout>
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="right"
+        android:text=" משוב מורה:"
+        android:textColor="@color/black"
+        android:textSize="27sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
+<androidx.core.widget.NestedScrollView
+    android:id="@+id/SV1"
+    android:layout_marginTop="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    android:visibility="gone"
+    >
     <TextView
         android:id="@+id/disTMashov"
         android:layout_width="match_parent"
-        android:layout_height="247dp"
+        android:layout_height="wrap_content"
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
         android:background="@color/white"
         android:textColor="@color/black"
-        android:textSize="27sp"
-        android:visibility="gone"/>
+        android:textSize="27sp"/>
+</androidx.core.widget.NestedScrollView>
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/text10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif"
+        android:layout_gravity="right"
+        android:text=" משוב תלמיד:"
+        android:textColor="@color/black"
+        android:textSize="27sp"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/SV2"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:visibility="gone">
+    <TextView
+        android:id="@+id/disSMashov"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="start|top"
+        android:inputType="textMultiLine"
+        android:background="@color/white"
+        android:textColor="@color/black"
+        android:textSize="27sp"/>
+    </androidx.core.widget.NestedScrollView>
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
