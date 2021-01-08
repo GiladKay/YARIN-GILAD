@@ -97,7 +97,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                             finish();
                             startActivity(i);
                         })
-                        .setIcon(R.drawable.account).show();
+                        .setIcon(R.drawable.ic_account).show();
                 break;
             case (R.id.btnUpcoming):
                 startActivity(new Intent(getBaseContext(), MeetingsActivity.class));

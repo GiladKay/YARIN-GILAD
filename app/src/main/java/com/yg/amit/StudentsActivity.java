@@ -3,6 +3,7 @@ package com.yg.amit;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -17,11 +18,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -77,6 +81,44 @@ public class StudentsActivity extends AppCompatActivity {
     private String className;
 
     private int tHour, tMinute;
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.student_menu,menu);
+
+
+        MenuItem menuItem=menu.findItem(R.id.search);
+        menuItem.setVisible(true);
+        SearchView searchView =(SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setQueryHint("חפש תלמיד");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                studentAdapter.getFilter().filter(s);
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId()== R.id.exit)
+                finish();
+
+
+
+
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,7 +279,7 @@ public class StudentsActivity extends AppCompatActivity {
                     Integer.parseInt(data.split("&&")[i].split("==")[1])));
         }
 
-        studentAdapter = new StudentAdapter(this, 0, 0, studentList);
+        studentAdapter = new StudentAdapter(this,  studentList);
         lvS.setAdapter(studentAdapter);
 
 
