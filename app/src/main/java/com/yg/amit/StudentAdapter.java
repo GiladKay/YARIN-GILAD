@@ -31,6 +31,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
         this.context = context;
         this.originalList = objects;
         this.tempList = objects;
+
     }
 
     @Override
@@ -64,6 +65,8 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
             tvName.setTextColor(Color.GRAY);
             tvMeetingC.setTextColor(Color.GRAY);
         }
+
+
 
         return view;
     }
@@ -102,6 +105,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
                 results.count = filters.size();
                 results.values = filters;
             }
+
             else {
                 results.count = tempList.size();
                 results.values = tempList;

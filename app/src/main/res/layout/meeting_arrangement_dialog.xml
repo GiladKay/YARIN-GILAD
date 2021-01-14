@@ -217,7 +217,20 @@
         android:textColor="@color/black"
         android:textSize="27sp"/>
     </androidx.core.widget.NestedScrollView>
-<LinearLayout
+
+
+    <Switch
+        android:id="@+id/SwitchSave"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+        android:fontFamily="sans-serif"
+        android:text="  שמור ללוח שנה"
+        android:textAlignment="textStart"
+        android:theme="@style/Theme.AMIT"
+        android:gravity="start" />
+
+    <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -236,7 +249,9 @@
         android:backgroundTint="#1C6519"
         android:visibility="gone"
         android:text="הפגישה נעשתה" />
-</LinearLayout>
+
+
+    </LinearLayout>
 </LinearLayout>
 </LinearLayout>
 </ScrollView>

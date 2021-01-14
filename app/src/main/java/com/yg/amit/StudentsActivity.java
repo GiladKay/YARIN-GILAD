@@ -1,12 +1,14 @@
 package com.yg.amit;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.Notification;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -16,7 +18,10 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,14 +31,18 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -51,6 +60,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -60,6 +70,11 @@ public class StudentsActivity extends AppCompatActivity {
     private Dialog arrMeeting;  //dialog for arranging a meeting
     private TextView tvDate, tvTime;
     private MaterialButton btnCreate;
+    private Switch switchCalen; //Switch for calendar save
+
+    private  SharedPreferences sd;
+
+    public static final String SWITCH_STATE="switchState";
 
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
@@ -84,6 +99,8 @@ public class StudentsActivity extends AppCompatActivity {
 
 
 
+
+
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         getMenuInflater().inflate(R.menu.student_menu,menu);
@@ -105,6 +122,8 @@ public class StudentsActivity extends AppCompatActivity {
                 studentAdapter.getFilter().filter(s);
                 return false;
             }
+
+
         });
         return true;
     }
@@ -113,10 +132,6 @@ public class StudentsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId()== R.id.exit)
                 finish();
-
-
-
-
         return true;
     }
 
@@ -143,6 +158,10 @@ public class StudentsActivity extends AppCompatActivity {
         tvTime = (TextView) arrMeeting.findViewById(R.id.tvTime2);
         tvDate = (TextView) arrMeeting.findViewById(R.id.tvDate2);
         btnCreate = (MaterialButton) arrMeeting.findViewById(R.id.btnCreate);
+
+        sd=getSharedPreferences(Menu.AMIT_SP,MODE_PRIVATE);
+        switchCalen=(Switch)arrMeeting.findViewById(R.id.SwitchSave);
+        switchCalen.setChecked(sd.getBoolean(SWITCH_STATE,false));
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
@@ -283,16 +302,23 @@ public class StudentsActivity extends AppCompatActivity {
         lvS.setAdapter(studentAdapter);
 
 
+
+
         lvS.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                if(studentList.get(i).getMeetingCount()<2&&type.equals("teacher") ) {
+                Student student=((Student) studentAdapter.getItem(i));
 
-                    tvSName.setText(studentList.get(i).getName() + " ");
-                    tvMeetCount.setText(studentList.get(i).getMeetingCount() + "/2 ");
+                switchCalen.setVisibility(View.VISIBLE);
+
+                if(student.getMeetingCount()<2&&type.equals("teacher") ) {
+
+                    tvSName.setText(student.getName() + " ");
+                    tvMeetCount.setText(student.getMeetingCount() + "/2 ");
 
                     btnCreate.setOnClickListener(new View.OnClickListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onClick(View view) {
 
@@ -301,17 +327,54 @@ public class StudentsActivity extends AppCompatActivity {
                             if (!time.isEmpty() && !Date.isEmpty()) {
                                 //TODO send an email to the student
 
-                                studentList.get(i).incMeetingCount();
+                                student.incMeetingCount();
+
                                 hasBeenEdited = true;
                                 lvS.setAdapter(studentAdapter);
 
-                                createMeeting(studentList.get(i).getName(),time,Date);
+                                createMeeting(student.getName(),time,Date);
 
-                                Toast.makeText(getApplicationContext(), "פגישה עם "+studentList.get(i).getName()+" בתאריך: "+Date+ " בשעה: "+time, Toast.LENGTH_LONG).show();
+
+                                switchCalen.setVisibility(View.GONE);
+
+                                if(switchCalen.isChecked()){
+                                    Calendar cal = Calendar.getInstance();
+                                    long endTime;
+                                    long startTime=0;
+                                    cal.set(Calendar.HOUR_OF_DAY,Integer.parseInt(tvTime.getText().toString().split(":")[0]));
+                                    cal.set(Calendar.MINUTE,Integer.parseInt(tvTime.getText().toString().split(":")[1]));
+
+
+                                    cal.set(Calendar.YEAR,Integer.parseInt(tvDate.getText().toString().split("/")[2]));
+                                    cal.set(Calendar.MONTH,Integer.parseInt(tvDate.getText().toString().split("/")[1])-1);
+                                    cal.set(Calendar.DAY_OF_MONTH,Integer.parseInt(tvDate.getText().toString().split("/")[0]));
+
+                                    endTime=cal.getTimeInMillis()+30*60*1000;
+                                    Date d = cal.getTime();
+
+                                    startTime=d.getTime();
+                                    startTime=cal.getTimeInMillis();
+
+                                    Intent intent = new Intent(Intent.ACTION_EDIT);
+                                    intent.setType("vnd.android.cursor.item/event");
+                                    intent.putExtra("beginTime",startTime);
+                                    intent.putExtra("rrule", "FREQ=YEARLY");
+                                    intent.putExtra("endTime", endTime);
+                                    intent.putExtra("title", "פגישה עם "+student.getName());
+                                    if(intent.resolveActivity(getPackageManager())!=null){
+                                        startActivity(intent);
+                                    }else{
+                                        Toast.makeText(StudentsActivity.this,"אין לך אפליקציה שיכולה לשמור את התאריך",Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                                Toast.makeText(getApplicationContext(), "פגישה עם "+student.getName()+" בתאריך: "+Date+ " בשעה: "+time, Toast.LENGTH_LONG).show();
                                 arrMeeting.hide();
+
+
                             } else {
                                 Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
                             }
+
                         }
                     });
 
@@ -401,18 +464,84 @@ public class StudentsActivity extends AppCompatActivity {
         super.onDestroy();
 
         if(hasBeenEdited){//if a meetings was booked
-
             //update the number of meetings a student has in file
-            String data="";
-            for(Student student:studentList){
-                data+=student.getName()+"=="+student.getMeetingCount()+"&&" ;
-            }
-            className+=".txt";
-            writeToFile(data,this,className);//update the meeting counter
-            uploadFile(className,"Classes/");//
+            updateMeetingCount();
+        }
 
+        SharedPreferences.Editor editor=sd.edit();
+        editor.putBoolean(SWITCH_STATE,switchCalen.isChecked());
+        editor.commit();
+    }
+
+    public void updateMeetingCount(){
+
+        //TODO fix the method so the file is uploaded only after the lambda is finished
+
+
+        for(int i=0;i<studentList.size();i++){
+            Student student=studentList.get(i);
+            student.setMeetingCount(0);
+
+
+            mStorageRef.child("Meetings/").child("Upcoming/").listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference prefix : listResult.getPrefixes()) {
+                            // All the prefixes under listRef.
+                            // You may call listAll() recursively on them.
+                        }
+
+                        for (StorageReference item : listResult.getItems()) {
+                            // All the items under listRef.
+                            if (item.getName().contains(student.getName())) {
+                                student.incMeetingCount();
+                            }
+                        }
+
+                    });
+            mStorageRef.child("Meetings/").child("Done/").listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference prefix : listResult.getPrefixes()) {
+                            // All the prefixes under listRef.
+                            // You may call listAll() recursively on them.
+                        }
+
+                        for (StorageReference item : listResult.getItems()) {
+                            // All the items under listRef.
+                            if (item.getName().contains(student.getName())) {
+                                student.incMeetingCount();
+                            }
+                        }
+
+                    });
+            mStorageRef.child("Meetings/").child("Finished/").listAll()
+                    .addOnSuccessListener(listResult -> {
+                        for (StorageReference prefix : listResult.getPrefixes()) {
+                            // All the prefixes under listRef.
+                            // You may call listAll() recursively on them.
+                        }
+
+                        for (StorageReference item : listResult.getItems()) {
+                            // All the items under listRef.
+                            if (item.getName().contains(student.getName())) {
+                                student.incMeetingCount();
+                            }
+                        }
+
+                    });
 
         }
+
+                String data="";
+
+                for(Student student:studentList){
+                    data+=student.getName()+"=="+student.getMeetingCount()+"&&" ;
+                }
+
+
+                className+=".txt";
+                writeToFile(data,getBaseContext(),className);//update the meeting counter
+                uploadFile(className,"Classes/");//
+
     }
 
     @Override
@@ -421,4 +550,6 @@ public class StudentsActivity extends AppCompatActivity {
         startActivity(new Intent(getBaseContext(), ClassesActivity.class));
         finish();
     }
+
 }
+
