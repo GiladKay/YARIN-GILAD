@@ -28,11 +28,11 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     private String name, type;
     private TextView tvTitle;
-    private Button btnUpcoming, btnClasses, btnTeachers, btnAccount;
+    private Button btnUpcoming, btnClasses, btnTeachers, btnAccount, btnAdmin;
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        getMenuInflater().inflate(R.menu.student_menu,menu);
+        getMenuInflater().inflate(R.menu.student_menu, menu);
 
 
         return true;
@@ -50,7 +50,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         setContentView(R.layout.activity_menu);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
-        Toolbar toolbar=findViewById(R.id.toolbar3);
+        Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("תפריט ");
         toolbar.findViewById(R.id.btnAccount).setVisibility(View.VISIBLE);
@@ -63,6 +63,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         btnClasses = (MaterialButton) findViewById(R.id.btnClasses);
         btnTeachers = (MaterialButton) findViewById(R.id.btnTeachers);
         btnAccount = (Button) findViewById(R.id.btnAccount);
+        btnAdmin = (Button) findViewById(R.id.btnAdmin);
+        btnAdmin.setOnClickListener(this);
         btnUpcoming.setOnClickListener(this);
         btnClasses.setOnClickListener(this);
         btnTeachers.setOnClickListener(this);
@@ -79,6 +81,9 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         if (type.equals("student")) {
             btnClasses.setVisibility(View.GONE);
             btnTeachers.setVisibility(View.GONE);
+        }
+        if (name.equals("admin")) {
+            btnAdmin.setVisibility(View.VISIBLE);
         }
     }
 
@@ -111,7 +116,10 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 startActivity(new Intent(getBaseContext(), TeacherActivity.class));
                 finish();
                 break;
-
+            case (R.id.btnAdmin):
+                startActivity(new Intent(getBaseContext(), AdminActivity.class));
+                finish();
+                break;
         }
 
     }

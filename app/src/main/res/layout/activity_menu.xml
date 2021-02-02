@@ -64,9 +64,22 @@
         android:paddingTop="10dp"
         android:paddingBottom="15dp"
         android:textSize="30sp"
-
         android:backgroundTint="#07A5FF"
         android:fontFamily="sans-serif"
         android:textStyle="bold"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAdmin"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#8BC34A"
+        android:fontFamily="sans-serif"
+        android:paddingTop="10dp"
+        android:paddingBottom="15dp"
+        android:text="ניהול אקסל"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
 </LinearLayout>
