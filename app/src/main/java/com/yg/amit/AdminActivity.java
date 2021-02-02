@@ -6,6 +6,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.firebase.auth.ImportUserRecord;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class AdminActivity extends AppCompatActivity {
 
     private Button btnUpdate;
@@ -17,7 +22,7 @@ public class AdminActivity extends AppCompatActivity {
 
         btnUpdate = (Button) findViewById(R.id.btnUpdate);
         btnUpdate.setOnClickListener(v -> {
-            // TODO
+            // TODO download excel files from firebase and manage users and firestore.
         });
     }
 }
