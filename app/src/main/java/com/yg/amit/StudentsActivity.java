@@ -6,14 +6,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -34,6 +37,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -63,6 +67,7 @@ public class StudentsActivity extends AppCompatActivity {
     private SharedPreferences sd;
 
     public static final String SWITCH_STATE = "switchState";
+    public static final String PD_END = "hasFinished";
 
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
@@ -74,6 +79,8 @@ public class StudentsActivity extends AppCompatActivity {
     private TextView tvSName, tvMeetCount;
 
     private ProgressDialog pd;
+
+    private ContentResolver contentResolver;
 
     private StorageReference mStorageRef;
 
@@ -129,6 +136,8 @@ public class StudentsActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
 
+        contentResolver=getContentResolver();
+
         sp = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
         name = sp.getString(Menu.NAME_KEY, "name");
         type = sp.getString(Menu.TYPE_KEY, "student");
@@ -154,6 +163,7 @@ public class StudentsActivity extends AppCompatActivity {
         pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
         pd.setCancelable(false);
         pd.show();
+
 
         mStorageRef.child("Classes").listAll()
                 .addOnSuccessListener(listResult -> {
@@ -309,6 +319,7 @@ public class StudentsActivity extends AppCompatActivity {
 
                             String time = tvTime.getText().toString();
                             String Date = tvDate.getText().toString();
+
                             if (!time.isEmpty() && !Date.isEmpty()) {
                                 //TODO send an email to the student
 
@@ -317,28 +328,27 @@ public class StudentsActivity extends AppCompatActivity {
                                 hasBeenEdited = true;
                                 lvS.setAdapter(studentAdapter);
 
-                                createMeeting(student.getName(), time, Date);
+                                if(!switchCalen.isChecked())
+                                     createMeeting(student.getName(), time, Date);
 
 
-                                switchCalen.setVisibility(View.GONE);
 
                                 if (switchCalen.isChecked()) {
                                     Calendar cal = Calendar.getInstance();
                                     long endTime;
-                                    long startTime = 0;
+                                    long startTime;
+
+
                                     cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTime.getText().toString().split(":")[0]));
                                     cal.set(Calendar.MINUTE, Integer.parseInt(tvTime.getText().toString().split(":")[1]));
-
-
                                     cal.set(Calendar.YEAR, Integer.parseInt(tvDate.getText().toString().split("/")[2]));
                                     cal.set(Calendar.MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[1]) - 1);
                                     cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[0]));
 
-                                    endTime = cal.getTimeInMillis() + 30 * 60 * 1000;
-                                    Date d = cal.getTime();
 
-                                    startTime = d.getTime();
                                     startTime = cal.getTimeInMillis();
+                                    endTime = startTime + 30 * 60 * 1000;
+
 
                                     Intent intent = new Intent(Intent.ACTION_EDIT);
                                     intent.setType("vnd.android.cursor.item/event");
@@ -348,16 +358,19 @@ public class StudentsActivity extends AppCompatActivity {
                                     intent.putExtra("title", "פגישה עם " + student.getName());
                                     if (intent.resolveActivity(getPackageManager()) != null) {
                                         startActivity(intent);
+                                        createMeeting(student.getName(), time, Date);
                                     } else {
                                         Toast.makeText(StudentsActivity.this, "אין לך אפליקציה שיכולה לשמור את התאריך", Toast.LENGTH_LONG).show();
+                                        createMeeting(student.getName(), time, Date);
                                     }
+
+
                                 }
                                 Toast.makeText(getApplicationContext(), "פגישה עם " + student.getName() + " בתאריך: " + Date + " בשעה: " + time, Toast.LENGTH_LONG).show();
                                 arrMeeting.hide();
-
-
+                                switchCalen.setVisibility(View.GONE);
                             } else {
-                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " + Date, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " , Toast.LENGTH_LONG).show();
                             }
 
                         }
@@ -438,6 +451,7 @@ public class StudentsActivity extends AppCompatActivity {
 
     private void createMeeting(String studentName, String time, String Date) {
         writeToFile(studentName + "&&" + name + "&&" + Date + "&&" + time + "&&", this, studentName + "&" + name + ".txt");
+
         uploadFile(studentName + "&" + name + ".txt", "Meetings/Upcoming/");
     }
 
@@ -447,6 +461,9 @@ public class StudentsActivity extends AppCompatActivity {
 
         if (hasBeenEdited) {//if a meetings was booked
             //update the number of meetings a student has in file
+            pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
+            pd.setCancelable(false);
+            pd.show();
             updateMeetingCount();
         }
 
@@ -499,6 +516,15 @@ public class StudentsActivity extends AppCompatActivity {
                                                                                             Log.d("TAG", "updateMeetingCount: ENDED!");
                                                                                             // END OF THE METHOD
                                                                                             // TODO WHATEVER YOU WANT
+
+
+                                                                                            SharedPreferences sd = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
+                                                                                            SharedPreferences.Editor editor = sd.edit();
+
+                                                                                            editor.putBoolean(PD_END, true);
+                                                                                            editor.commit();
+
+
                                                                                         }
                                                                                     });
                                                                         }
@@ -516,6 +542,8 @@ public class StudentsActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
 
     @Override
     public void onBackPressed() {

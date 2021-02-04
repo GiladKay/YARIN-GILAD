@@ -20,9 +20,9 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class Menu extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String AMIT_SP = "AMIT";
-    public static final String NAME_KEY = "name";
-    public static final String TYPE_KEY = "type";
+    public static final String AMIT_SP = "AMIT"; //SharedPreference keys
+    public static final String NAME_KEY = "name";//
+    public static final String TYPE_KEY = "type";//
 
     private SharedPreferences sharedPreferences;
 
@@ -114,10 +114,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 break;
             case (R.id.btnTeachers):
                 startActivity(new Intent(getBaseContext(), TeacherActivity.class));
-                finish();
-                break;
-            case (R.id.btnAdmin):
-                startActivity(new Intent(getBaseContext(), AdminActivity.class));
                 finish();
                 break;
         }

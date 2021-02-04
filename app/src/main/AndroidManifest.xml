@@ -12,7 +12,6 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AMIT">
-        <activity android:name=".AdminActivity"></activity>
         <activity android:name=".TeacherActivity" />
         <activity android:name=".StudentsActivity" />
         <activity android:name=".ClassesActivity" />

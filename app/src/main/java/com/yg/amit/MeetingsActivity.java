@@ -9,10 +9,13 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -391,6 +394,7 @@ public class MeetingsActivity extends AppCompatActivity {
                                 writeToFile(data,getApplicationContext(),fileName);//update the meeting counter
                                 uploadFile(fileName,"Meetings/Upcoming/");//
 
+
                                 Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + Date, Toast.LENGTH_LONG).show();
                                     editMeet.hide();
 
@@ -401,6 +405,7 @@ public class MeetingsActivity extends AppCompatActivity {
                         MaterialButton done = (MaterialButton) editMeet.findViewById(R.id.btnMeetingDone);
                         if(type.equals("teacher"))
                             done.setVisibility(View.VISIBLE);
+
                         done.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -726,6 +731,19 @@ public class MeetingsActivity extends AppCompatActivity {
         // meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
         // lv.setAdapter(meetingAdapter);
     }
+
+/*
+    public void DeleteEvent(int your_event_id){
+
+        Uri eventsUri = Uri.parse("content://com.android.calendar/events");
+        Cursor cur = getContentResolver().query(eventsUri, null, null, null, null);
+
+        while (cur.moveToNext()){
+
+            Uri eventUri = ContentUris.withAppendedId(eventsUri, your_event_id);
+             getContentResolver().delete(eventUri, null, null);
+        }
+    }*/
 
     @Override
     public void onBackPressed() {
