@@ -12,6 +12,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -132,6 +133,7 @@ public class StudentsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
+
 
         Bundle extras = getIntent().getExtras();
         className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
@@ -348,14 +350,18 @@ public class StudentsActivity extends AppCompatActivity {
 
                                     startTime = cal.getTimeInMillis();
                                     endTime = startTime + 30 * 60 * 1000;
+                                    String title="פגישה עם " + student.getName();
 
+                                    long event_id = (startTime+endTime)/10000;
 
                                     Intent intent = new Intent(Intent.ACTION_EDIT);
                                     intent.setType("vnd.android.cursor.item/event");
                                     intent.putExtra("beginTime", startTime);
                                     intent.putExtra("rrule", "FREQ=YEARLY");
                                     intent.putExtra("endTime", endTime);
-                                    intent.putExtra("title", "פגישה עם " + student.getName());
+                                    intent.putExtra("title", title);
+
+                                    Log.d("the event id",event_id+"");
                                     if (intent.resolveActivity(getPackageManager()) != null) {
                                         startActivity(intent);
                                         createMeeting(student.getName(), time, Date);
@@ -382,6 +388,10 @@ public class StudentsActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
+
 
     /**
      * reads and outputs the contents of the now local Class file

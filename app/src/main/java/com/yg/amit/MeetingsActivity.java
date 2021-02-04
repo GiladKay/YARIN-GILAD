@@ -5,12 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +22,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -394,9 +397,26 @@ public class MeetingsActivity extends AppCompatActivity {
                                 writeToFile(data,getApplicationContext(),fileName);//update the meeting counter
                                 uploadFile(fileName,"Meetings/Upcoming/");//
 
+                                Calendar cal = Calendar.getInstance();
+                                long endTime;
+                                long startTime;
+                                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTime.getText().toString().split(":")[0]));
+                                cal.set(Calendar.MINUTE, Integer.parseInt(tvTime.getText().toString().split(":")[1]));
+                                cal.set(Calendar.YEAR, Integer.parseInt(tvDate.getText().toString().split("/")[2]));
+                                cal.set(Calendar.MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[1]) - 1);
+                                cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[0]));
+
+
+                                startTime = cal.getTimeInMillis();
+                                endTime = startTime + 30 * 60 * 1000;
+
+                                int id=ListSelectedCalendars("פגישה עם "+meeting.getStudent());
+                                UpdateCalendarEntry(id,startTime,endTime);
+
 
                                 Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + Date, Toast.LENGTH_LONG).show();
                                     editMeet.hide();
+
 
                             }
                         });
@@ -483,9 +503,111 @@ public class MeetingsActivity extends AppCompatActivity {
 
                     }
                 });
+
+
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                int event_id=ListSelectedCalendars("פגישה עם "+meetingList.get(i).getStudent());
+                DeleteCalendarEntry(event_id);
+                return false;
+            }
+        });
             }
 
+    public int ListSelectedCalendars(String eventtitle) {
 
+
+        Uri eventUri;
+        if (android.os.Build.VERSION.SDK_INT <= 7) {
+            // the old way
+
+            eventUri = Uri.parse("content://calendar/events");
+        } else {
+            // the new way
+
+            eventUri = Uri.parse("content://com.android.calendar/events");
+        }
+
+        int result = 0;
+        String projection[] = { "_id", "title" };
+        Cursor cursor = getContentResolver().query(eventUri, null, null, null,
+                null);
+
+        if (cursor.moveToFirst()) {
+
+            String calName;
+            String calID;
+
+            int nameCol = cursor.getColumnIndex(projection[1]);
+            int idCol = cursor.getColumnIndex(projection[0]);
+            do {
+                calName = cursor.getString(nameCol);
+                calID = cursor.getString(idCol);
+
+                if (calName != null && calName.contains(eventtitle)) {
+                    result = Integer.parseInt(calID);
+                }
+
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return result;
+
+    }
+
+    @SuppressLint("InlinedApi")
+    private int UpdateCalendarEntry(int entryID,long start,long end) {
+        int iNumRowsUpdated = 0;
+
+        Uri eventUri;
+        if (android.os.Build.VERSION.SDK_INT <= 7) {
+            // the old way
+
+            eventUri = Uri.parse("content://calendar/events");
+        } else {
+            // the new way
+
+            eventUri = Uri.parse("content://com.android.calendar/events");
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(CalendarContract.Events.DTSTART, start);
+        values.put(CalendarContract.Events.DTEND, end);
+
+        Uri updateUri = ContentUris.withAppendedId(eventUri, entryID);
+        iNumRowsUpdated = getContentResolver().update(updateUri, values, null,
+                null);
+
+        return iNumRowsUpdated;
+    }
+
+    public int DeleteCalendarEntry(int entryID) {
+        int iNumRowsDeleted = 0;
+
+        Uri eventUri = ContentUris
+                .withAppendedId(getCalendarUriBase(), entryID);
+        iNumRowsDeleted = getContentResolver().delete(eventUri, null, null);
+
+        return iNumRowsDeleted;
+    }
+
+    private Uri getCalendarUriBase() {
+        Uri eventUri;
+        if (android.os.Build.VERSION.SDK_INT <= 7) {
+            // the old way
+
+            eventUri = Uri.parse("content://calendar/events");
+        } else {
+            // the new way
+
+            eventUri = Uri.parse("content://com.android.calendar/events");
+        }
+
+        return eventUri;
+    }
 
     /**
      * method used to download data files from firebase
