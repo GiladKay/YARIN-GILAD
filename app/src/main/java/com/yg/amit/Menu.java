@@ -20,10 +20,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class Menu extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String AMIT_SP = "AMIT"; //SharedPreference keys
-    public static final String NAME_KEY = "name";//
-    public static final String TYPE_KEY = "type";//
-
     private SharedPreferences sharedPreferences;
 
     private String name, type;
@@ -56,7 +52,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         toolbar.findViewById(R.id.btnAccount).setVisibility(View.VISIBLE);
         setSupportActionBar(toolbar);
 
-        sharedPreferences = getSharedPreferences(AMIT_SP, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         btnUpcoming = (MaterialButton) findViewById(R.id.btnUpcoming);
@@ -70,8 +66,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         btnTeachers.setOnClickListener(this);
         btnAccount.setOnClickListener(this);
 
-        name = sharedPreferences.getString(NAME_KEY, "name");
-        type = sharedPreferences.getString(TYPE_KEY, "student");
+        name = sharedPreferences.getString(Utils.NAME_KEY, "name");
+        type = sharedPreferences.getString(Utils.TYPE_KEY, "student");
 
         tvTitle.setText("שלום " + name);
 

@@ -36,7 +36,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextInputLayout ipEmail, ipPassword;
     private TextInputEditText edtEmail, edtPassword;
     private MaterialButton btnNext, btnCancel;
-    public static final String TAG="TAG";
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -54,7 +53,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -98,18 +97,18 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                                 editor = sharedPreferences.edit();
-                                editor.putString(Menu.TYPE_KEY, (String) document.get(Menu.TYPE_KEY));
-                                editor.putString(Menu.NAME_KEY, (String) document.get(Menu.NAME_KEY));
+                                editor.putString(Utils.TYPE_KEY, (String) document.get(Utils.TYPE_KEY));
+                                editor.putString(Utils.NAME_KEY, (String) document.get(Utils.NAME_KEY));
                                 editor.commit();
 
                                 Intent i = new Intent(getBaseContext(), Menu.class);
                                 finish();
                                 startActivity(i);
                             } else {
-                                Log.d(TAG, "No such document");
+                                Log.d(Utils.TAG, "No such document");
                             }
                         } else {
-                            Log.d(TAG, "get failed with ", task.getException());
+                            Log.d(Utils.TAG, "get failed with ", task.getException());
                         }
                     }
                 });

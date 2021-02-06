@@ -39,6 +39,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-storage'
+
+
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
+
+    implementation files('libs/activation.jar')
+    implementation files('libs/additional.jar')
+    implementation files('libs/mail.jar')
+
     testImplementation 'junit:junit:4.+'
     implementation 'com.android.support:multidex:1.0.3'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

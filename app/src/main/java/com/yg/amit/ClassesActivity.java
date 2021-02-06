@@ -38,7 +38,6 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
 
     private ProgressDialog pd;
 
-    public static final String CLASS_NAME_KEY = "class";// key for the Intent Extra that contains the class name
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +100,7 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         String classname = classList.get(i).getClassName(); //inserts into classname the class name that was clicked in the listView
 
         Intent intent = new Intent(getBaseContext(), StudentsActivity.class);
-        intent.putExtra(CLASS_NAME_KEY, classname);// place the class name in an Extra that will be sent to StudentsActivity
+        intent.putExtra(Utils.CLASS_NAME_KEY, classname);// place the class name in an Extra that will be sent to StudentsActivity
         startActivity(intent);
         finish();
     }

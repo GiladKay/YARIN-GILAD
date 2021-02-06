@@ -67,8 +67,6 @@ public class StudentsActivity extends AppCompatActivity {
 
     private SharedPreferences sd;
 
-    public static final String SWITCH_STATE = "switchState";
-    public static final String PD_END = "hasFinished";
 
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
@@ -136,13 +134,13 @@ public class StudentsActivity extends AppCompatActivity {
 
 
         Bundle extras = getIntent().getExtras();
-        className = extras.getString(ClassesActivity.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
+        className = extras.getString(Utils.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
 
         contentResolver=getContentResolver();
 
-        sp = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
-        name = sp.getString(Menu.NAME_KEY, "name");
-        type = sp.getString(Menu.TYPE_KEY, "student");
+        sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
+        name = sp.getString(Utils.NAME_KEY, "name");
+        type = sp.getString(Utils.TYPE_KEY, "student");
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -155,9 +153,9 @@ public class StudentsActivity extends AppCompatActivity {
         tvDate = (TextView) arrMeeting.findViewById(R.id.tvDate2);
         btnCreate = (MaterialButton) arrMeeting.findViewById(R.id.btnCreate);
 
-        sd = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
+        sd = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
         switchCalen = (Switch) arrMeeting.findViewById(R.id.SwitchSave);
-        switchCalen.setChecked(sd.getBoolean(SWITCH_STATE, false));
+        switchCalen.setChecked(sd.getBoolean(Utils.SWITCH_STATE, false));
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
@@ -478,7 +476,7 @@ public class StudentsActivity extends AppCompatActivity {
         }
 
         SharedPreferences.Editor editor = sd.edit();
-        editor.putBoolean(SWITCH_STATE, switchCalen.isChecked());
+        editor.putBoolean(Utils.SWITCH_STATE, switchCalen.isChecked());
         editor.commit();
     }
 
@@ -523,16 +521,10 @@ public class StudentsActivity extends AppCompatActivity {
                                                                                     .addOnSuccessListener(taskSnapshot1 -> {
                                                                                         n.getAndIncrement();
                                                                                         if (n.get() == 2) {
-                                                                                            Log.d("TAG", "updateMeetingCount: ENDED!");
+                                                                                            Log.d(Utils.TAG, "updateMeetingCount: ENDED!");
                                                                                             // END OF THE METHOD
                                                                                             // TODO WHATEVER YOU WANT
 
-
-                                                                                            SharedPreferences sd = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
-                                                                                            SharedPreferences.Editor editor = sd.edit();
-
-                                                                                            editor.putBoolean(PD_END, true);
-                                                                                            editor.commit();
 
 
                                                                                         }
@@ -553,6 +545,18 @@ public class StudentsActivity extends AppCompatActivity {
                 });
     }
 
+
+    /**
+     * sends emails
+     * @param address = email address of recipient
+     * @param subject = title of email
+     * @param message = contents of email
+     */
+    private void sendEmail(String address, String subject, String message){
+        javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
+
+        javaMailAPI.execute();
+    }
 
 
     @Override

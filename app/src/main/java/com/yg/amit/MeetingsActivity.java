@@ -85,9 +85,6 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
     private int mode;
-    public static final int MODE_UPCOMING=0;
-    public static final int MODE_DONE=1;
-    public static final int MODE_FINISHED=2;
 
     private TextView tvSName,tvDiaTitle;
     private TextView tvDate, tvTime;
@@ -122,19 +119,19 @@ public class MeetingsActivity extends AppCompatActivity {
                 lv.setAdapter(meetingAdapter);
                 if(meetingList.isEmpty())
                     Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
-                mode=MODE_UPCOMING;
+                mode=Utils.MODE_UPCOMING;
                 break;
             case R.id.tMashov:
                 lv.setAdapter(doneAdapter);
                 if(doneList.isEmpty())
                     Toast.makeText(this, "אין פגישות שצריכות משוב", Toast.LENGTH_LONG).show();
-                mode=MODE_DONE;
+                mode=Utils.MODE_DONE;
                 break;
             case R.id.sAndTMashov:
                 lv.setAdapter(finishedAdapter);
                 if(finishedList.isEmpty())
                     Toast.makeText(this, "אין פגישות עם משוב מורה-תלמיד", Toast.LENGTH_LONG).show();
-                mode=MODE_FINISHED;
+                mode=Utils.MODE_FINISHED;
                 break;
 
             case R.id.exit:
@@ -159,12 +156,12 @@ public class MeetingsActivity extends AppCompatActivity {
 
         context=this;
 
-        mode=MODE_UPCOMING;
+        mode=Utils.MODE_UPCOMING;
 
-        sharedPreferences = getSharedPreferences(Menu.AMIT_SP, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
-        name = sharedPreferences.getString(Menu.NAME_KEY, "name");            //getting the users name
-        type = sharedPreferences.getString(Menu.TYPE_KEY, "student");         // confirming the user type (student,teacher,admin)
+        name = sharedPreferences.getString(Utils.NAME_KEY, "name");            //getting the users name
+        type = sharedPreferences.getString(Utils.TYPE_KEY, "student");         // confirming the user type (student,teacher,admin)
 
 
             editMeet = new Dialog(this);                               //initializing Dialog for altering meeting data
@@ -354,7 +351,7 @@ public class MeetingsActivity extends AppCompatActivity {
                         pd.show();
 
                         editMeet.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-                        if(mode==MODE_UPCOMING) {
+                        if(mode==Utils.MODE_UPCOMING) {
                             if(type.equals("student"))
                                 btnEdit.setVisibility(View.GONE);
                             else
@@ -362,14 +359,14 @@ public class MeetingsActivity extends AppCompatActivity {
                             downloadUpcomingFile(meetingList.get(i).getFileName(), i);
                         }
 
-                        if(mode==MODE_DONE) {
+                        if(mode==Utils.MODE_DONE) {
                             if(type.equals("student")) {
                                 MaterialButton btnDone = editMeet.findViewById(R.id.btnMeetingDone);
                                 btnDone.setText("כתוב משוב");
                             }
                             downloadDoneFile(doneList.get(i).getFileName(), i);
                         }
-                        if(mode==MODE_FINISHED){
+                        if(mode==Utils.MODE_FINISHED){
 
                             downloadDoneFile(finishedList.get(i).getFileName(),i);
                         }
@@ -751,7 +748,7 @@ public class MeetingsActivity extends AppCompatActivity {
     private void downloadDoneFile(String file ,int i) {
         File localFile = new File(getFilesDir() + "/" + file);
 
-        if(mode==MODE_DONE)
+        if(mode==Utils.MODE_DONE)
         mStorageRef.child("Meetings/Done/" + file).getFile(localFile)
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
@@ -762,7 +759,7 @@ public class MeetingsActivity extends AppCompatActivity {
             Log.w("Download", "onFailure: Download failed", exception);
         });
 
-        if(mode==MODE_FINISHED)
+        if(mode==Utils.MODE_FINISHED)
             mStorageRef.child("Meetings/Finished/" + file).getFile(localFile)
                     .addOnSuccessListener(taskSnapshot -> {
                         // Successfully downloaded data to local file
@@ -780,7 +777,7 @@ public class MeetingsActivity extends AppCompatActivity {
         Log.d("TAG", "updateMeeting: " + data);
 
 
-        if(mode==MODE_DONE) {
+        if(mode==Utils.MODE_DONE) {
             Meeting meeting = new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2], data.split("&&")[3], data.split("&&")[4]);//show time, date , and name of student
 
             doneList.set(i, meeting);
@@ -816,7 +813,7 @@ public class MeetingsActivity extends AppCompatActivity {
         }
 
 
-        if(mode==MODE_FINISHED) {
+        if(mode==Utils.MODE_FINISHED) {
             Meeting meeting = new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2],      "0"    , data.split("&&")[3],data.split("&&")[4]);//show time, date , and name of student
 
             finishedList.set(i, meeting);

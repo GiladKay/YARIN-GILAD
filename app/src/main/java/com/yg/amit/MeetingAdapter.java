@@ -55,8 +55,8 @@ public class MeetingAdapter extends ArrayAdapter<Meeting> {
 
         Meeting temp = objects.get(position);
 
-        sharedPreferences=getContext().getSharedPreferences(Menu.AMIT_SP,MODE_PRIVATE);
-        type=sharedPreferences.getString(Menu.TYPE_KEY,"student");
+        sharedPreferences=getContext().getSharedPreferences(Utils.AMIT_SP,MODE_PRIVATE);
+        type=sharedPreferences.getString(Utils.TYPE_KEY,"student");
 
         if(type.equals("student"))
             tvPerson.setText(temp.getTeacher());
