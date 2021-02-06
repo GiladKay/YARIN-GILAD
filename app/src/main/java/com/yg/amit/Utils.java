@@ -3,9 +3,8 @@ package com.yg.amit;
 public class Utils {
 
     //for sending emails (sender not receiver)
-    //TODO create Gmail account that sends the emails
-    public static final String EMAIL = "";//
-    public static final String PASSWORD = "";//
+    public static final String EMAIL = "meetingsamit@gmail.com";//
+    public static final String PASSWORD = "ysgk12345";//
 
     //SharedPreference keys
     public static final String AMIT_SP = "AMIT"; //

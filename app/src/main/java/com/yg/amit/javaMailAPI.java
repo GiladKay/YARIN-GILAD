@@ -3,8 +3,6 @@ package com.yg.amit;
 import android.content.Context;
 import android.os.AsyncTask;
 
-
-
 import java.util.Properties;
 
 import javax.mail.Message;
