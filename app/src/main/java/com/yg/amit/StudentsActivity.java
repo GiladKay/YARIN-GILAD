@@ -126,7 +126,6 @@ public class StudentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
-        sendEmail("yarinshattach@gmail.com", "Hi", "Test");
 
         Bundle extras = getIntent().getExtras();
         className = extras.getString(Utils.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
@@ -363,8 +362,13 @@ public class StudentsActivity extends AppCompatActivity {
                                         createMeeting(student.getName(), time, Date);
                                     }
 
-
                                 }
+
+                                String eSubject=" פגישה דו שנתית עם מורה - אמ" +"\""+"ית מודיעין בנים";
+                                String eMessage="נקבעה לך פגישה עם המורה "+ name + " בתאריך "+ Date + " בשעה "+ time +"\n כל הפרטים נמצאים באפליקציית אמ\"ית";
+
+                                sendEmail("gilad.kay236@gmail.com", eSubject, eMessage);
+
                                 Toast.makeText(getApplicationContext(), "פגישה עם " + student.getName() + " בתאריך: " + Date + " בשעה: " + time, Toast.LENGTH_LONG).show();
                                 arrMeeting.hide();
                                 switchCalen.setVisibility(View.GONE);
@@ -456,6 +460,7 @@ public class StudentsActivity extends AppCompatActivity {
         writeToFile(studentName + "&&" + name + "&&" + Date + "&&" + time + "&&", this, studentName + "&" + name + ".txt");
 
         uploadFile(studentName + "&" + name + ".txt", "Meetings/Upcoming/");
+
     }
 
     @Override
@@ -549,8 +554,9 @@ public class StudentsActivity extends AppCompatActivity {
      */
     private void sendEmail(String address, String subject, String message){
         javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
-
         javaMailAPI.execute();
+
+        Log.d(Utils.TAG, "email sent");
     }
 
 

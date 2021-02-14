@@ -9,24 +9,24 @@
         android:icon="@drawable/ic__search"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.widget.SearchView"
-        android:visible="false"></item>
+        android:visible="false" />
     <item
         android:title="פגישות קרובות"
         android:id="@+id/upcoming"
-        android:visible="false"></item>
+        android:visible="false" />
 
     <item
         android:title="משוב מורה"
         android:id="@+id/tMashov"
-        android:visible="false"></item>
+        android:visible="false" />
 
     <item
         android:title=" משוב מורה-תלמיד"
         android:id="@+id/sAndTMashov"
-        android:visible="false"></item>
+        android:visible="false" />
 
     <item
         android:icon="@drawable/ic_exit"
         android:title="יציאה"
-        android:id="@+id/exit"></item>
+        android:id="@+id/exit" />
 </menu>

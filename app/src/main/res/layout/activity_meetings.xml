@@ -14,9 +14,21 @@
         ></include>
 
 
+    <TextView
+        android:id="@+id/tvNoMeet"
+        android:layout_width="match_parent"
+        android:textSize="20dp"
+        android:textAlignment="center"
+        android:layout_weight="1"
+        android:text="אין פגישות קרובות"
+        android:gravity="center"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
     <ListView
         android:id="@+id/lv"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

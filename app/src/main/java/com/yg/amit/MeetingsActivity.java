@@ -78,6 +78,7 @@ public class MeetingsActivity extends AppCompatActivity {
     private String data;
     private Dialog editMeet;
     private MaterialButton btnEdit;
+    private TextView tvNoMeeting;
 
     private Dialog sendMashov;
     private EditText ETM;//edit text mashov
@@ -117,20 +118,34 @@ public class MeetingsActivity extends AppCompatActivity {
         switch (id){
             case R.id.upcoming:
                 lv.setAdapter(meetingAdapter);
-                if(meetingList.isEmpty())
+                tvNoMeeting.setText("אין פגישות קרובות");
+                if(meetingList.isEmpty()) {
                     Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
+                    tvNoMeeting.setVisibility(View.VISIBLE);
+                }
+                else
+                    tvNoMeeting.setVisibility(View.GONE);
                 mode=Utils.MODE_UPCOMING;
                 break;
             case R.id.tMashov:
                 lv.setAdapter(doneAdapter);
-                if(doneList.isEmpty())
+                tvNoMeeting.setText("ברגע שהמורה יסיים לכתוב משוב, תוכל לכתוב משוב על הפגישה שלך עם המורה");
+                if(doneList.isEmpty()){
                     Toast.makeText(this, "אין פגישות שצריכות משוב", Toast.LENGTH_LONG).show();
+                    tvNoMeeting.setVisibility(View.VISIBLE);
+                }
+                else
+                    tvNoMeeting.setVisibility(View.GONE);
                 mode=Utils.MODE_DONE;
                 break;
             case R.id.sAndTMashov:
                 lv.setAdapter(finishedAdapter);
-                if(finishedList.isEmpty())
+                if(finishedList.isEmpty()){
                     Toast.makeText(this, "אין פגישות עם משוב מורה-תלמיד", Toast.LENGTH_LONG).show();
+                    tvNoMeeting.setVisibility(View.VISIBLE);
+                }
+                else
+                    tvNoMeeting.setVisibility(View.GONE);
                 mode=Utils.MODE_FINISHED;
                 break;
 
@@ -189,6 +204,8 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
         lv = (ListView) findViewById(R.id.lv);
+        tvNoMeeting = (TextView)findViewById(R.id.tvNoMeet);
+        tvNoMeeting.setVisibility(View.GONE);
 
         pd = ProgressDialog.show(this, "פגישות", "מוריד נתונים...", true);
         pd.setCancelable(false);
@@ -209,12 +226,12 @@ public class MeetingsActivity extends AppCompatActivity {
 
                         meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
                         lv.setAdapter(meetingAdapter);
-
                     }
 
-                    if (meetingList.isEmpty())
+                    if (meetingList.isEmpty()) {
+                        tvNoMeeting.setVisibility(View.VISIBLE);
                         Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
-
+                    }
 
 
                     pd.dismiss();
