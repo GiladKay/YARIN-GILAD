@@ -1,8 +1,5 @@
 package com.yg.amit;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -14,6 +11,10 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,18 +25,20 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
     private Dialog login;
     private TextInputLayout ipEmail, ipPassword;
     private TextInputEditText edtEmail, edtPassword;
-    private MaterialButton btnNext, btnCancel;
+    private MaterialButton btnNext, btnCancel, btnForget;
+
+    private Dialog forget;
+    private TextInputLayout ipEmail1;
+    private TextInputEditText edtEmail1;
+    private MaterialButton btnNext1, btnCancel1;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -76,8 +79,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
             btnNext = (MaterialButton) login.findViewById(R.id.btnNext);
             btnCancel = (MaterialButton) login.findViewById(R.id.btnCancel);
+            btnForget = (MaterialButton) login.findViewById(R.id.btnForget);
             btnNext.setOnClickListener(this);
             btnCancel.setOnClickListener(this);
+            btnForget.setOnClickListener(this);
 
             new Handler().postDelayed(() -> {
                 login.show();
@@ -138,17 +143,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                pd.dismiss();
                                 if (task.isSuccessful()) {
                                     // Sign in success, update UI with the signed-in user's information
                                     Log.d("Login", "signInWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     updateUI(user);
-                                    pd.dismiss();
                                     login.dismiss();
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     Log.w("Login", "signInWithEmail:failure", task.getException());
-                                    pd.dismiss();
                                     if (task.getException().getMessage().contains("email") ||
                                             task.getException().getMessage().contains("Email"))
                                         ipEmail.setError(task.getException().getMessage());
@@ -176,6 +180,49 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         }
                     })
                     .setIcon(R.drawable.error).show();
+        }
+        if (v.getId() == R.id.btnForget) {
+            forget = new Dialog(this);
+            forget.setContentView(R.layout.forget_dialog);
+
+            ipEmail1 = (TextInputLayout) forget.findViewById(R.id.ipEmail1);
+
+            edtEmail1 = (TextInputEditText) forget.findViewById(R.id.edtEmail1);
+
+            btnNext1 = (MaterialButton) forget.findViewById(R.id.btnNext1);
+            btnCancel1 = (MaterialButton) forget.findViewById(R.id.btnCancel1);
+            btnNext1.setOnClickListener(v12 -> {
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                String emailAddress = edtEmail1.getText().toString().trim();
+
+                if (emailAddress.isEmpty())
+                    ipEmail1.setError("המייל ריק.");
+                else {
+                    final ProgressDialog pd = ProgressDialog.show(this, "התחברות", "מתחבר...", true);
+                    pd.setCancelable(false);
+                    pd.show();
+
+                    auth.sendPasswordResetEmail(emailAddress)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    pd.dismiss();
+                                    if (task.isSuccessful()) {
+                                        Log.d("TAG", "Email sent.");
+                                        forget.dismiss();
+                                        Toast.makeText(getApplicationContext(), "נשלח מייל לשחזור סיסמה", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Log.w("Login", "signInWithEmail:failure", task.getException());
+                                        ipEmail1.setError(task.getException().getMessage());
+                                    }
+                                }
+                            });
+                }
+            });
+            btnCancel1.setOnClickListener(v1 -> forget.dismiss());
+
+            forget.show();
+            forget.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         }
     }
 }
