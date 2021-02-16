@@ -32,8 +32,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -76,6 +81,7 @@ public class StudentsActivity extends AppCompatActivity {
     private ContentResolver contentResolver;
 
     private StorageReference mStorageRef;
+    FirebaseFirestore db;
 
     private SharedPreferences sp;
     private String name;
@@ -137,6 +143,7 @@ public class StudentsActivity extends AppCompatActivity {
         type = sp.getString(Utils.TYPE_KEY, "student");
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
 
         arrMeeting = new Dialog(this);                               //Initializing meeting arrangement dialog
         arrMeeting.setContentView(R.layout.meeting_arrangement_dialog);
@@ -364,10 +371,28 @@ public class StudentsActivity extends AppCompatActivity {
 
                                 }
 
-                                String eSubject=" פגישה דו שנתית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-                                String eMessage="נקבעה לך פגישה עם המורה "+ name + " בתאריך "+ Date + " בשעה "+ time +"\n כל הפרטים נמצאים באפליקציית אמ\"ית";
 
-                                sendEmail("gilad.kay236@gmail.com", eSubject, eMessage);
+                                //TODO ניסוח
+                                String eSubject=" שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
+                                String eMessage="נקבעה לך שיחה אישית עם המורה "+ name + " בתאריך "+ Date + " בשעה "+ time +"\n כל הפרטים נמצאים באפליקציית אמ\"ית";
+
+
+                                db.collection("users").whereEqualTo("name",student.getName())
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+                                                        sendEmail(document.getId(), eSubject, eMessage);
+                                                    }
+                                                } else {
+                                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                                                }
+                                            }
+                                        });
 
                                 Toast.makeText(getApplicationContext(), "פגישה עם " + student.getName() + " בתאריך: " + Date + " בשעה: " + time, Toast.LENGTH_LONG).show();
                                 arrMeeting.hide();
@@ -552,7 +577,7 @@ public class StudentsActivity extends AppCompatActivity {
      * @param subject = title of email
      * @param message = contents of email
      */
-    private void sendEmail(String address, String subject, String message){
+    public void sendEmail(String address, String subject, String message){
         javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
         javaMailAPI.execute();
 

@@ -37,9 +37,14 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -92,6 +97,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
     private StorageReference mStorageRef;
+    FirebaseFirestore db;
 
     private ProgressDialog pd;
 
@@ -197,6 +203,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
 
         meetingList = new ArrayList<>();
         doneList = new ArrayList<>();
@@ -380,6 +387,7 @@ public class MeetingsActivity extends AppCompatActivity {
                             if(type.equals("student")) {
                                 MaterialButton btnDone = editMeet.findViewById(R.id.btnMeetingDone);
                                 btnDone.setText("כתוב משוב");
+                                editMeet.findViewById(R.id.text8).setVisibility(View.GONE);
                             }
                             downloadDoneFile(doneList.get(i).getFileName(), i);
                         }
@@ -473,6 +481,30 @@ public class MeetingsActivity extends AppCompatActivity {
                                             String fileText = meetingList.get(i).getStudent() + "&&" + meetingList.get(i).getTeacher() + "&&"  + meetingList.get(i).getDate()+"&&"+ meetingList.get(i).getTime() + "&&" + mashov + "&&";
                                             writeToFile(fileText, getApplicationContext(), fileName);//update the meeting counter
                                             uploadFile(fileName, "Meetings/Done/");//
+
+                                            //TODO ניסוח
+                                            String eSubject="משוב על שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
+                                            String eMessage="הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך "+meetingList.get(i).getDate()+" בשעה "+meetingList.get(i).getTime() +" אם המורה "+meetingList.get(i).getTeacher();
+
+
+                                            db.collection("users").whereEqualTo("name",meetingList.get(i).getStudent())
+                                                    .get()
+                                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                            if (task.isSuccessful()) {
+                                                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                    Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+
+
+                                                                    sendEmail(document.getId(), eSubject, eMessage);
+                                                                }
+                                                            } else {
+                                                                Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                                                            }
+                                                        }
+                                                    });
 
                                             Toast.makeText(getApplicationContext(), "המשוב על הפגישה עם " + meetingList.get(i).getStudent() + " נשלח בהצלחה", Toast.LENGTH_LONG).show();
                                             meetingList.remove(i);
@@ -880,6 +912,19 @@ public class MeetingsActivity extends AppCompatActivity {
              getContentResolver().delete(eventUri, null, null);
         }
     }*/
+
+    /**
+     * sends emails
+     * @param address = email address of recipient
+     * @param subject = title of email
+     * @param message = contents of email
+     */
+    public void sendEmail(String address, String subject, String message){
+        javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
+        javaMailAPI.execute();
+
+        Log.d(Utils.TAG, "email sent");
+    }
 
     @Override
     public void onBackPressed() {
