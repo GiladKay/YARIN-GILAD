@@ -528,7 +528,7 @@ public class MeetingsActivity extends AppCompatActivity {
                                                 }
                                             });
 
-                                            String fileText = doneList.get(i).getStudent() + "&&" + doneList.get(i).getTeacher() +"&&" + doneList.get(i).getDate()+"&&"+ mashov + "&&"+doneList.get(i).getMashov()+"&&";
+                                            String fileText = doneList.get(i).getStudent() + "&&" + doneList.get(i).getTeacher() +"&&" + doneList.get(i).getDate()+"&&"+doneList.get(i).getTime()+"&&"+ mashov + "&&"+doneList.get(i).getMashov()+"&&";
                                             writeToFile(fileText, getApplicationContext(), fileName);//update the meeting counter
                                             uploadFile(fileName, "Meetings/Finished/");//
 
@@ -863,7 +863,7 @@ public class MeetingsActivity extends AppCompatActivity {
 
 
         if(mode==Utils.MODE_FINISHED) {
-            Meeting meeting = new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2],      "0"    , data.split("&&")[3],data.split("&&")[4]);//show time, date , and name of student
+            Meeting meeting = new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2],      data.split("&&")[3]   , data.split("&&")[4],data.split("&&")[5]);//show time, date , and name of student
 
             finishedList.set(i, meeting);
 

@@ -63,6 +63,20 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnForget"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:shadowColor="@color/black"
+            android:shadowDx="1"
+            android:shadowDy="2"
+            android:shadowRadius="1"
+            android:text="שכחתי סיסמה"
+            android:textColor="#90EAFC" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -73,6 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:backgroundTint="#1C6519"
+                android:layout_marginLeft="4dp"
                 android:text="הבא" />
 
             <com.google.android.material.button.MaterialButton
@@ -87,13 +102,6 @@
                 android:text="ביטול" />
 
         </RelativeLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnForget"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="שכחתי סיסמה" />
 
     </LinearLayout>
 
