@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="20dp"
-            android:text="התחברות"
+            android:text="שינוי סיסמה"
             android:fontFamily="sans-serif"
             android:shadowColor="@color/black"
             android:shadowDx="5"
@@ -28,20 +28,20 @@
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ipEmail"
+            android:id="@+id/ipOldPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:hint="אימייל"
-            app:startIconDrawable="@drawable/email"
+            android:hint="סיסמה ישנה"
+            app:endIconMode="password_toggle"
+            app:startIconDrawable="@drawable/password"
             app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtEmail"
+                android:id="@+id/edtOldPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLines="1" />
+                android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
-            android:hint="סיסמה"
+            android:hint="סיסמה חדשה"
             app:endIconMode="password_toggle"
             app:startIconDrawable="@drawable/password"
             app:errorEnabled="true">
@@ -87,13 +87,6 @@
                 android:text="ביטול" />
 
         </RelativeLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnForget"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="שכחתי סיסמה" />
 
     </LinearLayout>
 
