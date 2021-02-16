@@ -33,8 +33,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private SharedPreferences sharedPreferences;
 
     private Dialog newPass;
-    private TextInputLayout ipPassword, ipOldPassword;
-    private TextInputEditText edtPassword, edtOldPassword;
+    private TextInputLayout ipPassword, ipOldPassword,ipRepeatPassword;
+    private TextInputEditText edtPassword, edtOldPassword,edtRepeatPassword;
     private MaterialButton btnNext, btnCancel;
 
     private String name, type;
@@ -112,19 +112,23 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
                             ipPassword = (TextInputLayout) newPass.findViewById(R.id.ipPassword);
                             ipOldPassword = (TextInputLayout) newPass.findViewById(R.id.ipOldPassword);
+                            ipRepeatPassword = (TextInputLayout) newPass.findViewById(R.id.ipRepeatPassword);
 
                             edtPassword = (TextInputEditText) newPass.findViewById(R.id.edtPassword);
                             edtOldPassword = (TextInputEditText) newPass.findViewById(R.id.edtOldPassword);
+                            edtRepeatPassword = (TextInputEditText) newPass.findViewById(R.id.edtRepeatPassword);
 
                             btnNext = (MaterialButton) newPass.findViewById(R.id.btnNext);
                             btnCancel = (MaterialButton) newPass.findViewById(R.id.btnCancel);
                             btnNext.setOnClickListener(v12 -> {
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 String password = edtPassword.getText().toString().trim();
+                                String RePassword = edtRepeatPassword.getText().toString().trim();
                                 String oldPassword = edtOldPassword.getText().toString().trim();
 
                                 ipPassword.setError(null); // Clear the error
-                                ipOldPassword.setError(null); // Clear the error
+                                ipOldPassword.setError(null); //
+                                ipRepeatPassword.setError(null);//
 
                                 if (password.isEmpty())
                                     ipPassword.setError("הסיסמה ריקה.");
@@ -132,7 +136,14 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                                 if (oldPassword.isEmpty())
                                     ipOldPassword.setError("הסיסמה ריקה.");
 
-                                if (!password.isEmpty() && !oldPassword.isEmpty()) {
+                                if(RePassword.isEmpty()){
+                                    ipRepeatPassword.setError("הסיסמה ריקה.");
+                                }
+                                if(!RePassword.equals(password)){
+                                    ipPassword.setError("הססמאות החדשות שהזנת אינם תואמות");
+                                }
+
+                                if (!password.isEmpty() && !oldPassword.isEmpty() && !RePassword.isEmpty() && RePassword.equals(password)) {
                                     final ProgressDialog pd = ProgressDialog.show(this, "שינוי סיסמה", "משנה סיסמה...", true);
                                     pd.setCancelable(false);
                                     pd.show();
@@ -166,6 +177,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                                             });
                                 }
                             });
+
                             btnCancel.setOnClickListener(v1 -> {
                                 newPass.dismiss();
                             });
