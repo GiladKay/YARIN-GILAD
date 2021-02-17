@@ -3,9 +3,13 @@ package com.yg.amit;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -14,9 +18,11 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -432,12 +438,20 @@ public class MeetingsActivity extends AppCompatActivity {
                                 startTime = cal.getTimeInMillis();
                                 endTime = startTime + 30 * 60 * 1000;
 
-                                int id=ListSelectedCalendars("פגישה עם "+meeting.getStudent());
-                                UpdateCalendarEntry(id,startTime,endTime);
+                                if(ContextCompat.checkSelfPermission(MeetingsActivity.this, Manifest.permission.WRITE_CALENDAR)== PackageManager.PERMISSION_GRANTED) {
+                                    int id = ListSelectedCalendars("פגישה עם " + meeting.getStudent());
+                                    UpdateCalendarEntry(id, startTime, endTime);
 
+                                    editMeet.dismiss();
+                                }
+                                else{
+                                    RequestStoragePermission();
+
+                                    editMeet.dismiss();
+                                }
 
                                 Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + Date, Toast.LENGTH_LONG).show();
-                                    editMeet.hide();
+
 
 
                             }
@@ -541,7 +555,6 @@ public class MeetingsActivity extends AppCompatActivity {
                                     }
                                 });
 
-                                //TODO add one to the meeting count of the teacher
 
                             }
                         });
@@ -926,6 +939,43 @@ public class MeetingsActivity extends AppCompatActivity {
         Log.d(Utils.TAG, "email sent");
     }
 
+
+
+    public void RequestStoragePermission(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_CALENDAR)){
+
+            new AlertDialog.Builder(this)
+                    .setTitle("נצרכת הרשאה")
+                    .setMessage("ההרשאה הזאת נדרשת על מנת לעדכן את לוח השנה באשר לפגישות הנ\"ל")
+                    .setPositiveButton("אוקיי", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(MeetingsActivity.this,new String[] {Manifest.permission.WRITE_CALENDAR},Utils.STORAGE_PERMISSION_CODE);
+
+                        }
+                    })
+                    .setNegativeButton("ביטול", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    })
+                    .create().show();
+        }else{
+            ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.WRITE_CALENDAR},Utils.STORAGE_PERMISSION_CODE);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode== Utils.STORAGE_PERMISSION_CODE){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, "בקשת הרשאה אושרה", Toast.LENGTH_LONG).show();
+            }
+            else{
+                Toast.makeText(this, "בקשת הרשאה נדחתה", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();

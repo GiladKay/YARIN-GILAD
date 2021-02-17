@@ -322,7 +322,6 @@ public class StudentsActivity extends AppCompatActivity {
                             String Date = tvDate.getText().toString();
 
                             if (!time.isEmpty() && !Date.isEmpty()) {
-                                //TODO send an email to the student
 
                                 student.incMeetingCount();
 
@@ -548,7 +547,7 @@ public class StudentsActivity extends AppCompatActivity {
                                                                                         if (n.get() == 2) {
                                                                                             Log.d(Utils.TAG, "updateMeetingCount: ENDED!");
                                                                                             // END OF THE METHOD
-                                                                                            // TODO WHATEVER YOU WANT
+                                                                                            // WHATEVER YOU WANT
 
 
 

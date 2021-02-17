@@ -28,4 +28,7 @@ public class Utils {
 
     // key for sp containing the last state of the "add to calendar" switch
     public static final String SWITCH_STATE = "switchState";//
+
+
+    public static final int STORAGE_PERMISSION_CODE = 1;
 }
