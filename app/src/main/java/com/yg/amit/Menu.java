@@ -2,6 +2,7 @@ package com.yg.amit;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -27,6 +30,16 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class Menu extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,6 +54,11 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private TextView tvTitle;
     private Button btnUpcoming, btnClasses, btnTeachers, btnAccount, btnAdmin;
 
+
+    private String address="";
+    private String subject="";
+    private String message="";
+    StorageReference mStorageRef;
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         getMenuInflater().inflate(R.menu.student_menu, menu);
@@ -66,6 +84,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         mTitle.setText("תפריט ");
         toolbar.findViewById(R.id.btnAccount).setVisibility(View.VISIBLE);
         setSupportActionBar(toolbar);
+
+        sendFirebaseMail();
 
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
@@ -223,5 +243,116 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                     }
                 })
                 .setIcon(R.drawable.error).show();
+    }
+
+    /**
+     * reads and outputs the contents of the now local meeting file
+     * @param context-this
+     * @param file- name of the meeting file
+     * @return String containing all the data from the file
+     */
+    private String readFromFile(Context context, String file) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(file);
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString).append("\n");
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+    private void downloadFile(String file) {
+        File localFile = new File(getFilesDir() + "/" + file);
+
+        mStorageRef.child("Emails/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    updateClass(file);
+                }).addOnFailureListener(exception -> {
+            // Handle failed download
+            Log.w("Download", "onFailure: Download failed", exception);
+        });
+    }
+    private void updateClass(String file) {
+        String data = readFromFile(this, file);
+        Log.d("TAG", "MailMeeting: " + data);
+        String teacher= data.split("&&")[1];
+        String date = data.split("&&")[2];
+        String time = data.split("&&")[3];
+
+        if(data.split("&&").length==5){//has mashov
+            subject  ="משוב על שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
+            message= "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך "+date+" בשעה "+time +" אם המורה "+teacher;
+        }else{
+            subject=" שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
+            message="נקבעה לך שיחה אישית עם המורה "+ teacher + " בתאריך "+ date + " בשעה "+ time +"\n כל הפרטים נמצאים באפליקציית אמ\"ית";
+
+        }
+
+        address = file.substring(0,file.length()-4);
+        javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
+        javaMailAPI.execute();
+        Log.d(Utils.TAG, "email sent");
+        Log.d(Utils.TAG, address);
+
+        StorageReference desertRef = mStorageRef.child("Emails/" + file);
+
+        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Uh-oh, an error occurred!
+            }
+        });
+
+    }
+
+    public void sendFirebaseMail(){
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
+        mStorageRef.child("Emails/").listAll()
+                .addOnSuccessListener(listResult -> {
+                    for (StorageReference prefix : listResult.getPrefixes()) {
+                        // All the prefixes under listRef.
+                        // You may call listAll() recursively on them.
+                    }
+
+                    for (StorageReference item : listResult.getItems()) {
+                        // All the items under listRef.
+                        downloadFile(item.getName());
+
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Uh-oh, an error occurred!
+                    Log.w("getMeetings", "onFailure: ", e);
+                });
+
+
+
     }
 }

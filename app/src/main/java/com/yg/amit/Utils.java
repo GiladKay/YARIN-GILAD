@@ -12,7 +12,7 @@ public class Utils {
     public static final String TYPE_KEY = "type";//
 
     // log tag
-    public static final String TAG="TAG";//
+    public static final String TAG="debug_tag";//
 
 
     // the modes in which a user can view meeting (upcoming meetings, done meetings (with teacher mashov) and
