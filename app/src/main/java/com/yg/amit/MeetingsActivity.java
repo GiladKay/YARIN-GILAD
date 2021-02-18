@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -65,7 +66,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MeetingsActivity extends AppCompatActivity {
+public class MeetingsActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences sharedPreferences;
 
@@ -80,6 +81,10 @@ public class MeetingsActivity extends AppCompatActivity {
 
     private ArrayList<Meeting> finishedList;
     private MeetingAdapter finishedAdapter;
+
+    private Button btnUpcoming;
+    private Button btnDone;
+    private Button btnFinished;
 
     private ListView lv;
     private String data;
@@ -106,64 +111,6 @@ public class MeetingsActivity extends AppCompatActivity {
     private int tHour, tMinute;
 
 
-    @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        getMenuInflater().inflate(R.menu.student_menu,menu);
-
-        if(type.equals("admin"))
-            menu.findItem(R.id.sAndTMashov).setVisible(true);
-        if(!type.equals("teacher")) {
-            menu.findItem(R.id.tMashov).setVisible(true);
-            menu.findItem(R.id.upcoming).setVisible(true);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id= item.getItemId();
-
-        switch (id){
-            case R.id.upcoming:
-                lv.setAdapter(meetingAdapter);
-                tvNoMeeting.setText("אין פגישות קרובות");
-                if(meetingList.isEmpty()) {
-                    Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
-                    tvNoMeeting.setVisibility(View.VISIBLE);
-                }
-                else
-                    tvNoMeeting.setVisibility(View.GONE);
-                mode=Utils.MODE_UPCOMING;
-                break;
-            case R.id.tMashov:
-                lv.setAdapter(doneAdapter);
-                tvNoMeeting.setText("ברגע שהמורה יסיים לכתוב משוב, תוכל לכתוב משוב על הפגישה שלך עם המורה");
-                if(doneList.isEmpty()){
-                    Toast.makeText(this, "אין פגישות שצריכות משוב", Toast.LENGTH_LONG).show();
-                    tvNoMeeting.setVisibility(View.VISIBLE);
-                }
-                else
-                    tvNoMeeting.setVisibility(View.GONE);
-                mode=Utils.MODE_DONE;
-                break;
-            case R.id.sAndTMashov:
-                lv.setAdapter(finishedAdapter);
-                if(finishedList.isEmpty()){
-                    Toast.makeText(this, "אין פגישות עם משוב מורה-תלמיד", Toast.LENGTH_LONG).show();
-                    tvNoMeeting.setVisibility(View.VISIBLE);
-                }
-                else
-                    tvNoMeeting.setVisibility(View.GONE);
-                mode=Utils.MODE_FINISHED;
-                break;
-
-            case R.id.exit:
-                finish();
-                break;
-
-        }
-        return true;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,6 +158,21 @@ public class MeetingsActivity extends AppCompatActivity {
         doneList = new ArrayList<>();
         finishedList = new ArrayList<>();
 
+
+        btnUpcoming=(Button) findViewById(R.id.btnUpcoming);
+        btnUpcoming.setOnClickListener(this);
+        btnDone = (Button) findViewById(R.id.btnDone);
+        btnDone.setOnClickListener(this);
+        btnFinished = (Button) findViewById(R.id.btnFinished);
+        btnFinished.setOnClickListener(this);
+
+        if(type.equals("student")||type.equals("teacher")){
+            btnFinished.setVisibility(View.GONE);
+        }
+        if(type.equals("teacher")){
+            btnDone.setVisibility(View.GONE);
+            btnUpcoming.setVisibility(View.GONE);
+        }
 
         lv = (ListView) findViewById(R.id.lv);
         tvNoMeeting = (TextView)findViewById(R.id.tvNoMeet);
@@ -956,6 +918,8 @@ public class MeetingsActivity extends AppCompatActivity {
         }
     }
 
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode== Utils.STORAGE_PERMISSION_CODE){
@@ -968,10 +932,54 @@ public class MeetingsActivity extends AppCompatActivity {
         }
     }
 
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         startActivity(new Intent(getBaseContext(), Menu.class));
         finish();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btnUpcoming:
+                lv.setAdapter(meetingAdapter);
+                tvNoMeeting.setText("אין פגישות קרובות");
+                if(meetingList.isEmpty()) {
+                    Toast.makeText(this, "אין פגישות קרובות!", Toast.LENGTH_LONG).show();
+                    tvNoMeeting.setVisibility(View.VISIBLE);
+                }
+                else
+                    tvNoMeeting.setVisibility(View.GONE);
+                mode=Utils.MODE_UPCOMING;
+                break;
+            case R.id.btnDone:
+                lv.setAdapter(doneAdapter);
+                tvNoMeeting.setText("ברגע שהמורה יסיים לכתוב משוב, תוכל לכתוב משוב על הפגישה שלך עם המורה");
+                if(doneList.isEmpty()){
+                    Toast.makeText(this, "אין פגישות שצריכות משוב", Toast.LENGTH_LONG).show();
+                    tvNoMeeting.setVisibility(View.VISIBLE);
+                }
+                else
+                    tvNoMeeting.setVisibility(View.GONE);
+                mode=Utils.MODE_DONE;
+                break;
+            case R.id.btnFinished:
+                lv.setAdapter(finishedAdapter);
+                if(finishedList.isEmpty()){
+                    Toast.makeText(this, "אין פגישות עם משוב מורה-תלמיד", Toast.LENGTH_LONG).show();
+                    tvNoMeeting.setVisibility(View.VISIBLE);
+                }
+                else
+                    tvNoMeeting.setVisibility(View.GONE);
+                mode=Utils.MODE_FINISHED;
+                break;
+
+            case R.id.exit:
+                finish();
+                break;
+
+        }
     }
 }
