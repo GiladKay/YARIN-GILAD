@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -74,7 +76,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
     private String name, type;
 
     private ArrayList<Meeting> meetingList;
-    private ArrayAdapter<Meeting> meetingAdapter;
+    private MeetingAdapter meetingAdapter;
 
     private ArrayList<Meeting> doneList;
     private MeetingAdapter doneAdapter;
@@ -111,6 +113,36 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
     private int tHour, tMinute;
 
 
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.search, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.search);
+        menuItem.setVisible(true);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setQueryHint("חפש תלמיד");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                if(mode==Utils.MODE_UPCOMING)
+                    meetingAdapter.getFilter().filter(s);
+                if(mode==Utils.MODE_DONE)
+                    doneAdapter.getFilter().filter(s);
+                if(mode==Utils.MODE_FINISHED)
+                    finishedAdapter.getFilter().filter(s);
+                return false;
+            }
+
+
+        });
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +155,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("פגישות");
         setSupportActionBar(toolbar);
+
 
         context=this;
 
@@ -195,7 +228,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                         if(item.getName().contains(name)||type.equals("admin"))
                         meetingList.add(new Meeting(item.getName().split("&")[0],item.getName().split("&")[1].replace(".txt",""),"0","0"));
 
-                        meetingAdapter = new MeetingAdapter(this, 0, 0, meetingList);
+                        meetingAdapter =new MeetingAdapter(context,meetingList);
                         lv.setAdapter(meetingAdapter);
                     }
 
@@ -226,7 +259,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                 doneList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
 
 
-                            doneAdapter=new MeetingAdapter(context,0,0,doneList);
+                            doneAdapter=new MeetingAdapter(context,doneList);
                         }
 
                     })
@@ -249,7 +282,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                             // All the items under listRef.
                             finishedList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
 
-                            finishedAdapter=new MeetingAdapter(context,0,0,finishedList);
+                            finishedAdapter=new MeetingAdapter(context,finishedList);
                         }
 
                     })
