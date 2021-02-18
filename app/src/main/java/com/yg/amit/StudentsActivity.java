@@ -370,11 +370,8 @@ public class StudentsActivity extends AppCompatActivity {
 
                                 }
 
-
-                                //TODO ניסוח
                                 String eSubject=" שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-                                String eMessage="נקבעה לך שיחה אישית עם המורה "+ name + " בתאריך "+ Date + " בשעה "+ time +"\n כל הפרטים נמצאים באפליקציית אמ\"ית";
-
+                                String eMessage="נקבעה לך שיחה אישית עם המורה "+ name + ", בתאריך: "+ Date + ", בשעה: "+ time +".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
                                 db.collection("users").whereEqualTo("name",student.getName())
                                         .get()
@@ -409,10 +406,6 @@ public class StudentsActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
 
     /**
      * reads and outputs the contents of the now local Class file
@@ -482,22 +475,13 @@ public class StudentsActivity extends AppCompatActivity {
 
     private void createMeeting(String studentName, String time, String Date) {
         writeToFile(studentName + "&&" + name + "&&" + Date + "&&" + time + "&&", this, studentName + "&" + name + ".txt");
-
         uploadFile(studentName + "&" + name + ".txt", "Meetings/Upcoming/");
-
+        updateMeetingCount();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        if (hasBeenEdited) {//if a meetings was booked
-            //update the number of meetings a student has in file
-            pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
-            pd.setCancelable(false);
-            pd.show();
-            updateMeetingCount();
-        }
 
         SharedPreferences.Editor editor = sd.edit();
         editor.putBoolean(Utils.SWITCH_STATE, switchCalen.isChecked());
@@ -549,8 +533,6 @@ public class StudentsActivity extends AppCompatActivity {
                                                                                             // END OF THE METHOD
                                                                                             // WHATEVER YOU WANT
 
-
-
                                                                                         }
                                                                                     });
                                                                         }
@@ -568,7 +550,6 @@ public class StudentsActivity extends AppCompatActivity {
                     }
                 });
     }
-
 
     /**
      * sends emails

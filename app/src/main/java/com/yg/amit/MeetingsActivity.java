@@ -1,12 +1,5 @@
 package com.yg.amit;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -14,7 +7,6 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
-import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -38,10 +30,15 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,7 +64,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class MeetingsActivity extends AppCompatActivity {
 
@@ -771,8 +767,6 @@ public class MeetingsActivity extends AppCompatActivity {
         return ret;
     }
 
-
-
     private void writeToFile(String data,Context context, String file) {
 
 
@@ -804,8 +798,6 @@ public class MeetingsActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 
     private void downloadDoneFile(String file ,int i) {
         File localFile = new File(getFilesDir() + "/" + file);
@@ -939,8 +931,6 @@ public class MeetingsActivity extends AppCompatActivity {
         Log.d(Utils.TAG, "email sent");
     }
 
-
-
     public void RequestStoragePermission(){
         if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_CALENDAR)){
 
@@ -965,6 +955,7 @@ public class MeetingsActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.WRITE_CALENDAR},Utils.STORAGE_PERMISSION_CODE);
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode== Utils.STORAGE_PERMISSION_CODE){
@@ -976,6 +967,7 @@ public class MeetingsActivity extends AppCompatActivity {
             }
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

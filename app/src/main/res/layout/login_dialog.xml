@@ -68,7 +68,6 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnForget"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
@@ -76,8 +75,7 @@
             android:shadowDx="1"
             android:shadowDy="2"
             android:shadowRadius="1"
-            android:text="שכחתי סיסמה"
-            android:textColor="#90EAFC" />
+            android:text="שכחתי סיסמה" />
 
         <RelativeLayout
             android:layout_width="match_parent"

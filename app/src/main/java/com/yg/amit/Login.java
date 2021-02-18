@@ -198,7 +198,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 if (emailAddress.isEmpty())
                     ipEmail1.setError("המייל ריק.");
                 else {
-                    final ProgressDialog pd = ProgressDialog.show(this, "התחברות", "מתחבר...", true);
+                    final ProgressDialog pd = ProgressDialog.show(this, "שחזור סיסמה", "שולח מייל...", true);
                     pd.setCancelable(false);
                     pd.show();
 

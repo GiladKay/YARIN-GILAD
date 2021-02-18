@@ -39,7 +39,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 public class Menu extends AppCompatActivity implements View.OnClickListener {
 
@@ -85,8 +84,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         toolbar.findViewById(R.id.btnAccount).setVisibility(View.VISIBLE);
         setSupportActionBar(toolbar);
 
-        sendFirebaseMail();
-
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         tvTitle = (TextView) findViewById(R.id.tvTitle);
@@ -108,6 +105,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
         if (type.equals("teacher")) {
             btnTeachers.setVisibility(View.GONE);
+            sendFirebaseMail();
         }
         if (type.equals("student")) {
             btnClasses.setVisibility(View.GONE);
@@ -279,6 +277,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
         return ret;
     }
+
     private void downloadFile(String file) {
         File localFile = new File(getFilesDir() + "/" + file);
 
@@ -286,25 +285,26 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 .addOnSuccessListener(taskSnapshot -> {
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
-                    updateClass(file);
+                    sendMail(file);
                 }).addOnFailureListener(exception -> {
             // Handle failed download
             Log.w("Download", "onFailure: Download failed", exception);
         });
     }
-    private void updateClass(String file) {
+
+    private void sendMail(String file) {
         String data = readFromFile(this, file);
         Log.d("TAG", "MailMeeting: " + data);
         String teacher= data.split("&&")[1];
         String date = data.split("&&")[2];
         String time = data.split("&&")[3];
 
-        if(data.split("&&").length==5){//has mashov
+        if(!data.split("&&")[5].isEmpty()){//has mashov
             subject  ="משוב על שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-            message= "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך "+date+" בשעה "+time +" אם המורה "+teacher;
+            message= "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: "+date+", בשעה: "+time +", עם המורה "+teacher+".";
         }else{
             subject=" שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-            message="נקבעה לך שיחה אישית עם המורה "+ teacher + " בתאריך "+ date + " בשעה "+ time +"\n כל הפרטים נמצאים באפליקציית אמ\"ית";
+            message="נקבעה לך שיחה אישית עם המורה "+ teacher + ", בתאריך: "+ date + ", בשעה: "+ time +".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
         }
 
