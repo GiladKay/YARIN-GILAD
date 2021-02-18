@@ -38,6 +38,7 @@
         android:layout_margin="10dp"
         android:orientation="vertical"
         app:singleSelection="true"
+        app:selectionRequired="true"
         app:checkedButton="@id/btnUpcoming">
 
         <Button

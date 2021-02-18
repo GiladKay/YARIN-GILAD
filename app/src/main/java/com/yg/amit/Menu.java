@@ -91,8 +91,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         btnClasses = (MaterialButton) findViewById(R.id.btnClasses);
         btnTeachers = (MaterialButton) findViewById(R.id.btnTeachers);
         btnAccount = (Button) findViewById(R.id.btnAccount);
-        btnAdmin = (Button) findViewById(R.id.btnAdmin);
-        btnAdmin.setOnClickListener(this);
         btnUpcoming.setOnClickListener(this);
         btnClasses.setOnClickListener(this);
         btnTeachers.setOnClickListener(this);
