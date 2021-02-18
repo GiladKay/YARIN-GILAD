@@ -228,7 +228,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                         if (item.getName().contains(name) || type.equals("admin"))
                             meetingList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
 
-                        meetingAdapter =new MeetingAdapter(context, 0, 0, meetingList);
+                        meetingAdapter =new MeetingAdapter(context, meetingList);
                         lv.setAdapter(meetingAdapter);
                     }
 
@@ -259,7 +259,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                 doneList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
 
 
-                            doneAdapter = new MeetingAdapter(context, 0, 0, doneList);
+                            doneAdapter = new MeetingAdapter(context, doneList);
                         }
 
                     })
@@ -282,7 +282,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                             // All the items under listRef.
                             finishedList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
 
-                            finishedAdapter = new MeetingAdapter(context, 0, 0, finishedList);
+                            finishedAdapter = new MeetingAdapter(context, finishedList);
                         }
 
                     })
