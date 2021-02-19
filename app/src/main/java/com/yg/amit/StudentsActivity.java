@@ -137,7 +137,7 @@ public class StudentsActivity extends AppCompatActivity {
 
         sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
         name = sp.getString(Utils.NAME_KEY, "name");
-        type = sp.getString(Utils.TYPE_KEY, "student");
+        type = sp.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
         db = FirebaseFirestore.getInstance();

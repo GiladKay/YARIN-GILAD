@@ -98,19 +98,19 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         btnAccount.setOnClickListener(this);
 
         name = sharedPreferences.getString(Utils.NAME_KEY, "name");
-        type = sharedPreferences.getString(Utils.TYPE_KEY, "student");
+        type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
 
         tvTitle.setText("שלום " + name);
 
-        if (type.equals("teacher")) {
+        if (type.equals(Utils.TYPE_TEACHER)) {
             btnTeachers.setVisibility(View.GONE);
             sendFirebaseMail();
         }
-        if (type.equals("student")) {
+        if (type.equals(Utils.TYPE_STUDENT)) {
             btnClasses.setVisibility(View.GONE);
             btnTeachers.setVisibility(View.GONE);
         }
-        if (name.equals("admin")) {
+        if (name.equals(Utils.TYPE_ADMIN)) {
             btnAdmin.setVisibility(View.VISIBLE);
         }
     }
@@ -171,12 +171,12 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                                     user.reauthenticate(credential)
                                             .addOnCompleteListener(task -> {
                                                 if (task.isSuccessful()) {
-                                                    Log.d("TAG", "User re-authenticated.");
+                                                    Log.d(Utils.TAG, "User re-authenticated.");
                                                     user.updatePassword(password)
                                                             .addOnCompleteListener(task1 -> {
                                                                 pd.dismiss();
                                                                 if (task1.isSuccessful()) {
-                                                                    Log.d("TAG", "User password updated.");
+                                                                    Log.d(Utils.TAG, "User password updated.");
                                                                     newPass.dismiss();
                                                                     Toast.makeText(getApplicationContext(), "הסיסמה שונתה בהצלחה!", Toast.LENGTH_LONG).show();
                                                                 } else {
@@ -296,7 +296,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     private void sendMail(String file) {
         String data = readFromFile(this, file);
-        Log.d("TAG", "MailMeeting: " + data);
+        Log.d(Utils.TAG, "MailMeeting: " + data);
         String teacher = data.split("&&")[1];
         String date = data.split("&&")[2];
         String time = data.split("&&")[3];

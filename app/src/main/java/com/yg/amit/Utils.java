@@ -24,11 +24,15 @@ public class Utils {
     // key for the Intent Extra that contains the class name
     public static final String CLASS_NAME_KEY = "class";//
 
-
+    // Access types
+    public static final String TYPE_STUDENT="student";
+    public static final String TYPE_TEACHER="teacher";
+    public static final String TYPE_ADMIN="admin";
 
     // key for sp containing the last state of the "add to calendar" switch
     public static final String SWITCH_STATE = "switchState";//
 
 
-    public static final int STORAGE_PERMISSION_CODE = 1;
+    public static final int STORAGE_PERMISSION_CODE1 = 1;
+    public static final int STORAGE_PERMISSION_CODE2 = 2;
 }
