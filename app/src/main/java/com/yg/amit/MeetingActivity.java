@@ -4,19 +4,25 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class MeetingActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -43,6 +50,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private String meetingFile;
     private int meetingMode;
+
+    private String data;
 
     private StorageReference mStorageRef;
 
@@ -83,12 +92,29 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnSend) {
-            // TODO send mashov
+            pd = ProgressDialog.show(this, "פגישה", "שולח משוב...", true);
+            pd.setCancelable(false);
+            pd.show();
+
+            String mashov = edtInput.getText().toString().trim();
+
+            if(type.equals("student")) {
+                String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
+                        + data.split("&&")[3] + "&&" + mashov + "&&" + data.split("&&")[5] + "&&";
+                writeToFile(newData, this, meetingFile);
+                uploadFile(meetingFile, "Meetings/Finished/");
+            }
+            if(type.equals("teacher")) {
+                String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
+                        + data.split("&&")[3] + "&&" + data.split("&&")[4] + "&&" + mashov + "&&";
+                writeToFile(newData, this, meetingFile);
+                uploadFile(meetingFile, "Meetings/Done/");
+            }
         }
     }
 
     public void updateUI(String file) {
-        String data = readFromFile(this, file);
+        data = readFromFile(this, file);
 
         tvTitle.setText(data.split("&&")[0] + " - " + data.split("&&")[1]);
         tvSubTitle.setText(data.split("&&")[2] + " - " + data.split("&&")[3]);
@@ -158,6 +184,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 .addOnFailureListener(exception -> {
                     // Handle failed download
                     Log.w("Download", "onFailure: Download failed", exception);
+                    pd.dismiss();
+                    Toast.makeText(getApplicationContext(),"אירעה שגיאה", Toast.LENGTH_LONG).show();
                 });
     }
 
@@ -195,5 +223,63 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         return ret;
+    }
+
+    private void writeToFile(String data, Context context, String file) {
+
+
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file, MODE_PRIVATE)); // APPEND OR PRIVATE
+            outputStreamWriter.append(data);
+            outputStreamWriter.close();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private void uploadFile(String fileName, String path) {
+        Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
+        StorageReference riversRef = mStorageRef.child(path + fileName);
+
+        riversRef.putFile(file)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d("Upload", "onSuccess: Upload succeeded");
+
+                        StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + fileName);
+
+                        if(path.equals("Meetings/Finished/")) desertRef = mStorageRef.child("Meetings/Done/" + fileName);
+
+                        desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                // File deleted successfully
+                                // TODO send email if type.equals("teacher")
+                                pd.dismiss();
+                                tvHelper.setText("המשוב נשלח בהצלחה!");
+                                ipInput.setVisibility(View.GONE);
+                                edtInput.setVisibility(View.GONE);
+                                btnSend.setVisibility(View.GONE);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                                pd.dismiss();
+                                Toast.makeText(getApplicationContext(),"אירעה שגיאה", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Log.w("Upload", "onSuccess: Upload failed", exception);
+                        pd.dismiss();
+                        Toast.makeText(getApplicationContext(),"אירעה שגיאה", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 }
