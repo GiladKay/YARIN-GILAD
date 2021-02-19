@@ -59,10 +59,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class StudentsActivity extends AppCompatActivity {
 
-    private Dialog arrMeeting;  //dialog for arranging a meeting
-    private TextView tvDate, tvTime;
-    private MaterialButton btnCreate;
-    private Switch switchCalen; //Switch for calendar save
+
 
     private SharedPreferences sd;
 
@@ -73,7 +70,6 @@ public class StudentsActivity extends AppCompatActivity {
 
     private boolean hasBeenEdited = false; // remembers if an edit to the students has occurred
 
-    private TextView tvSName, tvMeetCount;
 
     private ProgressDialog pd;
 
@@ -88,7 +84,6 @@ public class StudentsActivity extends AppCompatActivity {
 
     private String className;
 
-    private int tHour, tMinute;
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
@@ -140,20 +135,8 @@ public class StudentsActivity extends AppCompatActivity {
         type = sp.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        db = FirebaseFirestore.getInstance();
 
-        arrMeeting = new Dialog(this);                               //Initializing meeting arrangement dialog
-        arrMeeting.setContentView(R.layout.meeting_arrangement_dialog);
 
-        tvMeetCount = (TextView) arrMeeting.findViewById(R.id.tvMeetings);
-        tvSName = (TextView) arrMeeting.findViewById(R.id.tvStudentName);
-        tvTime = (TextView) arrMeeting.findViewById(R.id.tvTime2);
-        tvDate = (TextView) arrMeeting.findViewById(R.id.tvDate2);
-        btnCreate = (MaterialButton) arrMeeting.findViewById(R.id.btnCreate);
-
-        sd = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
-        switchCalen = (Switch) arrMeeting.findViewById(R.id.SwitchSave);
-        switchCalen.setChecked(sd.getBoolean(Utils.SWITCH_STATE, false));
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
@@ -185,71 +168,6 @@ public class StudentsActivity extends AppCompatActivity {
                 });
 
         // all the listeners used for the time and date arrangement in a new meeting
-        DatePickerDialog.OnDateSetListener mDateSetListener;
-        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                month = month + 1;
-                Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
-
-                String d = "" + day;
-                if (day < 10) {
-                    d = "0" + day;
-                }
-                String m = "" + month;
-                if (month < 10) {
-                    m = "0" + month;
-                }
-                String date = d + "/" + m + "/" + year;
-                tvDate.setText(date);
-            }
-        };
-
-        tvDate.setOnClickListener(new View.OnClickListener() {         //Dialog for the user to choose a date for the meeting
-            @Override
-            public void onClick(View view) {
-                Calendar cal = Calendar.getInstance(); //get the date of the current day
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH);
-                int day = cal.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog dialog = new DatePickerDialog(
-                        StudentsActivity.this,
-                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,
-                        mDateSetListener,
-                        year, month, day);
-
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
-            }
-        });
-
-        tvTime.setOnClickListener(new View.OnClickListener() {         //Dialog for the user to choose a time for the meeting
-            @Override
-            public void onClick(View view) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(
-                        StudentsActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int hour, int min) {
-                                tHour = hour;
-                                tMinute = min;
-                                String time = hour + ":" + min;
-                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                                try {
-                                    Date date = simpleDateFormat.parse(time);
-                                    tvTime.setText(simpleDateFormat.format(date));
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, 24, 0, true);
-                timePickerDialog.updateTime(tHour, tMinute);
-                timePickerDialog.show();
-
-            }
-        });
-
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
@@ -307,106 +225,12 @@ public class StudentsActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), InfoActivity.class);
                 intent.putExtra("SName", student.getName());
+                intent.putExtra("mCount",student.getMeetingCount());
+                intent.putExtra("classname",className);
                 startActivity(intent);
 
-                switchCalen.setVisibility(View.VISIBLE);
-
-                if (student.getMeetingCount() < 2 && type.equals("teacher")) {
-
-                    tvSName.setText(student.getName() + " ");
-                    tvMeetCount.setText(student.getMeetingCount() + "/2 ");
-
-                    btnCreate.setOnClickListener(new View.OnClickListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onClick(View view) {
-
-                            String time = tvTime.getText().toString();
-                            String Date = tvDate.getText().toString();
-
-                            if (!time.isEmpty() && !Date.isEmpty()) {
-
-                                student.incMeetingCount();
-
-                                hasBeenEdited = true;
-                                lvS.setAdapter(studentAdapter);
-
-                                if (!switchCalen.isChecked())
-                                    createMeeting(student.getName(), time, Date);
-
-
-                                if (switchCalen.isChecked()) {
-                                    Calendar cal = Calendar.getInstance();
-                                    long endTime;
-                                    long startTime;
-
-
-                                    cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTime.getText().toString().split(":")[0]));
-                                    cal.set(Calendar.MINUTE, Integer.parseInt(tvTime.getText().toString().split(":")[1]));
-                                    cal.set(Calendar.YEAR, Integer.parseInt(tvDate.getText().toString().split("/")[2]));
-                                    cal.set(Calendar.MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[1]) - 1);
-                                    cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[0]));
-
-
-                                    startTime = cal.getTimeInMillis();
-                                    endTime = startTime + 30 * 60 * 1000;
-                                    String title = "פגישה עם " + student.getName();
-
-                                    long event_id = (startTime + endTime) / 10000;
-
-                                    Intent intent = new Intent(Intent.ACTION_EDIT);
-                                    intent.setType("vnd.android.cursor.item/event");
-                                    intent.putExtra("beginTime", startTime);
-                                    intent.putExtra("rrule", "FREQ=YEARLY");
-                                    intent.putExtra("endTime", endTime);
-                                    intent.putExtra("title", title);
-
-                                    Log.d("the event id", event_id + "");
-                                    if (intent.resolveActivity(getPackageManager()) != null) {
-                                        startActivity(intent);
-                                        createMeeting(student.getName(), time, Date);
-                                    } else {
-                                        Toast.makeText(StudentsActivity.this, "אין לך אפליקציה שיכולה לשמור את התאריך", Toast.LENGTH_LONG).show();
-                                        createMeeting(student.getName(), time, Date);
-                                    }
-
-                                }
-
-                                String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
-                                String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + Date + ", בשעה: " + time + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
-
-                                db.collection("users").whereEqualTo("name", student.getName())
-                                        .get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
-
-                                                        sendEmail(document.getId(), eSubject, eMessage);
-                                                    }
-                                                } else {
-                                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
-                                                }
-                                            }
-                                        });
-
-                                Toast.makeText(getApplicationContext(), "פגישה עם " + student.getName() + " בתאריך: " + Date + " בשעה: " + time, Toast.LENGTH_LONG).show();
-                                arrMeeting.hide();
-                                switchCalen.setVisibility(View.GONE);
-                            } else {
-                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות ", Toast.LENGTH_LONG).show();
-                            }
-
-                        }
-                    });
-
-                    arrMeeting.show();
-
                 }
-            }
-        });
+            });
     }
 
     /**
@@ -445,126 +269,9 @@ public class StudentsActivity extends AppCompatActivity {
         return ret;
     }
 
-    private void uploadFile(String fileName, String path) {
-        Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
-        StorageReference riversRef = mStorageRef.child(path + fileName);
-
-        riversRef.putFile(file)
-                .addOnSuccessListener(taskSnapshot -> {
-                    Log.d("Upload", "onSuccess: Upload succeeded - " + fileName);
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        Log.w("Upload", "onSuccess: Upload failed", exception);
-                    }
-                });
-    }
-
-    private void writeToFile(String data, Context context, String file) {
 
 
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file, MODE_PRIVATE)); // APPEND OR PRIVATE
-            outputStreamWriter.append(data);
-            outputStreamWriter.close();
-        } catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-    }
 
-    private void createMeeting(String studentName, String time, String Date) {
-        writeToFile(studentName + "&&" + name + "&&" + Date + "&&" + time + "&&", this, studentName + "&" + name + ".txt");
-        uploadFile(studentName + "&" + name + ".txt", "Meetings/Upcoming/");
-        updateMeetingCount();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        SharedPreferences.Editor editor = sd.edit();
-        editor.putBoolean(Utils.SWITCH_STATE, switchCalen.isChecked());
-        editor.commit();
-    }
-
-    public void updateMeetingCount() {
-        AtomicInteger n = new AtomicInteger();
-        mStorageRef.child("Classes/").listAll()
-                .addOnSuccessListener(listResult -> {
-                    for (StorageReference classRef : listResult.getItems()) {
-                        // All the items under listRef.
-                        if (classRef.getName().contains("Teachers") || classRef.getName().contains(className)) {
-                            File localFile = new File(getFilesDir() + "/" + classRef.getName());
-                            AtomicReference<String> classTxt = new AtomicReference<>("");
-
-                            mStorageRef.child("Classes/" + classRef.getName()).getFile(localFile)
-                                    .addOnSuccessListener(taskSnapshot -> {
-                                        // Successfully downloaded data to local file
-                                        Log.d("Download", "onSuccess: Download succeeded - " + classRef.getName());
-
-                                        String txt = readFromFile(getApplicationContext(), classRef.getName());
-                                        for (String s : txt.split("&&")) {
-                                            if (s.contains("==")) {
-                                                AtomicInteger c = new AtomicInteger();
-                                                mStorageRef.child("Meetings/").listAll()
-                                                        .addOnSuccessListener(listResult1 -> {
-                                                            for (StorageReference prefix : listResult1.getPrefixes()) {
-                                                                // All the prefixes under listRef.
-                                                                // You may call listAll() recursively on them.
-                                                                prefix.listAll().addOnSuccessListener(listResult2 -> {
-                                                                    for (StorageReference item : listResult2.getItems()) {
-                                                                        // All the items under listRef.
-                                                                        if (item.getName().contains(s.split("==")[0])) {
-                                                                            c.getAndIncrement();
-                                                                        }
-                                                                    }
-                                                                    if (prefix.getName().equals(listResult1.getPrefixes().get(2).getName())) {
-                                                                        classTxt.set(classTxt + s.split("==")[0] + "==" + c.get() + "&&");
-                                                                        if (txt.split("&&").length == classTxt.get().split("&&").length + 1) {
-                                                                            Log.d("TAG", "updateMeetingCount: " + classTxt.get());
-                                                                            writeToFile(classTxt.get(), getApplicationContext(), classRef.getName());
-                                                                            Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(classRef.getName()));
-                                                                            mStorageRef.child(classRef.getPath()).putFile(file)
-                                                                                    .addOnSuccessListener(taskSnapshot1 -> {
-                                                                                        n.getAndIncrement();
-                                                                                        if (n.get() == 2) {
-                                                                                            Log.d(Utils.TAG, "updateMeetingCount: ENDED!");
-                                                                                            // END OF THE METHOD
-                                                                                            // WHATEVER YOU WANT
-
-                                                                                        }
-                                                                                    });
-                                                                        }
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    }).addOnFailureListener(exception -> {
-                                // Handle failed download
-                                Log.w("Download", "onFailure: Download failed", exception);
-                            });
-                        }
-                    }
-                });
-    }
-
-    /**
-     * sends emails
-     *
-     * @param address = email address of recipient
-     * @param subject = title of email
-     * @param message = contents of email
-     */
-    public void sendEmail(String address, String subject, String message) {
-        javaMailAPI javaMailAPI = new javaMailAPI(this, address, subject, message);
-        javaMailAPI.execute();
-
-        Log.d(Utils.TAG, "email sent");
-    }
 
     @Override
     public void onBackPressed() {

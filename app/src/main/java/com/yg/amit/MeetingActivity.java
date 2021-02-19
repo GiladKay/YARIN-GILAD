@@ -126,19 +126,19 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         btnUpdateEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String time = tvTimeEdit.getText().toString();
-                String Date = tvDateEdit.getText().toString();
+                time = tvTimeEdit.getText().toString();
+                date = tvDateEdit.getText().toString();
 
 
                 //lv.setAdapter(meetingAdapter);
 
-                String data =  student+ "&&" + teacher + "&&" + Date + "&&" + time + "&&";
+                String data =  student+ "&&" + teacher + "&&" + date + "&&" + time + "&&";
 
                 String fileName = student + "&" + teacher + ".txt";
                 writeToFile(data, getApplicationContext(), fileName);//update the meeting counter
                 updateFile(fileName, "Meetings/Upcoming/");//
 
-                tvSubTitle.setText(Date + " - "+ time);
+                tvSubTitle.setText(date + " - "+ time);
 
                 diaEdit.dismiss();
 
@@ -165,7 +165,28 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     RequestStoragePermission2();
                 }
 
-                Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + Date, Toast.LENGTH_LONG).show();
+                String eSubject="שינוי זמן פגישה";
+                //TODO ניסוח
+                String eMessage="הפגישה עם המורה "+ teacher +" הועברה לשעה "+ time +" בתאריך "+date;
+
+                db.collection("users").whereEqualTo("name", student)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+
+                                        sendEmail(document.getId(), eSubject, eMessage);
+                                    }
+                                } else {
+                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                                }
+                            }
+                        });
+                Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + date, Toast.LENGTH_LONG).show();
 
 
             }
