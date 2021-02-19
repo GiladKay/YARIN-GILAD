@@ -59,7 +59,8 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/sMashov"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:layout_margin="8dp"
         app:strokeWidth="1dp"
         app:strokeColor="@color/colorPrimary"
@@ -79,14 +80,20 @@
                     android:textAppearance="?attr/textAppearanceHeadline6"
                     android:gravity="center"/>
 
-                <TextView
-                    android:id="@+id/tvSMashov"
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="המשוב"
-                    android:textAppearance="?attr/textAppearanceBody2"
-                    android:textColor="?android:attr/textColorSecondary" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tvSMashov"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="המשוב"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="?android:attr/textColorSecondary" />
+
+                </ScrollView>
 
             </LinearLayout>
 
@@ -95,7 +102,8 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/tMashov"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
         android:layout_margin="8dp"
         app:strokeWidth="1dp"
         app:strokeColor="@color/colorPrimary"
@@ -115,14 +123,20 @@
                 android:textAppearance="?attr/textAppearanceHeadline6"
                 android:gravity="center"/>
 
-            <TextView
-                android:id="@+id/tvTMashov"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="המשוב"
-                android:textAppearance="?attr/textAppearanceBody2"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvTMashov"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="המשוב"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="?android:attr/textColorSecondary" />
+
+            </ScrollView>
 
         </LinearLayout>
 

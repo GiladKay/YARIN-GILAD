@@ -95,7 +95,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         if (meetingMode == Utils.MODE_UPCOMING) {
             if (type.equals("teacher")) {
-                tvHelper.setVisibility(View.GONE);
+                tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
                 ipInput.setVisibility(View.VISIBLE);
                 edtInput.setVisibility(View.VISIBLE);
                 btnSend.setVisibility(View.VISIBLE);
@@ -103,7 +103,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (meetingMode == Utils.MODE_DONE) {
             if (type.equals("student")) {
-                tvHelper.setVisibility(View.GONE);
+                tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
                 ipInput.setVisibility(View.VISIBLE);
                 edtInput.setVisibility(View.VISIBLE);
                 btnSend.setVisibility(View.VISIBLE);
