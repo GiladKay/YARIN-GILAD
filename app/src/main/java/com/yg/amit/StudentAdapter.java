@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -24,14 +23,15 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
     private List<Student> originalList;
     private List<Student> tempList;
     private CustomFilter cf = new CustomFilter();
+    private String className;
 
-    public StudentAdapter(@NonNull Context context, @NonNull List<Student> objects) {
+    public StudentAdapter(@NonNull Context context, @NonNull List<Student> objects, String className) {
         super();
 
         this.context = context;
         this.originalList = objects;
         this.tempList = objects;
-
+        this.className = className;
     }
 
     @Override
@@ -59,14 +59,17 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
         Student temp = originalList.get(position);
 
         tvName.setText(temp.getName());
-        tvMeetingC.setText(temp.getMeetingCount() + "/2");
 
-        if (temp.getMeetingCount() >= 2) {
-            tvName.setTextColor(Color.GRAY);
-            tvMeetingC.setTextColor(Color.GRAY);
+        if(!className.equals("Teachers")) {
+            tvMeetingC.setText(temp.getMeetingCount() + "/2");
+
+            if (temp.getMeetingCount() >= 2) {
+                tvName.setTextColor(Color.GRAY);
+                tvMeetingC.setTextColor(Color.GRAY);
+            }
+        } else {
+            tvMeetingC.setText(temp.getMeetingCount() + "");
         }
-
-
 
         return view;
     }

@@ -66,7 +66,6 @@ public class StudentsActivity extends AppCompatActivity {
 
     private SharedPreferences sd;
 
-
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
     private ArrayList<Student> studentList;
@@ -90,7 +89,6 @@ public class StudentsActivity extends AppCompatActivity {
     private String className;
 
     private int tHour, tMinute;
-
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
@@ -132,11 +130,10 @@ public class StudentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
-
         Bundle extras = getIntent().getExtras();
         className = extras.getString(Utils.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
 
-        contentResolver=getContentResolver();
+        contentResolver = getContentResolver();
 
         sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
         name = sp.getString(Utils.NAME_KEY, "name");
@@ -160,11 +157,12 @@ public class StudentsActivity extends AppCompatActivity {
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
-
-        pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
+        if(!className.equals("Teachers"))
+            pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
+        if(className.equals("Teachers"))
+            pd = ProgressDialog.show(this, "מורים", "מוריד נתונים...", true);
         pd.setCancelable(false);
         pd.show();
-
 
         mStorageRef.child("Classes").listAll()
                 .addOnSuccessListener(listResult -> {
@@ -256,6 +254,7 @@ public class StudentsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("כיתה " + className);
+        if(className.equals("Teachers")) mTitle.setText("מורים");
         setSupportActionBar(toolbar);
 
     }
@@ -296,7 +295,7 @@ public class StudentsActivity extends AppCompatActivity {
                     Integer.parseInt(data.split("&&")[i].split("==")[1])));
         }
 
-        studentAdapter = new StudentAdapter(this, studentList);
+        studentAdapter = new StudentAdapter(this, studentList, className);
         lvS.setAdapter(studentAdapter);
 
 
@@ -305,6 +304,10 @@ public class StudentsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 Student student = ((Student) studentAdapter.getItem(i));
+
+                Intent intent = new Intent(getApplicationContext(), InfoActivity.class);
+                intent.putExtra("SName", student.getName());
+                startActivity(intent);
 
                 switchCalen.setVisibility(View.VISIBLE);
 
@@ -328,9 +331,8 @@ public class StudentsActivity extends AppCompatActivity {
                                 hasBeenEdited = true;
                                 lvS.setAdapter(studentAdapter);
 
-                                if(!switchCalen.isChecked())
-                                     createMeeting(student.getName(), time, Date);
-
+                                if (!switchCalen.isChecked())
+                                    createMeeting(student.getName(), time, Date);
 
 
                                 if (switchCalen.isChecked()) {
@@ -348,9 +350,9 @@ public class StudentsActivity extends AppCompatActivity {
 
                                     startTime = cal.getTimeInMillis();
                                     endTime = startTime + 30 * 60 * 1000;
-                                    String title="פגישה עם " + student.getName();
+                                    String title = "פגישה עם " + student.getName();
 
-                                    long event_id = (startTime+endTime)/10000;
+                                    long event_id = (startTime + endTime) / 10000;
 
                                     Intent intent = new Intent(Intent.ACTION_EDIT);
                                     intent.setType("vnd.android.cursor.item/event");
@@ -359,7 +361,7 @@ public class StudentsActivity extends AppCompatActivity {
                                     intent.putExtra("endTime", endTime);
                                     intent.putExtra("title", title);
 
-                                    Log.d("the event id",event_id+"");
+                                    Log.d("the event id", event_id + "");
                                     if (intent.resolveActivity(getPackageManager()) != null) {
                                         startActivity(intent);
                                         createMeeting(student.getName(), time, Date);
@@ -370,10 +372,10 @@ public class StudentsActivity extends AppCompatActivity {
 
                                 }
 
-                                String eSubject=" שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-                                String eMessage="נקבעה לך שיחה אישית עם המורה "+ name + ", בתאריך: "+ Date + ", בשעה: "+ time +".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
+                                String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
+                                String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + Date + ", בשעה: " + time + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
-                                db.collection("users").whereEqualTo("name",student.getName())
+                                db.collection("users").whereEqualTo("name", student.getName())
                                         .get()
                                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
@@ -394,7 +396,7 @@ public class StudentsActivity extends AppCompatActivity {
                                 arrMeeting.hide();
                                 switchCalen.setVisibility(View.GONE);
                             } else {
-                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות " , Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות ", Toast.LENGTH_LONG).show();
                             }
 
                         }
@@ -442,7 +444,6 @@ public class StudentsActivity extends AppCompatActivity {
 
         return ret;
     }
-
 
     private void uploadFile(String fileName, String path) {
         Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
@@ -553,24 +554,26 @@ public class StudentsActivity extends AppCompatActivity {
 
     /**
      * sends emails
+     *
      * @param address = email address of recipient
      * @param subject = title of email
      * @param message = contents of email
      */
-    public void sendEmail(String address, String subject, String message){
-        javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
+    public void sendEmail(String address, String subject, String message) {
+        javaMailAPI javaMailAPI = new javaMailAPI(this, address, subject, message);
         javaMailAPI.execute();
 
         Log.d(Utils.TAG, "email sent");
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(getBaseContext(), ClassesActivity.class));
+        if(!className.equals("Teachers"))
+            startActivity(new Intent(getBaseContext(), ClassesActivity.class));
+        else
+            startActivity(new Intent(getBaseContext(), Menu.class));
         finish();
     }
-
 }
 

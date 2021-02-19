@@ -45,8 +45,8 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private SharedPreferences sharedPreferences;
 
     private Dialog newPass;
-    private TextInputLayout ipPassword, ipOldPassword,ipRepeatPassword;
-    private TextInputEditText edtPassword, edtOldPassword,edtRepeatPassword;
+    private TextInputLayout ipPassword, ipOldPassword, ipRepeatPassword;
+    private TextInputEditText edtPassword, edtOldPassword, edtRepeatPassword;
     private MaterialButton btnNext, btnCancel;
 
     private String name, type;
@@ -54,10 +54,11 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private Button btnUpcoming, btnClasses, btnTeachers, btnAccount, btnAdmin;
 
 
-    private String address="";
-    private String subject="";
-    private String message="";
+    private String address = "";
+    private String subject = "";
+    private String message = "";
     StorageReference mStorageRef;
+
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
         getMenuInflater().inflate(R.menu.student_menu, menu);
@@ -152,10 +153,10 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                                 if (oldPassword.isEmpty())
                                     ipOldPassword.setError("הסיסמה ריקה.");
 
-                                if(RePassword.isEmpty()){
+                                if (RePassword.isEmpty()) {
                                     ipRepeatPassword.setError("הסיסמה ריקה.");
                                 }
-                                if(!RePassword.equals(password)){
+                                if (!RePassword.equals(password)) {
                                     ipPassword.setError("הססמאות החדשות שהזנת אינם תואמות");
                                 }
 
@@ -169,7 +170,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                                     // Prompt the user to re-provide their sign-in credentials
                                     user.reauthenticate(credential)
                                             .addOnCompleteListener(task -> {
-                                                if(task.isSuccessful()) {
+                                                if (task.isSuccessful()) {
                                                     Log.d("TAG", "User re-authenticated.");
                                                     user.updatePassword(password)
                                                             .addOnCompleteListener(task1 -> {
@@ -218,7 +219,9 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 finish();
                 break;
             case (R.id.btnTeachers):
-                startActivity(new Intent(getBaseContext(), TeacherActivity.class));
+                Intent intent = new Intent(getBaseContext(), StudentsActivity.class);
+                intent.putExtra(Utils.CLASS_NAME_KEY, "Teachers");// place the class name in an Extra that will be sent to StudentsActivity
+                startActivity(intent);
                 finish();
                 break;
         }
@@ -243,8 +246,9 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     /**
      * reads and outputs the contents of the now local meeting file
+     *
      * @param context-this
-     * @param file- name of the meeting file
+     * @param file-        name of the meeting file
      * @return String containing all the data from the file
      */
     private String readFromFile(Context context, String file) {
@@ -293,21 +297,21 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
     private void sendMail(String file) {
         String data = readFromFile(this, file);
         Log.d("TAG", "MailMeeting: " + data);
-        String teacher= data.split("&&")[1];
+        String teacher = data.split("&&")[1];
         String date = data.split("&&")[2];
         String time = data.split("&&")[3];
 
-        if(!data.split("&&")[5].isEmpty()){//has mashov
-            subject  ="משוב על שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-            message= "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: "+date+", בשעה: "+time +", עם המורה "+teacher+".";
-        }else{
-            subject=" שיחה אישית עם מורה - אמ" +"\""+"ית מודיעין בנים";
-            message="נקבעה לך שיחה אישית עם המורה "+ teacher + ", בתאריך: "+ date + ", בשעה: "+ time +".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
+        if (!data.split("&&")[5].isEmpty()) {//has mashov
+            subject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
+            message = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
+        } else {
+            subject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
+            message = "נקבעה לך שיחה אישית עם המורה " + teacher + ", בתאריך: " + date + ", בשעה: " + time + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
         }
 
-        address = file.substring(0,file.length()-4);
-        javaMailAPI javaMailAPI = new javaMailAPI(this, address,subject,message);
+        address = file.substring(0, file.length() - 4);
+        javaMailAPI javaMailAPI = new javaMailAPI(this, address, subject, message);
         javaMailAPI.execute();
         Log.d(Utils.TAG, "email sent");
         Log.d(Utils.TAG, address);
@@ -328,7 +332,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    public void sendFirebaseMail(){
+    public void sendFirebaseMail() {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
@@ -349,7 +353,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                     // Uh-oh, an error occurred!
                     Log.w("getMeetings", "onFailure: ", e);
                 });
-
 
 
     }

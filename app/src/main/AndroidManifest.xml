@@ -13,7 +13,8 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.AMIT">
-        <activity android:name=".MeetingActivity"></activity>
+        <activity android:name=".InfoActivity"></activity>
+        <activity android:name=".MeetingActivity" />
         <activity android:name=".TeacherActivity" />
         <activity android:name=".StudentsActivity" />
         <activity android:name=".ClassesActivity" />
