@@ -2,30 +2,18 @@ package com.yg.amit;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,12 +70,7 @@ public class MeetingAdapter extends BaseAdapter implements Filterable {
         sharedPreferences = context.getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
         type = sharedPreferences.getString(Utils.TYPE_KEY, "student");
 
-        if (type.equals("student"))
-            tvPerson.setText(temp.getTeacher());
-        else if (type.equals("teacher"))
-            tvPerson.setText(temp.getStudent());
-        else
-            tvPerson.setText(temp.getStudent() + " - " + temp.getTeacher());
+        tvPerson.setText(temp.getStudent() + " - " + temp.getTeacher());
 
 
         return view;
