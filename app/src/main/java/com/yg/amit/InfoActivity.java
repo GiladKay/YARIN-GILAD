@@ -345,7 +345,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                             endTime = startTime + 30 * 60 * 1000;
                             String title = "פגישה עם " + sName;
 
-                            long event_id = (startTime + endTime) / 10000;
 
                             Intent intent = new Intent(Intent.ACTION_EDIT);
                             intent.setType("vnd.android.cursor.item/event");
@@ -354,7 +353,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                             intent.putExtra("endTime", endTime);
                             intent.putExtra("title", title);
 
-                            Log.d("the event id", event_id + "");
                             if (intent.resolveActivity(getPackageManager()) != null) {
                                 startActivity(intent);
                                 createMeeting(sName, time, Date);

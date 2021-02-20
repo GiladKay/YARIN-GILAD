@@ -189,4 +189,18 @@
         android:fontFamily="sans-serif"
         android:textStyle="bold"
         android:visibility="gone"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddToCal"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="הוסף ללוח שנה"
+        android:paddingTop="10dp"
+        android:paddingBottom="15dp"
+        android:textSize="30sp"
+        android:backgroundTint="#5D5DFF"
+        android:fontFamily="sans-serif"
+        android:textStyle="bold"
+        android:visibility="gone"/>
 </LinearLayout>

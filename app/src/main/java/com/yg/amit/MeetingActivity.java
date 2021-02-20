@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -80,6 +81,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private TextInputEditText edtInput;
     private Button btnSend;
     private Button btnEdit;
+    private Button btnAddToCal;
 
     private CardView sMashov, tMashov;
     private TextView tvSMashov, tvTMashov;
@@ -109,6 +111,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
+
 
 
         Bundle extras = getIntent().getExtras();
@@ -271,6 +274,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvSMashov = findViewById(R.id.tvSMashov);
         tvTMashov = findViewById(R.id.tvTMashov);
         btnSend.setOnClickListener(this);
+        btnAddToCal = findViewById(R.id.btnAddToCal);
+        btnAddToCal.setOnClickListener(this);
 
 
 
@@ -330,6 +335,41 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             diaEdit.show();
         }
 
+        if(v.getId() == R.id.btnAddToCal){
+
+            Calendar cal = Calendar.getInstance();
+            long endTime;
+            long startTime;
+            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
+            cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
+            cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
+            cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
+            cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
+
+
+            startTime = cal.getTimeInMillis();
+            endTime = startTime + 30 * 60 * 1000;
+
+            Intent intent = new Intent(Intent.ACTION_EDIT);
+            intent.setType("vnd.android.cursor.item/event");
+            intent.putExtra("beginTime", startTime);
+            intent.putExtra("rrule", "FREQ=YEARLY");
+            intent.putExtra("endTime", endTime);
+            if(type.equals(Utils.TYPE_TEACHER))
+            intent.putExtra("title", "פגישה עם "+ student);
+            if(type.equals(Utils.TYPE_STUDENT))
+                intent.putExtra("title", "פגישה עם "+ teacher);
+
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(MeetingActivity.this, "אין לך אפליקציה שיכולה לשמור את התאריך", Toast.LENGTH_LONG).show();
+            }
+
+            btnAddToCal.setVisibility(View.GONE);
+
+        }
+
     }
 
     public void updateUI(String file) {
@@ -386,6 +426,28 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 tvTMashov.setVisibility(View.VISIBLE);
                 tvSMashov.setText(data.split("&&")[4]);
                 tvTMashov.setText(data.split("&&")[5]);
+            }
+        }
+
+        Calendar cal= Calendar.getInstance();
+
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
+        cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
+        cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
+        cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
+        cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
+
+
+        long startTime = cal.getTimeInMillis();
+        long endTime = startTime + 30 * 60 * 1000;
+        if(type.equals(type.equals(Utils.TYPE_TEACHER))) {
+            if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
+                btnAddToCal.setVisibility(View.VISIBLE);
+            }
+        }
+        if(type.equals(Utils.TYPE_STUDENT)){
+            if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
+                btnAddToCal.setVisibility(View.VISIBLE);
             }
         }
 
@@ -651,6 +713,51 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CALENDAR}, Utils.STORAGE_PERMISSION_CODE2);
         }
     }
+
+    public boolean eventExistsOnCalendar(String eventTitle, long startTimeMs, long endTimeMs) {
+        if (eventTitle == null || "".equals(eventTitle)) {
+            return false;
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        // If no end time, use start + 1 hour or = 1 day. Query is slow if searching a huge time range
+        if (endTimeMs <= 0) {
+            endTimeMs = startTimeMs + 1000 * 60 * 60; // + 1 hour
+        }
+
+        final ContentResolver resolver = getContentResolver();
+        final String[] duplicateProjection = {CalendarContract.Events.TITLE}; // Can change to whatever unique param you are searching for
+        Cursor cursor =
+                CalendarContract.Instances.query(
+                        resolver,
+                        duplicateProjection,
+                        startTimeMs,
+                        endTimeMs,
+                        '"' + eventTitle + '"');
+
+        if (cursor == null) {
+            return false;
+        }
+        if (cursor.getCount() == 0) {
+            cursor.close();
+            return false;
+        }
+
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(0);
+            if (eventTitle.equals(title)) {
+                cursor.close();
+                return true;
+            }
+        }
+
+        cursor.close();
+        return false;
+    }
+
+
+
     /**
      * sends emails
      *
