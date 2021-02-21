@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#D4D4D4">
+    android:background="@color/white"
 
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/text9"
+            android:id="@+id/tvTitle3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/purple_700"
+            android:layout_marginTop="50dp"
+
+            android:background="#009688"
             android:fontFamily="sans-serif"
-            android:paddingRight="15dp"
-            android:text="פגישה"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:shadowRadius="10"
+            android:text=" קביעת  פגישה"
             android:textColor="@color/white"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -31,18 +33,6 @@
             android:orientation="vertical">
 
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/tvTitle3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="10dp"
-                android:fontFamily="sans-serif"
-                android:shadowRadius="5"
-                android:text=" קביעת  פגישה"
-                android:textColor="@color/black"
-                android:textSize="35sp"
-                android:textStyle="bold" />
 
 
             <com.google.android.material.textview.MaterialTextView
@@ -110,22 +100,23 @@
                 android:orientation="horizontal">
 
 
-                <TextView
+
+
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/tvDate2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:background="@color/purple_700"
-                    android:clickable="true"
+                    android:layout_marginTop="70dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="#15DC65"
                     android:fontFamily="sans-serif"
-                    android:gravity="end"
-                    android:hint="תאריך"
-                    android:shadowRadius="5"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@color/cardview_light_background"
-                    android:textColorHint="@color/cardview_light_background"
-                    android:textSize="30sp"
+                    android:gravity="center"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:shadowRadius="10"
+                    android:text="תאריך "
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -135,22 +126,21 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
+
+                <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/tvTime2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:background="@color/purple_700"
-                    android:clickable="true"
+                    android:layout_marginBottom="20dp"
+                    android:background="#15DC65"
                     android:fontFamily="sans-serif"
-                    android:gravity="end"
-                    android:hint="שעה"
-                    android:shadowRadius="5"
-                    android:textAlignment="viewEnd"
-                    android:textColor="@color/cardview_light_background"
-                    android:textColorHint="@color/cardview_light_background"
-                    android:textSize="30sp"
+                    android:gravity="center"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
+                    android:shadowRadius="10"
+                    android:text="שעה"
+                    android:textColor="@color/white"
+                    android:textSize="26sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -184,4 +174,3 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</ScrollView>
