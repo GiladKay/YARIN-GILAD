@@ -17,8 +17,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -26,9 +24,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -166,84 +162,67 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
                 db.collection("users").whereEqualTo("name", student)
                         .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                        sendEmail(document.getId(), eSubject, eMessage);
-                                    }
-                                } else {
-                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                                    sendEmail(document.getId(), eSubject, eMessage);
                                 }
+                            } else {
+                                Log.w(Utils.TAG, "Error getting documents.", task.getException());
                             }
                         });
             }
         });
 
-        tvTimeEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(
-                        MeetingActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                                tHour = i;
-                                tMinute = i1;
-                                String time = i + ":" + i1;
-                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                                try {
-                                    Date date = simpleDateFormat.parse(time);
-                                    tvTimeEdit.setText(simpleDateFormat.format(date));
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, 24, 0, true);
-                timePickerDialog.updateTime(tHour, tMinute);
-                timePickerDialog.show();
+        tvTimeEdit.setOnClickListener(view -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                    MeetingActivity.this,
+                    android.R.style.Theme_DeviceDefault_Dialog_MinWidth,
+                    (timePicker, i, i1) -> {
+                        tHour = i;
+                        tMinute = i1;
+                        String time = i + ":" + i1;
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
+                        try {
+                            Date date = simpleDateFormat.parse(time);
+                            tvTimeEdit.setText(simpleDateFormat.format(date));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }, 0, 0, true);
+            timePickerDialog.updateTime(tHour, tMinute);
+            timePickerDialog.show();
 
-            }
         });
 
         DatePickerDialog.OnDateSetListener mDateSetListener;
 
-        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                month = month + 1;
-                Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
+        mDateSetListener = (datePicker, year, month, day) -> {
+            month = month + 1;
+            Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
 
-                String d = "" + day;
-                if (day < 10) {
-                    d = "0" + day;
-                }
-                String m = "" + month;
-                if (month < 10) {
-                    m = "0" + month;
-                }
-                String date = d + "/" + m + "/" + year;
-
-                tvDateEdit.setText(date);
+            String d = "" + day;
+            if (day < 10) {
+                d = "0" + day;
             }
+            String m = "" + month;
+            if (month < 10) {
+                m = "0" + month;
+            }
+            String date = d + "/" + m + "/" + year;
+
+            tvDateEdit.setText(date);
         };
 
-        tvDateEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                DatePickerDialog dialog = new DatePickerDialog(
-                        MeetingActivity.this,
-                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,
-                        mDateSetListener,
-                        Integer.parseInt(tvDateEdit.getText().toString().substring(6, 10)), Integer.parseInt(tvDateEdit.getText().toString().substring(3, 5)), Integer.parseInt(tvDateEdit.getText().toString().substring(0, 2)));
-
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
-            }
+        tvDateEdit.setOnClickListener(view -> {
+            DatePickerDialog dialog = new DatePickerDialog(
+                    MeetingActivity.this,
+                    android.R.style.Theme_DeviceDefault_Dialog_MinWidth,
+                    mDateSetListener,
+                    Integer.parseInt(tvDateEdit.getText().toString().substring(6, 10)), Integer.parseInt(tvDateEdit.getText().toString().substring(3, 5)), Integer.parseInt(tvDateEdit.getText().toString().substring(0, 2)));
+            dialog.show();
         });
 
         tvTitle = findViewById(R.id.tvTitle);
