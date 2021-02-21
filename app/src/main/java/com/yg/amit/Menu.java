@@ -3,7 +3,6 @@ package com.yg.amit;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -213,12 +212,7 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 .setTitle("יציאה")
                 .setMessage("האם לצאת מהאפליקציה?")
                 .setNegativeButton("לא", null)
-                .setPositiveButton("כן", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
+                .setPositiveButton("כן", (dialog, which) -> finish())
                 .setIcon(R.drawable.error).show();
     }
 

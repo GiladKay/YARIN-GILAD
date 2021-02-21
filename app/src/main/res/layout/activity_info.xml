@@ -29,6 +29,22 @@
         android:textSize="30sp"
         android:textStyle="bold" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tvSubTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="#15DC65"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp"
+        android:shadowRadius="10"
+        android:text="מספר פגישות: "
+        android:textColor="@color/white"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

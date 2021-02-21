@@ -1,17 +1,11 @@
 package com.yg.amit;
 
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,8 +19,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
-import com.google.android.material.button.MaterialButton;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -53,18 +45,14 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
     private Button btnFinished;
 
     private ListView lv;
-    private String data;
-    private MaterialButton btnEdit;
+
     private TextView tvNoMeeting;
 
     private int mode;
 
     private StorageReference mStorageRef;
-    private FirebaseFirestore db;
 
     private ProgressDialog pd;
-
-    private int tHour, tMinute;
 
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
@@ -118,7 +106,6 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);         // confirming the user type (student,teacher,admin)
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
-        db = FirebaseFirestore.getInstance();
 
         meetingList = new ArrayList<>();
         doneList = new ArrayList<>();
@@ -136,12 +123,6 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
         tvNoMeeting.setVisibility(View.GONE);
 
         updateLists();
-
-        lv.setOnItemLongClickListener((adapterView, view, i, l) -> {
-            int event_id = ListSelectedCalendars("פגישה עם " + meetingList.get(i).getStudent());
-            DeleteCalendarEntry(event_id);
-            return false;
-        });
     }
 
     public void updateLists() {
@@ -213,112 +194,6 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
                 });
     }
-
-    public int ListSelectedCalendars(String eventtitle) {
-
-
-        Uri eventUri;
-        if (android.os.Build.VERSION.SDK_INT <= 7) {
-            // the old way
-
-            eventUri = Uri.parse("content://calendar/events");
-        } else {
-            // the new way
-
-            eventUri = Uri.parse("content://com.android.calendar/events");
-        }
-
-        int result = 0;
-        String projection[] = {"_id", "title"};
-        Cursor cursor = getContentResolver().query(eventUri, null, null, null,
-                null);
-
-        if (cursor.moveToFirst()) {
-
-            String calName;
-            String calID;
-
-            int nameCol = cursor.getColumnIndex(projection[1]);
-            int idCol = cursor.getColumnIndex(projection[0]);
-            do {
-                calName = cursor.getString(nameCol);
-                calID = cursor.getString(idCol);
-
-                if (calName != null && calName.contains(eventtitle)) {
-                    result = Integer.parseInt(calID);
-                }
-
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-
-        return result;
-
-    }
-
-    @SuppressLint("InlinedApi")
-    private int UpdateCalendarEntry(int entryID, long start, long end) {
-        int iNumRowsUpdated = 0;
-
-        Uri eventUri;
-        if (android.os.Build.VERSION.SDK_INT <= 7) {
-            // the old way
-
-            eventUri = Uri.parse("content://calendar/events");
-        } else {
-            // the new way
-
-            eventUri = Uri.parse("content://com.android.calendar/events");
-        }
-
-        ContentValues values = new ContentValues();
-        values.put(CalendarContract.Events.DTSTART, start);
-        values.put(CalendarContract.Events.DTEND, end);
-
-        Uri updateUri = ContentUris.withAppendedId(eventUri, entryID);
-        iNumRowsUpdated = getContentResolver().update(updateUri, values, null,
-                null);
-
-        return iNumRowsUpdated;
-    }
-
-    public int DeleteCalendarEntry(int entryID) {
-        int iNumRowsDeleted = 0;
-
-        Uri eventUri = ContentUris
-                .withAppendedId(getCalendarUriBase(), entryID);
-        iNumRowsDeleted = getContentResolver().delete(eventUri, null, null);
-
-        return iNumRowsDeleted;
-    }
-
-    private Uri getCalendarUriBase() {
-        Uri eventUri;
-        if (android.os.Build.VERSION.SDK_INT <= 7) {
-            // the old way
-
-            eventUri = Uri.parse("content://calendar/events");
-        } else {
-            // the new way
-
-            eventUri = Uri.parse("content://com.android.calendar/events");
-        }
-
-        return eventUri;
-    }
-
-/*
-    public void DeleteEvent(int your_event_id){
-
-        Uri eventsUri = Uri.parse("content://com.android.calendar/events");
-        Cursor cur = getContentResolver().query(eventsUri, null, null, null, null);
-
-        while (cur.moveToNext()){
-
-            Uri eventUri = ContentUris.withAppendedId(eventsUri, your_event_id);
-             getContentResolver().delete(eventUri, null, null);
-        }
-    }*/
 
     @Override
     public void onClick(View v) {

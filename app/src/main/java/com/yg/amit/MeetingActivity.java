@@ -89,7 +89,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private String meetingFile;
     private int meetingMode;
-    private int pos;
 
     private String data;
 
@@ -114,7 +113,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         Bundle extras = getIntent().getExtras();
         meetingFile = extras.getString("Meeting");
         meetingMode = extras.getInt("Mode");
-        pos = extras.getInt("position");
 
         diaEdit = new Dialog(this);
         diaEdit.setContentView(R.layout.edit_meeting_dialog);
@@ -290,26 +288,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                         + data.split("&&")[3] + "&&" + data.split("&&")[4] + "&&" + mashov + "&&";
                 writeToFile(newData, this, meetingFile);
                 uploadFile(meetingFile, "Meetings/Done/");
-
-                String eSubject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
-                String eMessage = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
-
-                db.collection("users").whereEqualTo("name", student)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
-
-                                        sendEmail(document.getId(), eSubject, eMessage);
-                                    }
-                                } else {
-                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
-                                }
-                            }
-                        });
             }
         }
 
@@ -318,7 +296,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         if (v.getId() == R.id.btnAddToCal) {
-
             Calendar cal = Calendar.getInstance();
             long endTime;
             long startTime;
@@ -327,7 +304,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
             cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
             cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
-
 
             startTime = cal.getTimeInMillis();
             endTime = startTime + 30 * 60 * 1000;
@@ -349,9 +325,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             }
 
             btnAddToCal.setVisibility(View.GONE);
-
         }
-
     }
 
     public void updateUI(String file) {
@@ -362,7 +336,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         date = data.split("&&")[2];
         time = data.split("&&")[3];
 
-        tvTitle.setText(teacher + " - " + student);
+        tvTitle.setText(student + " - " + teacher);
         tvSubTitle.setText(data.split("&&")[2] + " - " + data.split("&&")[3]);
 
         tvTitleEdit.setText(teacher + " - " + student);
@@ -370,7 +344,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvTimeEdit.setText(time);
 
         if (meetingMode == Utils.MODE_UPCOMING && type.equals(Utils.TYPE_TEACHER)) {
-
             tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
             ipInput.setVisibility(View.VISIBLE);
             edtInput.setVisibility(View.VISIBLE);
@@ -422,7 +395,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         long startTime = cal.getTimeInMillis();
         long endTime = startTime + 30 * 60 * 1000;
-        if (type.equals(type.equals(Utils.TYPE_TEACHER))) {
+        if (type.equals(Utils.TYPE_TEACHER)) {
             if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
@@ -528,13 +501,40 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void onSuccess(Void aVoid) {
                                 // File deleted successfully
-                                // TODO send email if type.equals("teacher")
-                                pd.dismiss();
-                                tvHelper.setText("המשוב נשלח בהצלחה!");
-                                ipInput.setVisibility(View.GONE);
-                                edtInput.setVisibility(View.GONE);
-                                btnSend.setVisibility(View.GONE);
-                                btnEdit.setVisibility(View.GONE);
+                                if(type.equals(Utils.TYPE_TEACHER)) {
+                                    String eSubject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
+                                    String eMessage = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
+
+                                    db.collection("users").whereEqualTo("name", student)
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+                                                            sendEmail(document.getId(), eSubject, eMessage);
+                                                            pd.dismiss();
+                                                            tvHelper.setText("המשוב נשלח בהצלחה!");
+                                                            ipInput.setVisibility(View.GONE);
+                                                            edtInput.setVisibility(View.GONE);
+                                                            btnSend.setVisibility(View.GONE);
+                                                            btnEdit.setVisibility(View.GONE);
+                                                        }
+                                                    } else {
+                                                        Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                                                    }
+                                                }
+                                            });
+                                } else {
+                                    pd.dismiss();
+                                    tvHelper.setText("המשוב נשלח בהצלחה!");
+                                    ipInput.setVisibility(View.GONE);
+                                    edtInput.setVisibility(View.GONE);
+                                    btnSend.setVisibility(View.GONE);
+                                    btnEdit.setVisibility(View.GONE);
+                                }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override

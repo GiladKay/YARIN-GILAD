@@ -60,55 +60,12 @@
         android:id="@+id/sMashov"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
         android:layout_margin="8dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="@color/colorPrimary"
-        app:cardElevation="0dp"
-        android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="משוב תלמיד"
-                    android:textAppearance="?attr/textAppearanceHeadline6"
-                    android:gravity="center"/>
-
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/tvSMashov"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="המשוב"
-                        android:textAppearance="?attr/textAppearanceBody2"
-                        android:textColor="?android:attr/textColorSecondary" />
-
-                </ScrollView>
-
-            </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/tMashov"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_margin="8dp"
-        app:strokeWidth="1dp"
-        app:strokeColor="@color/colorPrimary"
+        android:visibility="gone"
         app:cardElevation="0dp"
-        android:visibility="gone">
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -119,9 +76,52 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="משוב תלמיד"
+                android:textAppearance="?attr/textAppearanceHeadline6" />
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tvSMashov"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="המשוב"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="?android:attr/textColorSecondary" />
+
+            </ScrollView>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/tMashov"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="8dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="משוב מורה"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                android:gravity="center"/>
+                android:textAppearance="?attr/textAppearanceHeadline6" />
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -144,63 +144,75 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/ipInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_margin="10dp"
+        android:layout_weight="1"
         android:visibility="gone">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="top"
             android:hint="משוב"
             android:lines="5"
-            android:maxLines="10"
-            android:gravity="top"/>
+            android:maxLines="10" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSend"
-        style="@style/Widget.MaterialComponents.Button"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="שלח משוב"
-        android:paddingTop="10dp"
-        android:paddingBottom="15dp"
-        android:textSize="30sp"
-        android:backgroundTint="#07A5FF"
-        android:fontFamily="sans-serif"
-        android:textStyle="bold"
-        android:visibility="gone"/>
+        android:layout_margin="10dp"
+        android:orientation="vertical">
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSend"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#07A5FF"
+            android:fontFamily="sans-serif"
+            android:paddingTop="10dp"
+            android:paddingBottom="15dp"
+            android:text="שלח משוב"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnEdit"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="ערוך פגישה"
-        android:paddingTop="10dp"
-        android:paddingBottom="15dp"
-        android:textSize="30sp"
-        android:backgroundTint="#CEC28F"
-        android:fontFamily="sans-serif"
-        android:textStyle="bold"
-        android:visibility="gone"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEdit"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#CEC28F"
+            android:fontFamily="sans-serif"
+            android:paddingTop="10dp"
+            android:paddingBottom="15dp"
+            android:text="ערוך פגישה"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnAddToCal"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="הוסף ללוח שנה"
-        android:paddingTop="10dp"
-        android:paddingBottom="15dp"
-        android:textSize="30sp"
-        android:backgroundTint="#5D5DFF"
-        android:fontFamily="sans-serif"
-        android:textStyle="bold"
-        android:visibility="gone"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddToCal"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#5D5DFF"
+            android:fontFamily="sans-serif"
+            android:paddingTop="10dp"
+            android:paddingBottom="15dp"
+            android:text="הוסף ללוח שנה"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 </LinearLayout>
