@@ -8,22 +8,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -31,7 +26,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -46,11 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -63,7 +54,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
     private String type, name;
 
-    private String sName, className;
+    private String sName, className, email;
     private int meetCount;
 
     private Dialog arrMeeting;  //dialog for arranging a meeting
@@ -90,8 +81,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressDialog pd;
 
     private Context context;
-
-    private int tHour, tMinute;
 
     private String mDate, mTime;
 
@@ -159,152 +148,101 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         doneList = new ArrayList<>();
         finishedList = new ArrayList<>();
 
+        db.collection("users").whereEqualTo("name", sName)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+                                email = document.getId();
+                            }
+                        } else {
+                            Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                        }
+                    }
+                });
+
         updateLists();
 
-        DatePickerDialog.OnDateSetListener mDateSetListener;
-        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                month = month + 1;
-                Log.d("TAG", "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
+        clickListeners();
+    }
 
-                String d = "" + day;
-                if (day < 10) {
-                    d = "0" + day;
-                }
-                String m = "" + month;
-                if (month < 10) {
-                    m = "0" + month;
-                }
-                String date = d + "/" + m + "/" + year;
-                tvDate.setText(date);
+    private void clickListeners() {
+        Calendar cal = Calendar.getInstance();  //get the date of the current day
+        int tYear = cal.get(Calendar.YEAR);
+        int tMonth = cal.get(Calendar.MONTH);
+        int tDay = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog.OnDateSetListener onDateSetListener = (datePicker, year, month, day) -> {
+            month = month + 1;
+            Log.d("TAG", "onDateSet: dd/mm/yyy: " + day + "/" + month + "/" + year);
+
+            String d = "" + day;
+            if (day < 10) {
+                d = "0" + day;
             }
+            String m = "" + month;
+            if (month < 10) {
+                m = "0" + month;
+            }
+            mDate = d + "/" + m + "/" + year;
+            tvDate.setText(mDate);
         };
 
-        tvDate.setOnClickListener(new View.OnClickListener() {         //Dialog for the user to choose a date for the meeting
-            @Override
-            public void onClick(View view) {
-                Calendar cal = Calendar.getInstance(); //get the date of the current day
-                int year = cal.get(Calendar.YEAR);
-                int month = cal.get(Calendar.MONTH);
-                int day = cal.get(Calendar.DAY_OF_MONTH);
+        TimePickerDialog.OnTimeSetListener onTimeSetListener = (view, hourOfDay, minute) -> {
+            Log.d("TAG", "createMeeting: " + hourOfDay + ":" + minute);
 
-                DatePickerDialog dialog = new DatePickerDialog(
-                        InfoActivity.this,
-                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,
-                        mDateSetListener,
-                        year, month, day);
-
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                dialog.show();
+            String h = "" + hourOfDay;
+            if (hourOfDay < 10) {
+                h = "0" + hourOfDay;
             }
+            String m = "" + minute;
+            if (minute < 10) {
+                m = "0" + minute;
+            }
+            mTime = h + ":" + m;
+            tvTime.setText(mTime);
+        };
+
+        tvDate.setOnClickListener(view -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(context,
+                    android.R.style.Theme_DeviceDefault_Dialog_MinWidth,
+                    onDateSetListener,
+                    tYear, tMonth, tDay);
+            datePickerDialog.show();
         });
 
-        tvTime.setOnClickListener(new View.OnClickListener() {         //Dialog for the user to choose a time for the meeting
-            @Override
-            public void onClick(View view) {
-                TimePickerDialog timePickerDialog = new TimePickerDialog(
-                        InfoActivity.this,
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int hour, int min) {
-                                tHour = hour;
-                                tMinute = min;
-                                String time = hour + ":" + min;
-                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm");
-                                try {
-                                    Date date = simpleDateFormat.parse(time);
-                                    tvTime.setText(simpleDateFormat.format(date));
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, 24, 0, true);
-                timePickerDialog.updateTime(tHour, tMinute);
-                timePickerDialog.show();
-            }
+        tvTime.setOnClickListener(view -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(context,
+                    android.R.style.Theme_DeviceDefault_Dialog_MinWidth,
+                    onTimeSetListener,
+                    0, 0, true);
+            timePickerDialog.show();
         });
 
         switchCalen.setVisibility(View.VISIBLE);
 
-        tvSName.setText(sName + " ");
-        tvMeetCount.setText(meetCount + "/2 ");
+        tvSName.setText(sName);
+        tvMeetCount.setText(meetCount + "/2");
 
-        btnCreate.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View view) {
+        btnCreate.setOnClickListener(view -> {
 
-                String time = tvTime.getText().toString();
-                String Date = tvDate.getText().toString();
+            String time = tvTime.getText().toString();
+            String Date = tvDate.getText().toString();
 
-                if (!time.isEmpty() && !Date.isEmpty()) {
+            if (!time.isEmpty() && !Date.isEmpty()) {
+                pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
+                pd.setCancelable(false);
+                pd.show();
 
-                    if (!switchCalen.isChecked())
-                        createMeeting(sName, time, Date);
-
-                    if (switchCalen.isChecked()) {
-                        Calendar cal = Calendar.getInstance();
-                        long endTime;
-                        long startTime;
-
-                        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTime.getText().toString().split(":")[0]));
-                        cal.set(Calendar.MINUTE, Integer.parseInt(tvTime.getText().toString().split(":")[1]));
-                        cal.set(Calendar.YEAR, Integer.parseInt(tvDate.getText().toString().split("/")[2]));
-                        cal.set(Calendar.MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[1]) - 1);
-                        cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDate.getText().toString().split("/")[0]));
-
-                        startTime = cal.getTimeInMillis();
-                        endTime = startTime + 30 * 60 * 1000;
-                        String title = "פגישה עם " + sName;
-
-                        Intent intent = new Intent(Intent.ACTION_EDIT);
-                        intent.setType("vnd.android.cursor.item/event");
-                        intent.putExtra("beginTime", startTime);
-                        intent.putExtra("rrule", "FREQ=YEARLY");
-                        intent.putExtra("endTime", endTime);
-                        intent.putExtra("title", title);
-
-                        if (intent.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent);
-                            createMeeting(sName, time, Date);
-                        } else {
-                            Toast.makeText(InfoActivity.this, "אין לך אפליקציה שיכולה לשמור את התאריך", Toast.LENGTH_LONG).show();
-                            createMeeting(sName, time, Date);
-                        }
-                    }
-
-                    String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
-                    String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + Date + ", בשעה: " + time + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
-
-                    db.collection("users").whereEqualTo("name", sName)
-                            .get()
-                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                            Log.d(Utils.TAG, document.getId() + " => " + document.getData());
-
-                                            sendEmail(document.getId(), eSubject, eMessage);
-                                        }
-                                    } else {
-                                        Log.w(Utils.TAG, "Error getting documents.", task.getException());
-                                    }
-                                }
-                            });
-
-                    Toast.makeText(getApplicationContext(), "פגישה עם " + sName + " בתאריך: " + Date + " בשעה: " + time, Toast.LENGTH_LONG).show();
-                    arrMeeting.hide();
-                    btnNew.setVisibility(View.GONE);
-                    tvNoMeeting.setVisibility(View.GONE);
-                    meetingList.add(new Meeting(sName, name, Date, time));
-                    btnUpcoming.callOnClick();
-                    lv.setAdapter(meetingAdapter);
-                    switchCalen.setVisibility(View.GONE);
-                } else {
-                    Toast.makeText(getApplicationContext(), "יש למלא את כל השדות", Toast.LENGTH_LONG).show();
-                }
+                writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
+                uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
+                sendNewMail();
+            } else {
+                Toast.makeText(getApplicationContext(), "יש למלא את כל השדות", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -339,9 +277,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
             mode = Utils.MODE_FINISHED;
         }
         if (v.getId() == R.id.btnNew) {
-            //arrMeeting.show();
-            //arrMeeting.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-            createMeeting();
+            arrMeeting.show();
+            arrMeeting.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
         }
     }
 
@@ -436,75 +373,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    public void createMeeting() {
-        Calendar cal = Calendar.getInstance();  //get the date of the current day
-        int tYear = cal.get(Calendar.YEAR);
-        int tMonth = cal.get(Calendar.MONTH);
-        int tDay = cal.get(Calendar.DAY_OF_MONTH);
-
-        TimePickerDialog.OnTimeSetListener onTimeSetListener = (view, hourOfDay, minute) -> {
-            Log.d("TAG", "createMeeting: " + hourOfDay + ":" + minute);
-
-            String h = "" + hourOfDay;
-            if (hourOfDay < 10) {
-                h = "0" + hourOfDay;
-            }
-            String m = "" + minute;
-            if (minute < 10) {
-                m = "0" + minute;
-            }
-            mTime = h + ":" + m;
-
-            new MaterialAlertDialogBuilder(context)
-                    .setTitle("יצירת פגישה")
-                    .setMessage("האם אתה מאשר יצירת פגישה עם " + sName + ", בתאריך: " + mDate + ", בשעה: " + mTime + "?")
-                    .setNegativeButton("לא", null)
-                    .setPositiveButton("כן", (dialog, which) -> {
-                        // Respond to positive button press
-                        pd = ProgressDialog.show(this, "יצירת פגישה", "יוצר את הפגישה...", true);
-                        pd.setCancelable(false);
-                        pd.show();
-                        writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", this, sName + "&" + name + ".txt");
-                        uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
-                        sendNewMail();
-                    })
-                    .show();
-        };
-
-        DatePickerDialog.OnDateSetListener onDateSetListener = (datePicker, year, month, day) -> {
-            month++;
-            Log.d("TAG", "onDateSet: dd/mm/yyy: " + day + "/" + month + "/" + year);
-
-            String d = "" + day;
-            if (day < 10) {
-                d = "0" + day;
-            }
-            String m = "" + month;
-            if (month < 10) {
-                m = "0" + month;
-            }
-            mDate = d + "/" + m + "/" + year;
-
-            TimePickerDialog timePickerDialog = new TimePickerDialog(context,
-                    android.R.style.Theme_DeviceDefault_Dialog_MinWidth,
-                    onTimeSetListener, 0, 0, true);
-
-            timePickerDialog.show();
-        };
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(context,
-                android.R.style.Theme_DeviceDefault_Dialog_MinWidth,
-                onDateSetListener,
-                tYear, tMonth, tDay);
-
-        datePickerDialog.show();
-    }
-
-    private void createMeeting(String studentName, String time, String Date) {
-        writeToFile(studentName + "&&" + name + "&&" + Date + "&&" + time + "&&", this, studentName + "&" + name + ".txt");
-        uploadMeeting(studentName + "&" + name + ".txt", "Meetings/Upcoming/");
-    }
-
     public void updateMeetingCount() {
         AtomicInteger n = new AtomicInteger();
         mStorageRef.child("Classes/").listAll()
@@ -552,16 +420,15 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                                                             tvSubTitle.setText("מספר פגישות: " + meetCount);
                                                                                             btnNew.setVisibility(View.GONE);
                                                                                             Toast.makeText(context, "הפגישה נוצרה בהצלחה!", Toast.LENGTH_LONG).show();
+                                                                                            arrMeeting.dismiss();
+                                                                                            tvNoMeeting.setVisibility(View.GONE);
+                                                                                            meetingList.add(new Meeting(sName, name, mDate, mTime));
+                                                                                            btnUpcoming.callOnClick();
+                                                                                            lv.setAdapter(meetingAdapter);
+                                                                                            switchCalen.setVisibility(View.GONE);
                                                                                             pd.dismiss();
-                                                                                            new MaterialAlertDialogBuilder(context)
-                                                                                                    .setTitle("יצירת פגישה")
-                                                                                                    .setMessage("האם אתה מעוניין לשמור את הפגישה בלוח השנה שלך?")
-                                                                                                    .setNegativeButton("לא", null)
-                                                                                                    .setPositiveButton("כן", (dialog, which) -> {
-                                                                                                        // Respond to positive button press
-                                                                                                        createEvent();
-                                                                                                    })
-                                                                                                    .show();
+                                                                                            if(switchCalen.isChecked())
+                                                                                                createEvent();
                                                                                         }
                                                                                     });
                                                                         }
@@ -580,7 +447,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    public void createEvent () {
+    public void createEvent() {
         Calendar cal = Calendar.getInstance();
         long endTime;
         long startTime;
@@ -598,7 +465,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
         intent.putExtra("beginTime", startTime);
-        intent.putExtra("rrule", "FREQ=YEARLY");
         intent.putExtra("endTime", endTime);
         intent.putExtra("title", title);
 
@@ -632,22 +498,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
         String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + mDate + ", בשעה: " + mTime + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
-        db.collection("users").whereEqualTo("name", sName)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(Utils.TAG, document.getId() + " => " + document.getData());
-
-                                sendEmail(document.getId(), eSubject, eMessage);
-                            }
-                        } else {
-                            Log.w(Utils.TAG, "Error getting documents.", task.getException());
-                        }
-                    }
-                });
+        sendEmail(email, eSubject, eMessage);
     }
 
     private void writeToFile(String data, Context context, String file) {
