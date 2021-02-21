@@ -5,7 +5,6 @@ public class Student {
     private String name;
     private int meetingCount;
 
-
     public Student(String name, int meetingCount) {
         this.name = name;
         this.meetingCount = meetingCount;
@@ -30,5 +29,4 @@ public class Student {
     public void incMeetingCount(){
         meetingCount++;
     }
-
 }

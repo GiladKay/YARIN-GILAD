@@ -2,7 +2,6 @@ package com.yg.amit;
 
 public class Class {
 
-
     private String className;
 
     public Class(String className) {

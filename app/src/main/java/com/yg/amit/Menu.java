@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -51,27 +50,13 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     private String name, type;
     private TextView tvTitle;
-    private Button btnUpcoming, btnClasses, btnTeachers, btnAccount, btnAdmin;
+    private Button btnUpcoming, btnClasses, btnTeachers, btnAccount;
 
 
     private String address = "";
     private String subject = "";
     private String message = "";
     StorageReference mStorageRef;
-
-    @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        getMenuInflater().inflate(R.menu.student_menu, menu);
-
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        finish();
-        return true;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,9 +94,6 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         if (type.equals(Utils.TYPE_STUDENT)) {
             btnClasses.setVisibility(View.GONE);
             btnTeachers.setVisibility(View.GONE);
-        }
-        if (name.equals(Utils.TYPE_ADMIN)) {
-            btnAdmin.setVisibility(View.VISIBLE);
         }
     }
 
@@ -212,17 +194,13 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 break;
             case (R.id.btnUpcoming):
                 startActivity(new Intent(getBaseContext(), MeetingsActivity.class));
-                finish();
                 break;
             case (R.id.btnClasses):
                 startActivity(new Intent(getBaseContext(), ClassesActivity.class));
-                finish();
                 break;
             case (R.id.btnTeachers):
-                Intent intent = new Intent(getBaseContext(), StudentsActivity.class);
-                intent.putExtra(Utils.CLASS_NAME_KEY, "Teachers");// place the class name in an Extra that will be sent to StudentsActivity
-                startActivity(intent);
-                finish();
+                sharedPreferences.edit().putString(Utils.CLASS_NAME_KEY, "Teachers").commit();
+                startActivity(new Intent(getBaseContext(), StudentsActivity.class));
                 break;
         }
 

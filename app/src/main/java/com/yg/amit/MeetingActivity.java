@@ -73,8 +73,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private TextView tvTimeEdit, tvDateEdit;
     private Button btnUpdateEdit;
 
-    private String student,teacher, date , time;
-
+    private String student, teacher, date, time;
 
     private TextView tvTitle, tvSubTitle, tvHelper;
     private TextInputLayout ipInput;
@@ -112,12 +111,10 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
 
-
-
         Bundle extras = getIntent().getExtras();
         meetingFile = extras.getString("Meeting");
         meetingMode = extras.getInt("Mode");
-        pos= extras.getInt("position");
+        pos = extras.getInt("position");
 
         diaEdit = new Dialog(this);
         diaEdit.setContentView(R.layout.edit_meeting_dialog);
@@ -132,16 +129,15 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 time = tvTimeEdit.getText().toString();
                 date = tvDateEdit.getText().toString();
 
-
                 //lv.setAdapter(meetingAdapter);
 
-                String data =  student+ "&&" + teacher + "&&" + date + "&&" + time + "&&";
+                String data = student + "&&" + teacher + "&&" + date + "&&" + time + "&&";
 
                 String fileName = student + "&" + teacher + ".txt";
                 writeToFile(data, getApplicationContext(), fileName);//update the meeting counter
                 updateFile(fileName, "Meetings/Upcoming/");//
 
-                tvSubTitle.setText(date + " - "+ time);
+                tvSubTitle.setText(date + " - " + time);
 
                 diaEdit.dismiss();
 
@@ -154,7 +150,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
                 cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
 
-
                 startTime = cal.getTimeInMillis();
                 endTime = startTime + 30 * 60 * 1000;
 
@@ -162,15 +157,14 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     int id = ListSelectedCalendars("פגישה עם " + student);
                     UpdateCalendarEntry(id, startTime, endTime);
 
-                } else if(!(ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR)== PackageManager.PERMISSION_GRANTED )){
+                } else if (!(ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED)) {
                     RequestStoragePermission1();
-                } else{
+                } else {
                     RequestStoragePermission2();
                 }
 
-                String eSubject="שינוי זמן פגישה";
-                //TODO ניסוח
-                String eMessage="הפגישה עם המורה "+ teacher +" הועברה לשעה "+ time +" בתאריך "+date;
+                String eSubject = "שינוי זמן הפגישה";
+                String eMessage = "הפגישה עם המורה " + teacher + ", הועברה לתאריך: " + date + ", בשעה: " + time + ".";
 
                 db.collection("users").whereEqualTo("name", student)
                         .get()
@@ -181,7 +175,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-
                                         sendEmail(document.getId(), eSubject, eMessage);
                                     }
                                 } else {
@@ -189,12 +182,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                 }
                             }
                         });
-                Toast.makeText(getApplicationContext(), "time: " + time + " Date: " + date, Toast.LENGTH_LONG).show();
-
-
             }
         });
-
 
         tvTimeEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -259,8 +248,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-
-
         tvTitle = findViewById(R.id.tvTitle);
         tvSubTitle = findViewById(R.id.tvSubTitle);
         tvHelper = findViewById(R.id.tvHelper);
@@ -277,9 +264,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         btnAddToCal = findViewById(R.id.btnAddToCal);
         btnAddToCal.setOnClickListener(this);
 
-
-
-
         pd = ProgressDialog.show(this, "פגישה", "מוריד נתונים...", true);
         pd.setCancelable(false);
         pd.show();
@@ -295,47 +279,45 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
             String mashov = edtInput.getText().toString().trim();
 
-            if(type.equals(Utils.TYPE_STUDENT)) {
+            if (type.equals(Utils.TYPE_STUDENT)) {
                 String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
                         + data.split("&&")[3] + "&&" + mashov + "&&" + data.split("&&")[5] + "&&";
                 writeToFile(newData, this, meetingFile);
                 uploadFile(meetingFile, "Meetings/Finished/");
             }
-            if(type.equals(Utils.TYPE_TEACHER)) {
+            if (type.equals(Utils.TYPE_TEACHER)) {
                 String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
                         + data.split("&&")[3] + "&&" + data.split("&&")[4] + "&&" + mashov + "&&";
                 writeToFile(newData, this, meetingFile);
                 uploadFile(meetingFile, "Meetings/Done/");
-            }
 
-            String eSubject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
-            String eMessage = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
+                String eSubject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
+                String eMessage = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
 
+                db.collection("users").whereEqualTo("name", student)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-            db.collection("users").whereEqualTo("name", student)
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d(Utils.TAG, document.getId() + " => " + document.getData());
-
-
-                                    sendEmail(document.getId(), eSubject, eMessage);
+                                        sendEmail(document.getId(), eSubject, eMessage);
+                                    }
+                                } else {
+                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
                                 }
-                            } else {
-                                Log.w(Utils.TAG, "Error getting documents.", task.getException());
                             }
-                        }
-                    });
+                        });
+            }
         }
 
-        if(v.getId() == R.id.btnEdit){
+        if (v.getId() == R.id.btnEdit) {
             diaEdit.show();
         }
 
-        if(v.getId() == R.id.btnAddToCal){
+        if (v.getId() == R.id.btnAddToCal) {
 
             Calendar cal = Calendar.getInstance();
             long endTime;
@@ -355,10 +337,10 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             intent.putExtra("beginTime", startTime);
             intent.putExtra("rrule", "FREQ=YEARLY");
             intent.putExtra("endTime", endTime);
-            if(type.equals(Utils.TYPE_TEACHER))
-            intent.putExtra("title", "פגישה עם "+ student);
-            if(type.equals(Utils.TYPE_STUDENT))
-                intent.putExtra("title", "פגישה עם "+ teacher);
+            if (type.equals(Utils.TYPE_TEACHER))
+                intent.putExtra("title", "פגישה עם " + student);
+            if (type.equals(Utils.TYPE_STUDENT))
+                intent.putExtra("title", "פגישה עם " + teacher);
 
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
@@ -375,10 +357,10 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     public void updateUI(String file) {
         data = readFromFile(this, file);
 
-        student=data.split("&&")[0];
-        teacher=data.split("&&")[1];
-        date=data.split("&&")[2];
-        time=data.split("&&")[3];
+        student = data.split("&&")[0];
+        teacher = data.split("&&")[1];
+        date = data.split("&&")[2];
+        time = data.split("&&")[3];
 
         tvTitle.setText(teacher + " - " + student);
         tvSubTitle.setText(data.split("&&")[2] + " - " + data.split("&&")[3]);
@@ -389,11 +371,11 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         if (meetingMode == Utils.MODE_UPCOMING && type.equals(Utils.TYPE_TEACHER)) {
 
-                tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
-                ipInput.setVisibility(View.VISIBLE);
-                edtInput.setVisibility(View.VISIBLE);
-                btnSend.setVisibility(View.VISIBLE);
-                btnEdit.setVisibility(View.VISIBLE);
+            tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
+            ipInput.setVisibility(View.VISIBLE);
+            edtInput.setVisibility(View.VISIBLE);
+            btnSend.setVisibility(View.VISIBLE);
+            btnEdit.setVisibility(View.VISIBLE);
         }
 
         if (meetingMode == Utils.MODE_DONE) {
@@ -429,7 +411,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
 
-        Calendar cal= Calendar.getInstance();
+        Calendar cal = Calendar.getInstance();
 
         cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
         cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
@@ -440,12 +422,12 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         long startTime = cal.getTimeInMillis();
         long endTime = startTime + 30 * 60 * 1000;
-        if(type.equals(type.equals(Utils.TYPE_TEACHER))) {
+        if (type.equals(type.equals(Utils.TYPE_TEACHER))) {
             if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
         }
-        if(type.equals(Utils.TYPE_STUDENT)){
+        if (type.equals(Utils.TYPE_STUDENT)) {
             if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
@@ -477,7 +459,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     // Handle failed download
                     Log.w("Download", "onFailure: Download failed", exception);
                     pd.dismiss();
-                    Toast.makeText(getApplicationContext(),"אירעה שגיאה", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
                 });
     }
 
@@ -518,8 +500,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void writeToFile(String data, Context context, String file) {
-
-
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(file, MODE_PRIVATE)); // APPEND OR PRIVATE
             outputStreamWriter.append(data);
@@ -541,7 +521,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
                         StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + fileName);
 
-                        if(path.equals("Meetings/Finished/")) desertRef = mStorageRef.child("Meetings/Done/" + fileName);
+                        if (path.equals("Meetings/Finished/"))
+                            desertRef = mStorageRef.child("Meetings/Done/" + fileName);
 
                         desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
@@ -560,7 +541,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             public void onFailure(@NonNull Exception exception) {
                                 // Uh-oh, an error occurred!
                                 pd.dismiss();
-                                Toast.makeText(getApplicationContext(),"אירעה שגיאה", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -571,10 +552,11 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                         // Handle unsuccessful uploads
                         Log.w("Upload", "onSuccess: Upload failed", exception);
                         pd.dismiss();
-                        Toast.makeText(getApplicationContext(),"אירעה שגיאה", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
                     }
                 });
     }
+
     private void updateFile(String fileName, String path) {
         Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
         StorageReference riversRef = mStorageRef.child(path + fileName);
@@ -596,8 +578,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public int ListSelectedCalendars(String eventtitle) {
-
-
         Uri eventUri;
         if (android.os.Build.VERSION.SDK_INT <= 7) {
             // the old way
@@ -636,7 +616,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         return result;
 
     }
-
 
     @SuppressLint("InlinedApi")
     private int UpdateCalendarEntry(int entryID, long start, long end) {
@@ -756,8 +735,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         return false;
     }
 
-
-
     /**
      * sends emails
      *
@@ -770,14 +747,5 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         javaMailAPI.execute();
 
         Log.d(Utils.TAG, "email sent");
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(this,MeetingsActivity.class);
-        intent.putExtra("pos",pos);
-        startActivity(intent);
-        finish();
     }
 }

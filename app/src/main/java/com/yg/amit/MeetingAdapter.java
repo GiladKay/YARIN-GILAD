@@ -35,9 +35,7 @@ public class MeetingAdapter extends BaseAdapter implements Filterable {
        this.context = context;
        this.originalList = objects;
        this.tempList = objects;
-
    }
-
 
     @Override
     public int getCount() {
@@ -60,10 +58,7 @@ public class MeetingAdapter extends BaseAdapter implements Filterable {
         LayoutInflater layoutInflater = ((Activity) context).getLayoutInflater();
         View view = layoutInflater.inflate(R.layout.meeting_layout, parent, false);
 
-
         TextView tvPerson = (TextView) view.findViewById(R.id.tvPerson);
-
-
 
         Meeting temp = originalList.get(position);
 
@@ -72,29 +67,23 @@ public class MeetingAdapter extends BaseAdapter implements Filterable {
 
         tvPerson.setText(temp.getStudent() + " - " + temp.getTeacher());
 
-
         return view;
     }
-
 
     @NonNull
     @Override
     public Filter getFilter() {
-
         if (cf == null) {
             cf = new MeetingAdapter.CustomFilter();
         }
         return cf;
     }
 
-
     class CustomFilter extends Filter {
-
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
             String filterString;
             FilterResults results = new FilterResults();
-
 
             if (charSequence != null && charSequence.length() > 0) {
                 filterString = charSequence.toString().toLowerCase();

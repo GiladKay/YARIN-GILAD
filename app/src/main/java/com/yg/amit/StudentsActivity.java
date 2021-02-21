@@ -1,44 +1,25 @@
 package com.yg.amit;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -48,20 +29,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class StudentsActivity extends AppCompatActivity {
-
-
-
-    private SharedPreferences sd;
 
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
@@ -69,7 +39,6 @@ public class StudentsActivity extends AppCompatActivity {
     private String data;       //String containing data from the chosen class file
 
     private boolean hasBeenEdited = false; // remembers if an edit to the students has occurred
-
 
     private ProgressDialog pd;
 
@@ -84,10 +53,9 @@ public class StudentsActivity extends AppCompatActivity {
 
     private String className;
 
-
     @Override
     public boolean onCreateOptionsMenu(android.view.Menu menu) {
-        getMenuInflater().inflate(R.menu.student_menu, menu);
+        getMenuInflater().inflate(R.menu.search, menu);
 
 
         MenuItem menuItem = menu.findItem(R.id.search);
@@ -113,30 +81,19 @@ public class StudentsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.exit)
-            finish();
-        return true;
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
-
-        Bundle extras = getIntent().getExtras();
-        className = extras.getString(Utils.CLASS_NAME_KEY); //fetching the class name from the Intents Extra
 
         contentResolver = getContentResolver();
 
         sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
         name = sp.getString(Utils.NAME_KEY, "name");
         type = sp.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
+        className = sp.getString(Utils.CLASS_NAME_KEY, "class"); // fetching the class name from the Intents Extra
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
-
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
@@ -149,11 +106,6 @@ public class StudentsActivity extends AppCompatActivity {
 
         mStorageRef.child("Classes").listAll()
                 .addOnSuccessListener(listResult -> {
-                    for (StorageReference prefix : listResult.getPrefixes()) {
-                        // All the prefixes under listRef.
-                        // You may call listAll() recursively on them.
-                    }
-
                     for (StorageReference item : listResult.getItems()) {
                         // All the items under listRef.
                         if (item.getName().contains(className))   //locating the file that has the same name as the class we clicked on
@@ -167,14 +119,11 @@ public class StudentsActivity extends AppCompatActivity {
                     Log.w("getClass", "onFailure: ", e);
                 });
 
-        // all the listeners used for the time and date arrangement in a new meeting
-
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("כיתה " + className);
         if(className.equals("Teachers")) mTitle.setText("מורים");
         setSupportActionBar(toolbar);
-
     }
 
     /**
@@ -228,7 +177,7 @@ public class StudentsActivity extends AppCompatActivity {
                 intent.putExtra("mCount",student.getMeetingCount());
                 intent.putExtra("classname",className);
                 startActivity(intent);
-
+                finish();
                 }
             });
     }
@@ -241,7 +190,6 @@ public class StudentsActivity extends AppCompatActivity {
      * @return a String containing all the data from the file
      */
     private String readFromFile(Context context, String file) {
-
         String ret = "";
 
         try {
@@ -267,20 +215,6 @@ public class StudentsActivity extends AppCompatActivity {
         }
 
         return ret;
-    }
-
-
-
-
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if(!className.equals("Teachers"))
-            startActivity(new Intent(getBaseContext(), ClassesActivity.class));
-        else
-            startActivity(new Intent(getBaseContext(), Menu.class));
-        finish();
     }
 }
 

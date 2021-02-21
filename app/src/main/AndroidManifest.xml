@@ -15,7 +15,6 @@
         android:theme="@style/Theme.AMIT">
         <activity android:name=".InfoActivity"></activity>
         <activity android:name=".MeetingActivity" />
-        <activity android:name=".TeacherActivity" />
         <activity android:name=".StudentsActivity" />
         <activity android:name=".ClassesActivity" />
         <activity android:name=".MeetingsActivity" />

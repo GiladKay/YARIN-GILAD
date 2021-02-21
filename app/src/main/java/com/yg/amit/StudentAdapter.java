@@ -77,22 +77,17 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
     @NonNull
     @Override
     public Filter getFilter() {
-
         if(cf==null){
             cf=new CustomFilter();
         }
         return cf;
     }
 
-
-
     class CustomFilter extends Filter {
-
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
             String filterString;
             FilterResults results = new FilterResults();
-
 
             if (charSequence != null && charSequence.length() > 0) {
                 filterString = charSequence.toString().toLowerCase();

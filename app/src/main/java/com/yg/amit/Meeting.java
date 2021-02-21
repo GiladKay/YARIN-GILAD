@@ -31,21 +31,29 @@ public class Meeting {
     }
 
     public String getMashov() { return mashov; }
+
     public String getSmashov() { return Smashov; }
+
     public String getTeacher() { return teacher; }
+
     public String getStudent() { return student; }
+
     public String getFileName(){
         return student+"&"+teacher+".txt";
     }
+
     public String getDate() {
         return date;
     }
+
     public void setDate(String date) {
         this.date = date;
     }
+
     public String getTime() {
         return time;
     }
+
     public void setTime(String time) {
         this.time = time;
     }
