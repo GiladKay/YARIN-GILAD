@@ -423,9 +423,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                                                             arrMeeting.dismiss();
                                                                                             tvNoMeeting.setVisibility(View.GONE);
                                                                                             meetingList.add(new Meeting(sName, name, mDate, mTime));
-                                                                                            btnUpcoming.callOnClick();
-                                                                                            lv.setAdapter(meetingAdapter);
-                                                                                            switchCalen.setVisibility(View.GONE);
+                                                                                            btnUpcoming.performClick();
                                                                                             pd.dismiss();
                                                                                             if(switchCalen.isChecked())
                                                                                                 createEvent();

@@ -2,7 +2,6 @@ package com.yg.amit;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -22,12 +21,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,8 +59,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import okhttp3.internal.Util;
 
 public class MeetingActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -102,9 +96,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private int tHour, tMinute;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,8 +108,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
-
-
 
         Bundle extras = getIntent().getExtras();
         meetingFile = extras.getString("Meeting");
@@ -246,13 +235,12 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("פגישה ");
 
-        if(type.equals(Utils.TYPE_TEACHER)&&meetingMode== Utils.MODE_UPCOMING) {
-            btnEdit=(Button)toolbar.findViewById(R.id.btnEdit);
+        if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
+            btnEdit = (Button) toolbar.findViewById(R.id.btnEdit);
             btnEdit.setVisibility(View.VISIBLE);
             btnEdit.setOnClickListener(this);
 
-
-            btnDelete=(Button)toolbar.findViewById(R.id.btnBin);
+            btnDelete = (Button) toolbar.findViewById(R.id.btnBin);
             btnDelete.setVisibility(View.VISIBLE);
             btnDelete.setOnClickListener(this);
         }
@@ -263,7 +251,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         ipInput = findViewById(R.id.ipInput);
         edtInput = findViewById(R.id.edtInput);
         btnSend = findViewById(R.id.btnSend);
-
 
         sMashov = findViewById(R.id.sMashov);
         tMashov = findViewById(R.id.tMashov);
@@ -289,7 +276,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 pd.show();
 
                 btnAddToCal.setVisibility(View.GONE);
-                if (type.equals(Utils.TYPE_TEACHER)&&meetingMode==Utils.MODE_UPCOMING) {
+                if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
                     btnEdit.setVisibility(View.GONE);
                     btnDelete.setVisibility(View.GONE);
                 }
@@ -307,17 +294,18 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     writeToFile(newData, this, meetingFile);
                     uploadFile(meetingFile, "Meetings/Done/");
                 }
-            break;
+                break;
 
 
             case R.id.btnEdit:
                 diaEdit.show();
-            break;
+                break;
 
             case R.id.btnBin:
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("מחיקת פגישה")
                         .setMessage("האם אתה בטוח שאתה רוצה למחוק את הפגישה? ")
+                        .setIcon(R.drawable.error)
                         .setPositiveButton("כן ", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -330,9 +318,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                 DeleteCalendarEntry(ListSelectedCalendars("פגישה עם " + student));
                                 Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
 
-                                //TODO ניסוח
-                                String eSubject = "פגישה בוטלה - אמ" + "\"" + "ית מודיעין בנים";
-                                String eMessage = "הפגישה שהייתה אמורה להתקיים בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + " בוטלה.";
+                                String eSubject = "ביטול פגישה - אמ" + "\"" + "ית מודיעין בנים";
+                                String eMessage = "הפגישה שהייתה אמורה להתקיים בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ", בוטלה.";
 
                                 db.collection("users").whereEqualTo("name", student)
                                         .get()
@@ -351,16 +338,14 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                             }
                                         });
 
-                                Intent intent = new Intent(getBaseContext(), MeetingsActivity.class);
-                                startActivity(intent);
                                 finish();
                             }
                         })
-                        .setNeutralButton("לא ", null).show();
+                        .setNegativeButton("לא ", null).show();
 
                 break;
 
-            case  R.id.btnAddToCal:
+            case R.id.btnAddToCal:
                 Calendar cal = Calendar.getInstance();
                 long endTime;
                 long startTime;
@@ -390,7 +375,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 }
 
                 btnAddToCal.setVisibility(View.GONE);
-            break;
+                break;
 
         }
     }
@@ -461,12 +446,12 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         long startTime = cal.getTimeInMillis();
         long endTime = startTime + 30 * 60 * 1000;
-        if (type.equals(Utils.TYPE_TEACHER) && meetingMode==Utils.MODE_UPCOMING) {
+        if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
             if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
         }
-        if (type.equals(Utils.TYPE_STUDENT) && meetingMode==Utils.MODE_UPCOMING) {
+        if (type.equals(Utils.TYPE_STUDENT) && meetingMode == Utils.MODE_UPCOMING) {
             if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
@@ -567,7 +552,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void onSuccess(Void aVoid) {
                                 // File deleted successfully
-                                if(type.equals(Utils.TYPE_TEACHER)) {
+                                if (type.equals(Utils.TYPE_TEACHER)) {
                                     String eSubject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
                                     String eMessage = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
 
@@ -788,6 +773,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         return eventUri;
     }
+
     public boolean eventExistsOnCalendar(String eventTitle, long startTimeMs, long endTimeMs) {
         if (eventTitle == null || "".equals(eventTitle)) {
             return false;
@@ -842,13 +828,5 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         javaMailAPI.execute();
 
         Log.d(Utils.TAG, "email sent");
-    }
-
-    @Override
-    public void onBackPressed() {
-
-        Intent intent = new Intent(getBaseContext(), MeetingsActivity.class);
-        startActivity(intent);
-        finish();
     }
 }

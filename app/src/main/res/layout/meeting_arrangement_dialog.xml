@@ -135,7 +135,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:gravity="start"
-            android:text="  שמור ללוח שנה"
+            android:text="  שמור ביומן"
             android:textAlignment="textStart"
             android:textSize="18dp"
             android:theme="@style/Theme.AMIT"
