@@ -183,20 +183,7 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEdit"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:backgroundTint="#CEC28F"
-            android:fontFamily="sans-serif"
-            android:paddingTop="10dp"
-            android:paddingBottom="15dp"
-            android:text="ערוך פגישה"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            android:visibility="gone" />
+
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddToCal"
@@ -208,7 +195,7 @@
             android:fontFamily="sans-serif"
             android:paddingTop="10dp"
             android:paddingBottom="15dp"
-            android:text="הוסף ללוח שנה"
+            android:text="הוסף ליומן"
             android:textSize="30sp"
             android:textStyle="bold"
             android:visibility="gone" />

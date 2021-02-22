@@ -2,6 +2,7 @@ package com.yg.amit;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -21,14 +22,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -37,6 +42,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -58,6 +64,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import okhttp3.internal.Util;
+
 public class MeetingActivity extends AppCompatActivity implements View.OnClickListener {
 
     private SharedPreferences sharedPreferences;
@@ -76,6 +84,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private TextInputEditText edtInput;
     private Button btnSend;
     private Button btnEdit;
+    private Button btnDelete;
     private Button btnAddToCal;
 
     private CardView sMashov, tMashov;
@@ -93,6 +102,9 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private int tHour, tMinute;
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +117,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
+
+
 
         Bundle extras = getIntent().getExtras();
         meetingFile = extras.getString("Meeting");
@@ -228,14 +242,29 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             dialog.show();
         });
 
+        Toolbar toolbar = findViewById(R.id.toolbar3);
+        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+        mTitle.setText("פגישה ");
+
+        if(type.equals(Utils.TYPE_TEACHER)&&meetingMode== Utils.MODE_UPCOMING) {
+            btnEdit=(Button)toolbar.findViewById(R.id.btnEdit);
+            btnEdit.setVisibility(View.VISIBLE);
+            btnEdit.setOnClickListener(this);
+
+
+            btnDelete=(Button)toolbar.findViewById(R.id.btnBin);
+            btnDelete.setVisibility(View.VISIBLE);
+            btnDelete.setOnClickListener(this);
+        }
+        setSupportActionBar(toolbar);
         tvTitle = findViewById(R.id.tvTitle);
         tvSubTitle = findViewById(R.id.tvSubTitle);
         tvHelper = findViewById(R.id.tvHelper);
         ipInput = findViewById(R.id.ipInput);
         edtInput = findViewById(R.id.edtInput);
         btnSend = findViewById(R.id.btnSend);
-        btnEdit = findViewById(R.id.btnEdit);
-        btnEdit.setOnClickListener(this);
+
+
         sMashov = findViewById(R.id.sMashov);
         tMashov = findViewById(R.id.tMashov);
         tvSMashov = findViewById(R.id.tvSMashov);
@@ -252,61 +281,117 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.btnSend) {
-            pd = ProgressDialog.show(this, "פגישה", "שולח משוב...", true);
-            pd.setCancelable(false);
-            pd.show();
+        switch (v.getId()) {
 
-            String mashov = edtInput.getText().toString().trim();
+            case R.id.btnSend:
+                pd = ProgressDialog.show(this, "פגישה", "שולח משוב...", true);
+                pd.setCancelable(false);
+                pd.show();
 
-            if (type.equals(Utils.TYPE_STUDENT)) {
-                String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
-                        + data.split("&&")[3] + "&&" + mashov + "&&" + data.split("&&")[5] + "&&";
-                writeToFile(newData, this, meetingFile);
-                uploadFile(meetingFile, "Meetings/Finished/");
-            }
-            if (type.equals(Utils.TYPE_TEACHER)) {
-                String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
-                        + data.split("&&")[3] + "&&" + data.split("&&")[4] + "&&" + mashov + "&&";
-                writeToFile(newData, this, meetingFile);
-                uploadFile(meetingFile, "Meetings/Done/");
-            }
-        }
+                btnAddToCal.setVisibility(View.GONE);
+                if (type.equals(Utils.TYPE_TEACHER)&&meetingMode==Utils.MODE_UPCOMING) {
+                    btnEdit.setVisibility(View.GONE);
+                    btnDelete.setVisibility(View.GONE);
+                }
+                String mashov = edtInput.getText().toString().trim();
 
-        if (v.getId() == R.id.btnEdit) {
-            diaEdit.show();
-        }
+                if (type.equals(Utils.TYPE_STUDENT)) {
+                    String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
+                            + data.split("&&")[3] + "&&" + mashov + "&&" + data.split("&&")[5] + "&&";
+                    writeToFile(newData, this, meetingFile);
+                    uploadFile(meetingFile, "Meetings/Finished/");
+                }
+                if (type.equals(Utils.TYPE_TEACHER)) {
+                    String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
+                            + data.split("&&")[3] + "&&" + data.split("&&")[4] + "&&" + mashov + "&&";
+                    writeToFile(newData, this, meetingFile);
+                    uploadFile(meetingFile, "Meetings/Done/");
+                }
+            break;
 
-        if (v.getId() == R.id.btnAddToCal) {
-            Calendar cal = Calendar.getInstance();
-            long endTime;
-            long startTime;
-            cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
-            cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
-            cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
-            cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
-            cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
 
-            startTime = cal.getTimeInMillis();
-            endTime = startTime + 30 * 60 * 1000;
+            case R.id.btnEdit:
+                diaEdit.show();
+            break;
 
-            Intent intent = new Intent(Intent.ACTION_EDIT);
-            intent.setType("vnd.android.cursor.item/event");
-            intent.putExtra("beginTime", startTime);
-            intent.putExtra("rrule", "FREQ=YEARLY");
-            intent.putExtra("endTime", endTime);
-            if (type.equals(Utils.TYPE_TEACHER))
-                intent.putExtra("title", "פגישה עם " + student);
-            if (type.equals(Utils.TYPE_STUDENT))
-                intent.putExtra("title", "פגישה עם " + teacher);
+            case R.id.btnBin:
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("מחיקת פגישה")
+                        .setMessage("האם אתה בטוח שאתה רוצה למחוק את הפגישה? ")
+                        .setPositiveButton("כן ", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                startActivity(intent);
-            } else {
-                Toast.makeText(MeetingActivity.this, "אין לך אפליקציה שיכולה לשמור את התאריך", Toast.LENGTH_LONG).show();
-            }
+                                //TODO Update meeting count for student who's meeting is deleted
 
-            btnAddToCal.setVisibility(View.GONE);
+                                StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + meetingFile);
+                                desertRef.delete();
+
+                                DeleteCalendarEntry(ListSelectedCalendars("פגישה עם " + student));
+                                Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
+
+                                //TODO ניסוח
+                                String eSubject = "פגישה בוטלה - אמ" + "\"" + "ית מודיעין בנים";
+                                String eMessage = "הפגישה שהייתה אמורה להתקיים בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + " בוטלה.";
+
+                                db.collection("users").whereEqualTo("name", student)
+                                        .get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+                                                        sendEmail(document.getId(), eSubject, eMessage);
+                                                    }
+                                                } else {
+                                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                                                }
+                                            }
+                                        });
+
+                                Intent intent = new Intent(getBaseContext(), MeetingsActivity.class);
+                                startActivity(intent);
+                                finish();
+                            }
+                        })
+                        .setNeutralButton("לא ", null).show();
+
+                break;
+
+            case  R.id.btnAddToCal:
+                Calendar cal = Calendar.getInstance();
+                long endTime;
+                long startTime;
+                cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
+                cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
+                cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
+                cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
+                cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
+
+                startTime = cal.getTimeInMillis();
+                endTime = startTime + 30 * 60 * 1000;
+
+                Intent intent = new Intent(Intent.ACTION_EDIT);
+                intent.setType("vnd.android.cursor.item/event");
+                intent.putExtra("beginTime", startTime);
+                intent.putExtra("rrule", "FREQ=YEARLY");
+                intent.putExtra("endTime", endTime);
+                if (type.equals(Utils.TYPE_TEACHER))
+                    intent.putExtra("title", "פגישה עם " + student);
+                if (type.equals(Utils.TYPE_STUDENT))
+                    intent.putExtra("title", "פגישה עם " + teacher);
+
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MeetingActivity.this, "אין לך אפליקציה שיכולה לשמור את התאריך", Toast.LENGTH_LONG).show();
+                }
+
+                btnAddToCal.setVisibility(View.GONE);
+            break;
+
         }
     }
 
@@ -330,7 +415,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             ipInput.setVisibility(View.VISIBLE);
             edtInput.setVisibility(View.VISIBLE);
             btnSend.setVisibility(View.VISIBLE);
-            btnEdit.setVisibility(View.VISIBLE);
         }
 
         if (meetingMode == Utils.MODE_DONE) {
@@ -377,12 +461,12 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         long startTime = cal.getTimeInMillis();
         long endTime = startTime + 30 * 60 * 1000;
-        if (type.equals(Utils.TYPE_TEACHER)) {
+        if (type.equals(Utils.TYPE_TEACHER) && meetingMode==Utils.MODE_UPCOMING) {
             if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
         }
-        if (type.equals(Utils.TYPE_STUDENT)) {
+        if (type.equals(Utils.TYPE_STUDENT) && meetingMode==Utils.MODE_UPCOMING) {
             if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
                 btnAddToCal.setVisibility(View.VISIBLE);
             }
@@ -503,6 +587,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                             edtInput.setVisibility(View.GONE);
                                                             btnSend.setVisibility(View.GONE);
                                                             btnEdit.setVisibility(View.GONE);
+                                                            btnDelete.setVisibility(View.GONE);
+                                                            btnAddToCal.setVisibility(View.GONE);
                                                         }
                                                     } else {
                                                         Log.w(Utils.TAG, "Error getting documents.", task.getException());
@@ -516,6 +602,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     edtInput.setVisibility(View.GONE);
                                     btnSend.setVisibility(View.GONE);
                                     btnEdit.setVisibility(View.GONE);
+                                    btnAddToCal.setVisibility(View.GONE);
+                                    btnDelete.setVisibility(View.GONE);
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
@@ -676,6 +764,30 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    public int DeleteCalendarEntry(int entryID) {
+        int iNumRowsDeleted = 0;
+
+        Uri eventUri = ContentUris
+                .withAppendedId(getCalendarUriBase(), entryID);
+        iNumRowsDeleted = getContentResolver().delete(eventUri, null, null);
+
+        return iNumRowsDeleted;
+    }
+
+    private Uri getCalendarUriBase() {
+        Uri eventUri;
+        if (android.os.Build.VERSION.SDK_INT <= 7) {
+            // the old way
+
+            eventUri = Uri.parse("content://calendar/events");
+        } else {
+            // the new way
+
+            eventUri = Uri.parse("content://com.android.calendar/events");
+        }
+
+        return eventUri;
+    }
     public boolean eventExistsOnCalendar(String eventTitle, long startTimeMs, long endTimeMs) {
         if (eventTitle == null || "".equals(eventTitle)) {
             return false;
@@ -730,5 +842,13 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         javaMailAPI.execute();
 
         Log.d(Utils.TAG, "email sent");
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        Intent intent = new Intent(getBaseContext(), MeetingsActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -172,6 +172,7 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                                 if (mode == Utils.MODE_FINISHED)
                                                     intent.putExtra("Meeting", finishedList.get(i).getFileName());
                                                 startActivity(intent);
+                                                finish();
                                             });
 
                                             pd.dismiss();
