@@ -1,6 +1,7 @@
 package com.yg.amit;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -12,24 +13,41 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.firebase.FirebaseError;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class ClassesActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
     private SharedPreferences sp;
 
     private ListView lvClass;               //ListView for Classes
-    private ArrayList<Class> classList;     // Array list for the listView
-    private String data;                    // String containing data from the classes file
+    //private ArrayList<Class> classList;     // Array list for the listView
+    private String data;// String containing data from the classes file
 
+    private Context context;
+    private List<Class>  classList;
     private StorageReference mStorageRef;
 
+    private DatabaseReference mFirebaseRef;
+    private FirebaseDatabase mFirebaseInstance;
     private ProgressDialog pd;
 
     @Override
@@ -37,6 +55,12 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_classes);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
+
+        context=this;
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseRef = mFirebaseInstance.getReference("כיתות");
+
 
         sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
@@ -54,31 +78,39 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         pd.setCancelable(false);
         pd.show();
 
-        classList =new ArrayList<>();
-        mStorageRef.child("Classes/").listAll()
-                .addOnSuccessListener(listResult -> {
-                    for (StorageReference item : listResult.getItems()) {
-                        // All the items under listRef.
-                        if (!item.getName().contains("Teachers")) { // if the meeting as connected to the user (contains his name) or if the user is an admin
-                            classList.add(new Class(item.getName()));
-                        }
-                    }
 
-                    if (listResult.getItems().isEmpty())
-                        Toast.makeText(this, "אין כיתות", Toast.LENGTH_LONG).show();
 
-                    ClassAdapter cAdapter = new ClassAdapter(this, 0, 0, classList);
 
-                    lvClass.setAdapter(cAdapter);
+        lvClass.setOnItemClickListener(this);
+        classList = new ArrayList<Class>();
+        ClassAdapter cAdapter = new ClassAdapter(this, 0,0, classList);
 
-                    lvClass.setOnItemClickListener(this);
+        lvClass.setAdapter(cAdapter);
 
-                    pd.dismiss();
-                })
-                .addOnFailureListener(e -> {
-                    // Uh-oh, an error occurred!
-                    Log.w("getMeetings", "onFailure: ", e);
-                });
+        mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot:dataSnapshot.getChildren())
+                {
+                    classList.add(new Class(snapshot.getValue().toString()+".txt"));
+                    Log.d(Utils.TAG, snapshot.getValue().toString());
+                }
+
+                ClassAdapter cAdapter = new ClassAdapter(context, 0,0, classList);
+
+                lvClass.setAdapter(cAdapter);
+
+                lvClass.setOnItemClickListener((AdapterView.OnItemClickListener) context);
+                pd.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ClassesActivity.this,databaseError.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 
     @Override
@@ -88,4 +120,8 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
         sp.edit().putString(Utils.CLASS_NAME_KEY, classname).commit();
         startActivity(new Intent(getBaseContext(), StudentsActivity.class));
     }
+
+
+
+
 }

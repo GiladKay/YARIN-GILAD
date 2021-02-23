@@ -27,6 +27,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -49,6 +54,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
     private StorageReference mStorageRef;
     private FirebaseFirestore db;
+    private DatabaseReference mFirebaseRef;
+    private FirebaseDatabase mFirebaseInstance;
 
     private SharedPreferences sharedPreferences;
 
@@ -93,6 +100,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         mStorageRef = FirebaseStorage.getInstance().getReference();
         db = FirebaseFirestore.getInstance();
 
+
+
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         arrMeeting = new Dialog(this);                               //Initializing meeting arrangement dialog
@@ -113,6 +122,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
         context = this;
 
+
+
         tvTitle = findViewById(R.id.tvTitle);
         tvSubTitle = findViewById(R.id.tvSubTitle);
         tvNoMeeting = findViewById(R.id.tvNoMeet);
@@ -131,6 +142,10 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         sName = extras.getString("SName");
         className = extras.getString("classname");
         meetCount = extras.getInt("mCount");
+
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
@@ -349,6 +364,9 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                     intent.putExtra("Meeting", doneList.get(i).getFileName());
                                                 if (mode == Utils.MODE_FINISHED)
                                                     intent.putExtra("Meeting", finishedList.get(i).getFileName());
+
+                                                intent.putExtra("sName",sName);
+                                                intent.putExtra("className",className);
                                                 startActivity(intent);
                                             });
 
@@ -373,76 +391,37 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    public void updateMeetingCount() {
-        AtomicInteger n = new AtomicInteger();
-        mStorageRef.child("Classes/").listAll()
-                .addOnSuccessListener(listResult -> {
-                    for (StorageReference classRef : listResult.getItems()) {
-                        // All the items under listRef.
-                        if (classRef.getName().contains("Teachers") || classRef.getName().contains(className)) {
-                            File localFile = new File(getFilesDir() + "/" + classRef.getName());
-                            AtomicReference<String> classTxt = new AtomicReference<>("");
+    public void updateMeetingCount(boolean inc) {
+        meetCount++;
+        tvSubTitle.setText("מספר פגישות: " + meetCount);
 
-                            mStorageRef.child("Classes/" + classRef.getName()).getFile(localFile)
-                                    .addOnSuccessListener(taskSnapshot -> {
-                                        // Successfully downloaded data to local file
-                                        Log.d("Download", "onSuccess: Download succeeded - " + classRef.getName());
+        mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
 
-                                        String txt = readFromFile(getApplicationContext(), classRef.getName());
-                                        for (String s : txt.split("&&")) {
-                                            if (s.contains("==")) {
-                                                AtomicInteger c = new AtomicInteger();
-                                                mStorageRef.child("Meetings/").listAll()
-                                                        .addOnSuccessListener(listResult1 -> {
-                                                            for (StorageReference prefix : listResult1.getPrefixes()) {
-                                                                // All the prefixes under listRef.
-                                                                // You may call listAll() recursively on them.
-                                                                prefix.listAll().addOnSuccessListener(listResult2 -> {
-                                                                    for (StorageReference item : listResult2.getItems()) {
-                                                                        // All the items under listRef.
-                                                                        if (item.getName().contains(s.split("==")[0])) {
-                                                                            c.getAndIncrement();
-                                                                        }
-                                                                    }
-                                                                    if (prefix.getName().equals(listResult1.getPrefixes().get(2).getName())) {
-                                                                        classTxt.set(classTxt + s.split("==")[0] + "==" + c.get() + "&&");
-                                                                        if (txt.split("&&").length == classTxt.get().split("&&").length + 1) {
-                                                                            Log.d("TAG", "updateMeetingCount: " + classTxt.get());
-                                                                            writeToFile(classTxt.get(), getApplicationContext(), classRef.getName());
-                                                                            Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(classRef.getName()));
-                                                                            mStorageRef.child(classRef.getPath()).putFile(file)
-                                                                                    .addOnSuccessListener(taskSnapshot1 -> {
-                                                                                        n.getAndIncrement();
-                                                                                        if (n.get() == 2) {
-                                                                                            Log.d(Utils.TAG, "updateMeetingCount: ENDED!");
-                                                                                            // END OF THE METHOD
-                                                                                            meetCount++;
-                                                                                            tvSubTitle.setText("מספר פגישות: " + meetCount);
-                                                                                            btnNew.setVisibility(View.GONE);
-                                                                                            Toast.makeText(context, "הפגישה נוצרה בהצלחה!", Toast.LENGTH_LONG).show();
-                                                                                            arrMeeting.dismiss();
-                                                                                            tvNoMeeting.setVisibility(View.GONE);
-                                                                                            meetingList.add(new Meeting(sName, name, mDate, mTime));
-                                                                                            btnUpcoming.performClick();
-                                                                                            pd.dismiss();
-                                                                                            if(switchCalen.isChecked())
-                                                                                                createEvent();
-                                                                                        }
-                                                                                    });
-                                                                        }
-                                                                    }
-                                                                });
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    }).addOnFailureListener(exception -> {
-                                // Handle failed download
-                                Log.w("Download", "onFailure: Download failed", exception);
-                            });
-                        }
-                    }
-                });
+                mFirebaseRef.setValue((Integer.parseInt(value) + 1) + "");
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.w(Utils.TAG, "Failed to read value.", error.toException());
+            }
+        });
+
+        btnNew.setVisibility(View.GONE);
+        Toast.makeText(context, "הפגישה נוצרה בהצלחה!", Toast.LENGTH_LONG).show();
+        arrMeeting.dismiss();
+        tvNoMeeting.setVisibility(View.GONE);
+        meetingList.add(new Meeting(sName, name, mDate, mTime));
+        btnUpcoming.performClick();
+        pd.dismiss();
+        if(switchCalen.isChecked())
+            createEvent();
     }
 
     public void createEvent() {
@@ -480,7 +459,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         riversRef.putFile(file)
                 .addOnSuccessListener(taskSnapshot -> {
                     Log.d("Upload", "onSuccess: Upload succeeded - " + fileName);
-                    updateMeetingCount();
+                    updateMeetingCount(true);
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override

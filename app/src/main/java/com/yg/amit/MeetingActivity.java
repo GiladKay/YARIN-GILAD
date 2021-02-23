@@ -41,6 +41,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -81,6 +86,10 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private Button btnDelete;
     private Button btnAddToCal;
 
+
+    private DatabaseReference mFirebaseRef;
+    private FirebaseDatabase mFirebaseInstance;
+
     private CardView sMashov, tMashov;
     private TextView tvSMashov, tvTMashov;
 
@@ -88,6 +97,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private String meetingFile;
     private int meetingMode;
+    private String sName, className;
 
     private String data;
 
@@ -112,6 +122,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         Bundle extras = getIntent().getExtras();
         meetingFile = extras.getString("Meeting");
         meetingMode = extras.getInt("Mode");
+        sName = extras.getString("sName");
+        className = extras.getString("className");
 
         diaEdit = new Dialog(this);
         diaEdit.setContentView(R.layout.edit_meeting_dialog);
@@ -120,6 +132,10 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvTimeEdit = (TextView) diaEdit.findViewById(R.id.tvEditTime);
         tvDateEdit = (TextView) diaEdit.findViewById(R.id.tvEditDate);
         btnUpdateEdit = (Button) diaEdit.findViewById(R.id.btnUpdate);
+
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
 
         btnUpdateEdit.setOnClickListener(view -> {
             pd = ProgressDialog.show(this, "עדכון פגישה", "מעדכן פגישה...", true);
@@ -311,6 +327,19 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             public void onClick(DialogInterface dialogInterface, int i) {
 
                                 //TODO Update meeting count for student who's meeting is deleted
+
+                                mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        String value = snapshot.getValue().toString();
+                                        mFirebaseRef.setValue((Integer.parseInt(value)-1)+"");
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
 
                                 StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + meetingFile);
                                 desertRef.delete();

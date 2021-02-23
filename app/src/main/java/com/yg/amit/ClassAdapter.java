@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -32,11 +33,12 @@ public class ClassAdapter extends ArrayAdapter<Class> {
     private Context context;
     private List<Class> objects;
 
-    public ClassAdapter(Context context, int resource, int textViewResourceId, List<Class> objects) {
-        super(context, resource, textViewResourceId, objects);
 
+
+    public ClassAdapter(Context context, int resource, int textViewResourceId, List<Class> objects) {
+        super(context, resource, textViewResourceId,objects);
+        this.objects=objects;
         this.context = context;
-        this.objects = objects;
     }
 
     @NonNull
@@ -47,9 +49,9 @@ public class ClassAdapter extends ArrayAdapter<Class> {
 
         TextView tvClass = (TextView) view.findViewById(R.id.tvClass);
 
-        Class temp = objects.get(position);
+        String temp = objects.get(position).getClassName();
 
-        tvClass.setText(temp.getClassName());
+        tvClass.setText(temp);
 
         return view;
     }
