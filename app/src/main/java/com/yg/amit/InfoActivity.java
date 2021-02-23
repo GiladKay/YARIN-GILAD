@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -422,14 +423,16 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
         mFirebaseRef2.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String value = snapshot.getValue(String.class);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String value = dataSnapshot.getValue(String.class);
 
+                if(!TextUtils.isEmpty(value) && TextUtils.isDigitsOnly(value))
                 mFirebaseRef2.setValue((Integer.parseInt(value) + 1) + "");
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(DatabaseError error) {
 
             }
         });

@@ -20,6 +20,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -89,6 +90,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private DatabaseReference mFirebaseRef;
     private FirebaseDatabase mFirebaseInstance;
+    private DatabaseReference mFirebaseRef2;
 
     private CardView sMashov, tMashov;
     private TextView tvSMashov, tvTMashov;
@@ -320,7 +322,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("מחיקת פגישה")
                         .setMessage("האם אתה בטוח שאתה רוצה למחוק את הפגישה? ")
-                        .setIcon(R.drawable.error)
+                        .setIcon(R.drawable.ic_bin)
                         .setPositiveButton("כן ", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -331,8 +333,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
                                 mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        String value = snapshot.getValue().toString();
+                                    public void onDataChange(DataSnapshot snapshot) {
+                                        String value = snapshot.getValue(String.class);
                                         mFirebaseRef.setValue((Integer.parseInt(value)-1)+"");
                                     }
 
@@ -342,21 +344,23 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     }
                                 });
 
-                                DatabaseReference mFirebaseRef2 = mFirebaseInstance.getReference("מורים").child(teacher);
+                                mFirebaseRef2 = mFirebaseInstance.getReference("מורים").child(teacher);
 
                                 mFirebaseRef2.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        String value = snapshot.getValue().toString();
-                                        mFirebaseRef2.setValue((Integer.parseInt(value)-1)+"");
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        String value = dataSnapshot.getValue(String.class);
+
+                                        if(!TextUtils.isEmpty(value)&& TextUtils.isDigitsOnly(value))
+                                        mFirebaseRef2.setValue((Integer.parseInt(value) - 1) + "");
+
                                     }
 
                                     @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
+                                    public void onCancelled(DatabaseError error) {
 
                                     }
                                 });
-
                                 StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + meetingFile);
                                 desertRef.delete();
 
