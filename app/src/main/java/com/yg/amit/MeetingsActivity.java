@@ -15,10 +15,16 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -165,14 +171,38 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                             lv.setOnItemClickListener((adapterView, view, i, l) -> {
                                                 Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
                                                 intent.putExtra("Mode", mode);
-                                                if (mode == Utils.MODE_UPCOMING)
+                                                String student="";
+                                                if (mode == Utils.MODE_UPCOMING) {
                                                     intent.putExtra("Meeting", meetingList.get(i).getFileName());
-                                                if (mode == Utils.MODE_DONE)
+                                                    student=meetingList.get(i).getStudent();
+                                                }
+                                                if (mode == Utils.MODE_DONE) {
                                                     intent.putExtra("Meeting", doneList.get(i).getFileName());
-                                                if (mode == Utils.MODE_FINISHED)
+                                                    student=doneList.get(i).getStudent();
+                                                }
+                                                if (mode == Utils.MODE_FINISHED) {
                                                     intent.putExtra("Meeting", finishedList.get(i).getFileName());
-                                                startActivity(intent);
-                                                finish();
+                                                    student =finishedList.get(i).getStudent();
+                                                }
+                                                DatabaseReference reference;
+                                                reference = FirebaseDatabase.getInstance().getReference();
+                                                reference.orderByChild(student).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+                                                            String parent = dataSnapshot.getKey();
+                                                            String keys = childSnapshot.getKey();
+                                                            intent.putExtra("className",keys);
+                                                        }
+
+                                                        startActivity(intent);
+                                                        finish();
+                                                    }
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
                                             });
 
                                             pd.dismiss();
@@ -226,4 +256,8 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
             mode = Utils.MODE_FINISHED;
         }
     }
+
+
+
+
 }

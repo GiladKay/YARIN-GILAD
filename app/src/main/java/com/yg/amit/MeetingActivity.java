@@ -99,7 +99,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private String meetingFile;
     private int meetingMode;
-    private String sName, className;
+    private String  className;
 
     private String data;
 
@@ -124,7 +124,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         Bundle extras = getIntent().getExtras();
         meetingFile = extras.getString("Meeting");
         meetingMode = extras.getInt("Mode");
-        sName = extras.getString("sName");
         className = extras.getString("className");
 
         diaEdit = new Dialog(this);
@@ -322,14 +321,14 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("מחיקת פגישה")
                         .setMessage("האם אתה בטוח שאתה רוצה למחוק את הפגישה? ")
-                        .setIcon(R.drawable.ic_bin)
+                        .setIcon(R.drawable.error)
                         .setPositiveButton("כן ", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
 
 
                                 mFirebaseInstance = FirebaseDatabase.getInstance();
-                                mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
+                                mFirebaseRef = mFirebaseInstance.getReference(className).child(student);
 
                                 mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override

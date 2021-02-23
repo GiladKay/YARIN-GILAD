@@ -248,7 +248,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
             String time = tvTime.getText().toString();
             String Date = tvDate.getText().toString();
 
-            if (!time.isEmpty() && !Date.isEmpty()) {
+            if (!time.equals("בחירת שעה") && !Date.equals("בחירת תאריך")) {
                 pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
                 pd.setCancelable(false);
                 pd.show();
@@ -365,7 +365,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                 if (mode == Utils.MODE_FINISHED)
                                                     intent.putExtra("Meeting", finishedList.get(i).getFileName());
 
-                                                intent.putExtra("sName",sName);
                                                 intent.putExtra("className",className);
 
 
