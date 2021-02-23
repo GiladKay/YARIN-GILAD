@@ -56,6 +56,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     private FirebaseFirestore db;
     private DatabaseReference mFirebaseRef;
     private FirebaseDatabase mFirebaseInstance;
+    DatabaseReference mFirebaseRef2;
 
     private SharedPreferences sharedPreferences;
 
@@ -144,8 +145,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         meetCount = extras.getInt("mCount");
 
 
-        mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
@@ -367,6 +366,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
                                                 intent.putExtra("sName",sName);
                                                 intent.putExtra("className",className);
+
+
                                                 startActivity(intent);
                                             });
 
@@ -391,9 +392,13 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                 });
     }
 
-    public void updateMeetingCount(boolean inc) {
+    public void updateMeetingCount() {
         meetCount++;
         tvSubTitle.setText("מספר פגישות: " + meetCount);
+
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
 
         mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -412,6 +417,23 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                 Log.w(Utils.TAG, "Failed to read value.", error.toException());
             }
         });
+
+        mFirebaseRef2 = mFirebaseInstance.getReference("מורים").child(name);
+
+        mFirebaseRef2.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String value = snapshot.getValue(String.class);
+
+                mFirebaseRef2.setValue((Integer.parseInt(value) + 1) + "");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         btnNew.setVisibility(View.GONE);
         Toast.makeText(context, "הפגישה נוצרה בהצלחה!", Toast.LENGTH_LONG).show();
@@ -459,7 +481,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         riversRef.putFile(file)
                 .addOnSuccessListener(taskSnapshot -> {
                     Log.d("Upload", "onSuccess: Upload succeeded - " + fileName);
-                    updateMeetingCount(true);
+                    updateMeetingCount();
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override

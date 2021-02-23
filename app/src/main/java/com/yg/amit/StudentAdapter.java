@@ -60,7 +60,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
 
         tvName.setText(temp.getName());
 
-        if(!className.equals("Teachers")) {
+        if(!className.equals("מורים")) {
             tvMeetingC.setText(temp.getMeetingCount() + "/2");
 
             if (temp.getMeetingCount() >= 2) {

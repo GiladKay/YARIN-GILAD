@@ -134,8 +134,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         btnUpdateEdit = (Button) diaEdit.findViewById(R.id.btnUpdate);
 
 
-        mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
+
 
         btnUpdateEdit.setOnClickListener(view -> {
             pd = ProgressDialog.show(this, "עדכון פגישה", "מעדכן פגישה...", true);
@@ -326,13 +325,30 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
 
-                                //TODO Update meeting count for student who's meeting is deleted
+
+                                mFirebaseInstance = FirebaseDatabase.getInstance();
+                                mFirebaseRef = mFirebaseInstance.getReference(className).child(sName);
 
                                 mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         String value = snapshot.getValue().toString();
                                         mFirebaseRef.setValue((Integer.parseInt(value)-1)+"");
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+
+                                DatabaseReference mFirebaseRef2 = mFirebaseInstance.getReference("מורים").child(teacher);
+
+                                mFirebaseRef2.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        String value = snapshot.getValue().toString();
+                                        mFirebaseRef2.setValue((Integer.parseInt(value)-1)+"");
                                     }
 
                                     @Override

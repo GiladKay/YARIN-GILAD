@@ -58,6 +58,7 @@ public class StudentsActivity extends AppCompatActivity {
     private String type;
 
     private String className;
+    private boolean isTeachers;
 
     private DatabaseReference mFirebaseRef;
     private FirebaseDatabase mFirebaseInstance;
@@ -97,6 +98,7 @@ public class StudentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
+        isTeachers=false;
         contentResolver = getContentResolver();
 
         sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
@@ -108,17 +110,24 @@ public class StudentsActivity extends AppCompatActivity {
 
         context=this;
 
-        mFirebaseInstance = FirebaseDatabase.getInstance();
-        mFirebaseRef = mFirebaseInstance.getReference(className);
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
         if(!className.equals("Teachers"))
             pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
-        if(className.equals("Teachers"))
+        if(className.equals("Teachers")) {
             pd = ProgressDialog.show(this, "מורים", "מוריד נתונים...", true);
+            isTeachers=true;
+        }
         pd.setCancelable(false);
         pd.show();
+
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        if(isTeachers)
+            mFirebaseRef = mFirebaseInstance.getReference("מורים");
+        else
+            mFirebaseRef = mFirebaseInstance.getReference(className);
 
 
 
@@ -132,7 +141,10 @@ public class StudentsActivity extends AppCompatActivity {
                     studentList.add(new Student(snapshot.getKey(), Integer.parseInt(snapshot.getValue().toString())));
                     Log.d(Utils.TAG, snapshot.getValue().toString());
                 }
-                studentAdapter = new StudentAdapter(context, studentList,className);
+                if(isTeachers)
+                    studentAdapter = new StudentAdapter(context, studentList,"מורים");
+                else
+                    studentAdapter = new StudentAdapter(context, studentList,className);
 
                 lvS.setAdapter(studentAdapter);
 
