@@ -134,9 +134,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvDateEdit = (TextView) diaEdit.findViewById(R.id.tvEditDate);
         btnUpdateEdit = (Button) diaEdit.findViewById(R.id.btnUpdate);
 
-
-
-
         btnUpdateEdit.setOnClickListener(view -> {
             pd = ProgressDialog.show(this, "עדכון פגישה", "מעדכן פגישה...", true);
             pd.setCancelable(false);
@@ -325,7 +322,9 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                         .setPositiveButton("כן ", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-
+                                pd = ProgressDialog.show(MeetingActivity.this, "פגישה", "מוחק פגישה...", true);
+                                pd.setCancelable(false);
+                                pd.show();
 
                                 mFirebaseInstance = FirebaseDatabase.getInstance();
                                 mFirebaseRef = mFirebaseInstance.getReference(className).child(student);
@@ -336,7 +335,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                         String value = snapshot.getValue(String.class);
                                         mFirebaseRef.setValue((Integer.parseInt(value)-1)+"");
                                     }
-
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
 
@@ -352,19 +350,14 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
                                         if(!TextUtils.isEmpty(value)&& TextUtils.isDigitsOnly(value))
                                         mFirebaseRef2.setValue((Integer.parseInt(value) - 1) + "");
-
                                     }
-
                                     @Override
                                     public void onCancelled(DatabaseError error) {
 
                                     }
                                 });
-                                StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + meetingFile);
-                                desertRef.delete();
 
                                 DeleteCalendarEntry(ListSelectedCalendars("פגישה עם " + student));
-                                Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
 
                                 String eSubject = "ביטול פגישה - אמ" + "\"" + "ית מודיעין בנים";
                                 String eMessage = "הפגישה שהייתה אמורה להתקיים בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ", בוטלה.";
@@ -385,6 +378,15 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                 }
                                             }
                                         });
+
+                                StorageReference desertRef = mStorageRef.child("Meetings/Upcoming/" + meetingFile);
+                                desertRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        pd.dismiss();
+                                        Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
+                                    }
+                                });
 
                                 finish();
                             }
@@ -532,6 +534,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     Log.w("Download", "onFailure: Download failed", exception);
                     pd.dismiss();
                     Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
+                    finish();
                 });
     }
 
@@ -677,6 +680,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     public void onFailure(@NonNull Exception exception) {
                         // Handle unsuccessful uploads
                         Log.w("Upload", "onSuccess: Upload failed", exception);
+                        Toast.makeText(MeetingActivity.this, "אירעה שגיאה", Toast.LENGTH_LONG).show();
                     }
                 });
     }

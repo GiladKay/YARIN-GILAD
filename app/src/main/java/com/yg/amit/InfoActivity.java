@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -25,6 +24,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -40,7 +40,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,8 +47,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class InfoActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -103,7 +100,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         db = FirebaseFirestore.getInstance();
 
 
-
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         arrMeeting = new Dialog(this);                               //Initializing meeting arrangement dialog
@@ -125,7 +121,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         context = this;
 
 
-
         tvTitle = findViewById(R.id.tvTitle);
         tvSubTitle = findViewById(R.id.tvSubTitle);
         tvNoMeeting = findViewById(R.id.tvNoMeet);
@@ -144,7 +139,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         sName = extras.getString("SName");
         className = extras.getString("classname");
         meetCount = extras.getInt("mCount");
-
 
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
@@ -365,7 +359,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                 if (mode == Utils.MODE_FINISHED)
                                                     intent.putExtra("Meeting", finishedList.get(i).getFileName());
 
-                                                intent.putExtra("className",className);
+                                                intent.putExtra("className", className);
 
 
                                                 startActivity(intent);
@@ -425,9 +419,21 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue(String.class);
 
-                if(!TextUtils.isEmpty(value) && TextUtils.isDigitsOnly(value))
-                mFirebaseRef2.setValue((Integer.parseInt(value) + 1) + "");
-
+                mFirebaseRef2.setValue((Integer.parseInt(value) + 1) + "")
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                btnNew.setVisibility(View.GONE);
+                                Toast.makeText(context, "הפגישה נוצרה בהצלחה!", Toast.LENGTH_LONG).show();
+                                arrMeeting.dismiss();
+                                tvNoMeeting.setVisibility(View.GONE);
+                                meetingList.add(new Meeting(sName, name, mDate, mTime));
+                                btnUpcoming.performClick();
+                                pd.dismiss();
+                                if (switchCalen.isChecked())
+                                    createEvent();
+                            }
+                        });
             }
 
             @Override
@@ -435,17 +441,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-
-
-        btnNew.setVisibility(View.GONE);
-        Toast.makeText(context, "הפגישה נוצרה בהצלחה!", Toast.LENGTH_LONG).show();
-        arrMeeting.dismiss();
-        tvNoMeeting.setVisibility(View.GONE);
-        meetingList.add(new Meeting(sName, name, mDate, mTime));
-        btnUpcoming.performClick();
-        pd.dismiss();
-        if(switchCalen.isChecked())
-            createEvent();
     }
 
     public void createEvent() {
