@@ -20,7 +20,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -348,7 +347,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         String value = dataSnapshot.getValue(String.class);
 
-                                        if(!TextUtils.isEmpty(value)&& TextUtils.isDigitsOnly(value))
                                         mFirebaseRef2.setValue((Integer.parseInt(value) - 1) + "");
                                     }
                                     @Override
