@@ -97,8 +97,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private ProgressDialog pd;
 
     private String meetingFile;
-    private int meetingMode;
-    private String  className;
+    private int meetingMode, meetCount;
+    private String  sName, className, pActivity;
 
     private String data;
 
@@ -124,6 +124,9 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         meetingFile = extras.getString("Meeting");
         meetingMode = extras.getInt("Mode");
         className = extras.getString("className");
+        sName = extras.getString("SName");
+        meetCount = extras.getInt("mCount");
+        pActivity = extras.getString("pActivity");
 
         diaEdit = new Dialog(this);
         diaEdit.setContentView(R.layout.edit_meeting_dialog);
@@ -386,6 +389,17 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     }
                                 });
 
+                                Intent intent = null;
+                                if(pActivity.equals("Info")) {
+                                    intent = new Intent(MeetingActivity.this, InfoActivity.class);
+                                    intent.putExtra("SName", sName);
+                                    intent.putExtra("mCount",meetCount);
+                                    intent.putExtra("classname",className);
+                                }
+                                if(pActivity.equals("Meetings"))
+                                    intent = new Intent(MeetingActivity.this, MeetingsActivity.class);
+
+                                startActivity(intent);
                                 finish();
                             }
                         })
@@ -878,5 +892,21 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         javaMailAPI.execute();
 
         Log.d(Utils.TAG, "email sent");
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = null;
+        if(pActivity.equals("Info")) {
+            intent = new Intent(this, InfoActivity.class);
+            intent.putExtra("SName", sName);
+            intent.putExtra("mCount",meetCount);
+            intent.putExtra("classname",className);
+        }
+        if(pActivity.equals("Meetings"))
+            intent = new Intent(this, MeetingsActivity.class);
+
+        startActivity(intent);
+        finish();
     }
 }

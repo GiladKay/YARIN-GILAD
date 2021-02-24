@@ -169,6 +169,10 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                             finishedAdapter = new MeetingAdapter(context, finishedList);
 
                                             lv.setOnItemClickListener((adapterView, view, i, l) -> {
+                                                pd = ProgressDialog.show(this, "פגישה", "פותח פגישה...", true);
+                                                pd.setCancelable(false);
+                                                pd.show();
+
                                                 Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
                                                 intent.putExtra("Mode", mode);
                                                 String student="";
@@ -195,6 +199,9 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                                             intent.putExtra("className",keys);
                                                         }
 
+                                                        intent.putExtra("pActivity", "Meetings");
+
+                                                        pd.dismiss();
                                                         startActivity(intent);
                                                         finish();
                                                     }

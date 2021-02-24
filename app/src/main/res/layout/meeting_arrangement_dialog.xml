@@ -33,7 +33,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:orientation="horizontal">
 
             <com.google.android.material.textview.MaterialTextView
@@ -66,7 +68,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal">
 
             <com.google.android.material.textview.MaterialTextView
@@ -100,8 +104,7 @@
             android:id="@+id/tvDate2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:background="#15DC65"
             android:fontFamily="sans-serif"
             android:gravity="center"
@@ -137,18 +140,22 @@
             android:gravity="start"
             android:text="  שמור ביומן"
             android:textAlignment="textStart"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:theme="@style/Theme.AMIT"
             android:visibility="visible" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCreate"
-            android:layout_width="wrap_content"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:backgroundTint="#6B00F7"
-            android:text="צור פגישה" />
-
+            android:backgroundTint="#07A5FF"
+            android:fontFamily="sans-serif"
+            android:paddingTop="10dp"
+            android:paddingBottom="15dp"
+            android:text="צור פגישה"
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

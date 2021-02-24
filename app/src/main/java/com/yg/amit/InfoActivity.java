@@ -350,19 +350,28 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                             }
 
                                             lv.setOnItemClickListener((adapterView, view, i, l) -> {
-                                                Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
-                                                intent.putExtra("Mode", mode);
-                                                if (mode == Utils.MODE_UPCOMING)
-                                                    intent.putExtra("Meeting", meetingList.get(i).getFileName());
-                                                if (mode == Utils.MODE_DONE)
-                                                    intent.putExtra("Meeting", doneList.get(i).getFileName());
-                                                if (mode == Utils.MODE_FINISHED)
-                                                    intent.putExtra("Meeting", finishedList.get(i).getFileName());
+                                                if ((mode == Utils.MODE_UPCOMING && meetingList.get(i).getTeacher().equals(name))
+                                                || (mode == Utils.MODE_DONE && doneList.get(i).getTeacher().equals(name))
+                                                || (mode == Utils.MODE_FINISHED && finishedList.get(i).getTeacher().equals(name))
+                                                || type.equals(Utils.TYPE_ADMIN)) {
+                                                    Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
+                                                    intent.putExtra("Mode", mode);
+                                                    if (mode == Utils.MODE_UPCOMING)
+                                                        intent.putExtra("Meeting", meetingList.get(i).getFileName());
+                                                    if (mode == Utils.MODE_DONE)
+                                                        intent.putExtra("Meeting", doneList.get(i).getFileName());
+                                                    if (mode == Utils.MODE_FINISHED)
+                                                        intent.putExtra("Meeting", finishedList.get(i).getFileName());
 
-                                                intent.putExtra("className", className);
+                                                    intent.putExtra("className", className);
+                                                    intent.putExtra("SName", sName);
+                                                    intent.putExtra("classname", className);
+                                                    intent.putExtra("mCount", meetCount);
+                                                    intent.putExtra("pActivity", "Info");
 
-
-                                                startActivity(intent);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
                                             });
 
                                             pd.dismiss();
