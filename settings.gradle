@@ -1,3 +1,2 @@
-include ':activation'
 include ':app'
 rootProject.name = "AMIT"
