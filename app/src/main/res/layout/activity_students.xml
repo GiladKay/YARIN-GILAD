@@ -5,22 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:layoutDirection="ltr"
     android:orientation="vertical"
     tools:context=".StudentsActivity">
 
     <include
         android:id="@+id/toolbar3"
-        layout="@layout/toolbar"
-        ></include>
-
+        layout="@layout/toolbar" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="15dp">
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="15dp"
+        android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitle1"
@@ -28,23 +27,23 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:paddingRight="5dp"
+            android:text="פגישות"
             android:textColor="@color/colorPrimary"
             android:textSize="30sp"
-            android:textStyle="bold"
-            android:text="פגישות" />
+            android:textStyle="bold" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tvTitle2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
             android:layout_weight="2"
             android:paddingRight="5dp"
-            android:textColor="@color/colorPrimary"
             android:shadowRadius="5"
-            android:layout_marginRight="10dp"
+            android:text="שם"
+            android:textColor="@color/colorPrimary"
             android:textSize="30sp"
-            android:textStyle="bold"
-            android:text="שם" />
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -52,6 +51,6 @@
         android:id="@+id/lvStudents"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginRight="15dp"/>
+        android:layout_marginRight="15dp" />
 
 </LinearLayout>
