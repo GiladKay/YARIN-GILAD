@@ -146,7 +146,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
             //lv.setAdapter(meetingAdapter);
 
-            String data = student + "&&" + teacher + "&&" + date + "&&" + time + "&&";
+            String data = student + "&&" + teacher + "&&" + date + "&&" + time + "&&&&&&";
 
             String fileName = student + "&" + teacher + ".txt";
             writeToFile(data, getApplicationContext(), fileName);
@@ -248,7 +248,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        mTitle.setText("פגישה ");
+        mTitle.setText("פגישה");
 
         if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
             btnEdit = (Button) toolbar.findViewById(R.id.btnEdit);
@@ -453,7 +453,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvTitle.setText(student + " - " + teacher);
         tvSubTitle.setText(data.split("&&")[2] + " - " + data.split("&&")[3]);
 
-        tvTitleEdit.setText(teacher + " - " + student);
+        tvTitleEdit.setText(student + " - " + teacher);
         tvDateEdit.setText(date);
         tvTimeEdit.setText(time);
 
