@@ -852,7 +852,10 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
             return false;
+        } else {
+            RequestStoragePermission2();
         }
+
         // If no end time, use start + 1 hour or = 1 day. Query is slow if searching a huge time range
         if (endTimeMs <= 0) {
             endTimeMs = startTimeMs + 1000 * 60 * 60; // + 1 hour

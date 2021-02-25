@@ -516,40 +516,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /**
-     * reads and outputs the contents of the now local Class file
-     *
-     * @param context-this
-     * @param file-        name of the class file
-     * @return a String containing all the data from the file
-     */
-    private String readFromFile(Context context, String file) {
-        String ret = "";
 
-        try {
-            InputStream inputStream = context.openFileInput(file);
-
-            if (inputStream != null) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ((receiveString = bufferedReader.readLine()) != null) {
-                    stringBuilder.append(receiveString).append("\n");
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        } catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-
-        return ret;
-    }
 
     /**
      * sends emails
