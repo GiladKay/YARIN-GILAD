@@ -358,8 +358,16 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     }
                                 });
 
-                                DeleteCalendarEntry(ListSelectedCalendars("פגישה עם " + student));
 
+
+                                if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+                                    DeleteCalendarEntry(ListSelectedCalendars("פגישה עם " + student));
+
+                                } else if (!(ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED)) {
+                                    RequestStoragePermission1();
+                                } else {
+                                    RequestStoragePermission2();
+                                }
                                 String eSubject = "ביטול פגישה - אמ" + "\"" + "ית מודיעין בנים";
                                 String eMessage = "הפגישה שהייתה אמורה להתקיים בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ", בוטלה.";
 
