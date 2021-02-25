@@ -516,17 +516,29 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         long startTime = cal.getTimeInMillis();
         long endTime = startTime + 30 * 60 * 1000;
-        if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
-            if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
-                btnAddToCal.setVisibility(View.VISIBLE);
-            }
-        }
-        if (type.equals(Utils.TYPE_STUDENT) && meetingMode == Utils.MODE_UPCOMING) {
-            if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
-                btnAddToCal.setVisibility(View.VISIBLE);
-            }
-        }
 
+        if(meetingMode == Utils.MODE_UPCOMING) {
+
+            if (type.equals(Utils.TYPE_TEACHER)) {
+                if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+                    if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
+                        btnAddToCal.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    RequestStoragePermission2();
+                }
+            }
+
+            if (type.equals(Utils.TYPE_STUDENT) ) {
+                if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+                    if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
+                        btnAddToCal.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    RequestStoragePermission2();
+                }
+            }
+        }
         pd.dismiss();
     }
 
@@ -796,7 +808,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void RequestStoragePermission2() {
+    public void RequestStoragePermission2( ) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CALENDAR)) {
 
             new AlertDialog.Builder(this)
