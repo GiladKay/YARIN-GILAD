@@ -669,9 +669,11 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     ipInput.setVisibility(View.GONE);
                                     edtInput.setVisibility(View.GONE);
                                     btnSend.setVisibility(View.GONE);
-                                    btnEdit.setVisibility(View.GONE);
-                                    btnAddToCal.setVisibility(View.GONE);
-                                    btnDelete.setVisibility(View.GONE);
+                                    if(type.equals(Utils.TYPE_TEACHER)) {
+                                        btnEdit.setVisibility(View.GONE);
+                                        btnAddToCal.setVisibility(View.GONE);
+                                        btnDelete.setVisibility(View.GONE);
+                                    }
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {

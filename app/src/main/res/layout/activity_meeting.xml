@@ -157,8 +157,8 @@
             android:layout_height="match_parent"
             android:gravity="top"
             android:hint="משוב"
-            android:lines="5"
-            android:maxLines="10" />
+            android:lines="13"
+            android:maxLines="13" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
