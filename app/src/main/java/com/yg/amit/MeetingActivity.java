@@ -400,7 +400,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                         if (pActivity.equals("Info")) {
                                             intent = new Intent(MeetingActivity.this, InfoActivity.class);
                                             intent.putExtra("SName", sName);
-                                            intent.putExtra("mCount", meetCount);
+                                            intent.putExtra("mCount", meetCount - 1);
                                             intent.putExtra("classname", className);
                                         }
                                         if (pActivity.equals("Meetings"))
