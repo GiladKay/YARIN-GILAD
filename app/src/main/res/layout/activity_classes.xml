@@ -13,7 +13,6 @@
         layout="@layout/toolbar" />
 
 
-
     <ListView
         android:id="@+id/lvClasses"
         android:layout_width="match_parent"

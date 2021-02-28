@@ -29,30 +29,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class StudentsActivity extends AppCompatActivity {
 
+    FirebaseFirestore db;
     private ListView lvS;       // listView for students
     private StudentAdapter studentAdapter;
     private ArrayList<Student> studentList;
     private String data;       //String containing data from the chosen class file
-
     private boolean hasBeenEdited = false; // remembers if an edit to the students has occurred
-
     private ProgressDialog pd;
-
     private ContentResolver contentResolver;
-
     private StorageReference mStorageRef;
-    FirebaseFirestore db;
-
     private SharedPreferences sp;
     private String name;
     private String type;
@@ -98,7 +87,7 @@ public class StudentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_students);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT); // Set orientation to false
 
-        isTeachers=false;
+        isTeachers = false;
         contentResolver = getContentResolver();
 
         sp = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
@@ -108,27 +97,26 @@ public class StudentsActivity extends AppCompatActivity {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        context=this;
+        context = this;
 
 
         lvS = (ListView) findViewById(R.id.lvStudents);
 
-        if(!className.equals("Teachers"))
+        if (!className.equals("Teachers"))
             pd = ProgressDialog.show(this, className, "מוריד נתונים...", true);
-        if(className.equals("Teachers")) {
+        if (className.equals("Teachers")) {
             pd = ProgressDialog.show(this, "מורים", "מוריד נתונים...", true);
-            isTeachers=true;
+            isTeachers = true;
         }
         pd.setCancelable(false);
         pd.show();
 
 
         mFirebaseInstance = FirebaseDatabase.getInstance();
-        if(isTeachers)
+        if (isTeachers)
             mFirebaseRef = mFirebaseInstance.getReference("מורים");
         else
             mFirebaseRef = mFirebaseInstance.getReference(className);
-
 
 
         studentList = new ArrayList<>();
@@ -136,15 +124,14 @@ public class StudentsActivity extends AppCompatActivity {
         mFirebaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot:dataSnapshot.getChildren())
-                {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     studentList.add(new Student(snapshot.getKey(), Integer.parseInt(snapshot.getValue().toString())));
                     Log.d(Utils.TAG, snapshot.getValue().toString());
                 }
-                if(isTeachers)
-                    studentAdapter = new StudentAdapter(context, studentList,"מורים");
+                if (isTeachers)
+                    studentAdapter = new StudentAdapter(context, studentList, "מורים");
                 else
-                    studentAdapter = new StudentAdapter(context, studentList,className);
+                    studentAdapter = new StudentAdapter(context, studentList, className);
 
                 lvS.setAdapter(studentAdapter);
 
@@ -156,8 +143,8 @@ public class StudentsActivity extends AppCompatActivity {
 
                         Intent intent = new Intent(getApplicationContext(), InfoActivity.class);
                         intent.putExtra("SName", student.getName());
-                        intent.putExtra("mCount",student.getMeetingCount());
-                        intent.putExtra("classname",className);
+                        intent.putExtra("mCount", student.getMeetingCount());
+                        intent.putExtra("classname", className);
                         startActivity(intent);
                         finish();
                     }
@@ -167,14 +154,14 @@ public class StudentsActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(StudentsActivity.this,databaseError.toString(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(StudentsActivity.this, databaseError.toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("כיתה " + className);
-        if(className.equals("Teachers")) mTitle.setText("מורים");
+        if (className.equals("Teachers")) mTitle.setText("מורים");
         setSupportActionBar(toolbar);
     }
 

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tvClass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginRight="10dp"
+        android:layout_weight="1"
         android:freezesText="false"
-        android:paddingRight="5dp"
-        android:shadowRadius="5"
         android:paddingTop="6dp"
+        android:paddingRight="5dp"
         android:paddingBottom="5dp"
+        android:shadowRadius="5"
         android:text="דוגמה"
         android:textColor="@color/black"
         android:textSize="30sp"

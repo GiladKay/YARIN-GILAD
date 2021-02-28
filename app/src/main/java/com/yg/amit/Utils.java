@@ -12,22 +12,22 @@ public class Utils {
     public static final String TYPE_KEY = "type";//
 
     // log tag
-    public static final String TAG="debug_tag";//
+    public static final String TAG = "debug_tag";//
 
 
     // the modes in which a user can view meeting (upcoming meetings, done meetings (with teacher mashov) and
     // finished meeting with both teacher and student mashov)
-    public static final int MODE_UPCOMING=0;//
-    public static final int MODE_DONE=1;//
-    public static final int MODE_FINISHED=2;//
+    public static final int MODE_UPCOMING = 0;//
+    public static final int MODE_DONE = 1;//
+    public static final int MODE_FINISHED = 2;//
 
     // key for the Intent Extra that contains the class name
     public static final String CLASS_NAME_KEY = "class";//
 
     // Access types
-    public static final String TYPE_STUDENT="student";
-    public static final String TYPE_TEACHER="teacher";
-    public static final String TYPE_ADMIN="admin";
+    public static final String TYPE_STUDENT = "student";
+    public static final String TYPE_TEACHER = "teacher";
+    public static final String TYPE_ADMIN = "admin";
 
     // key for sp containing the last state of the "add to calendar" switch
     public static final String SWITCH_STATE = "switchState";//

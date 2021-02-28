@@ -15,19 +15,19 @@
     <TextView
         android:id="@+id/tvNoMeet"
         android:layout_width="match_parent"
-        android:textSize="20dp"
-        android:textAlignment="center"
-        android:layout_weight="1"
-        android:text="אין פגישות קרובות"
-        android:gravity="center"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="אין פגישות קרובות"
+        android:textAlignment="center"
+        android:textSize="20dp"
+        android:visibility="gone" />
 
     <ListView
         android:id="@+id/lv"
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/toggleButton"
@@ -35,33 +35,33 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical"
-        app:singleSelection="true"
+        app:checkedButton="@id/btnUpcoming"
         app:selectionRequired="true"
-        app:checkedButton="@id/btnUpcoming">
+        app:singleSelection="true">
 
         <Button
             android:id="@+id/btnUpcoming"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="עוד לא נעשה"
-            style="?attr/materialButtonOutlinedStyle" />
+            android:text="עוד לא נעשה" />
 
         <Button
             android:id="@+id/btnDone"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="נעשה וללא משוב תלמיד"
-            style="?attr/materialButtonOutlinedStyle" />
+            android:text="נעשה וללא משוב תלמיד" />
 
         <Button
             android:id="@+id/btnFinished"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="נעשה"
-            style="?attr/materialButtonOutlinedStyle" />
+            android:text="נעשה" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

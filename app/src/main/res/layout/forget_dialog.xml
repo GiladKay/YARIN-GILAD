@@ -8,20 +8,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="20dp">
+        android:layout_margin="20dp"
+        android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="20dp"
-            android:text="שחזור סיסמה"
             android:fontFamily="sans-serif"
             android:shadowColor="@color/black"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="5"
+            android:text="שחזור סיסמה"
             android:textColor="@color/colorPrimary"
             android:textSize="40sp"
             android:textStyle="bold" />
@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:hint="אימייל לשחזור"
-            app:startIconDrawable="@drawable/email"
-            app:errorEnabled="true">
+            app:errorEnabled="true"
+            app:startIconDrawable="@drawable/email">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtEmail1"
@@ -53,19 +53,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:backgroundTint="#1C6519"
-                android:text="הבא" />
+                android:text="הבא"
+                app:backgroundTint="#1C6519" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel1"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#16365D"
-                android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
                 android:layout_toRightOf="@id/btnNext1"
-                android:text="ביטול" />
+                android:text="ביטול"
+                android:textColor="#16365D" />
 
         </RelativeLayout>
 

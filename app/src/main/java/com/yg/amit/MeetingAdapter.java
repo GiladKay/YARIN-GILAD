@@ -30,12 +30,12 @@ public class MeetingAdapter extends BaseAdapter implements Filterable {
     private SharedPreferences sharedPreferences;
     private String type;
 
-   public MeetingAdapter(@NonNull Context context,@NonNull List<Meeting> objects){
-       super();
-       this.context = context;
-       this.originalList = objects;
-       this.tempList = objects;
-   }
+    public MeetingAdapter(@NonNull Context context, @NonNull List<Meeting> objects) {
+        super();
+        this.context = context;
+        this.originalList = objects;
+        this.tempList = objects;
+    }
 
     @Override
     public int getCount() {
@@ -90,7 +90,7 @@ public class MeetingAdapter extends BaseAdapter implements Filterable {
                 ArrayList<Meeting> filters = new ArrayList<>();
 
                 for (int i = 0; i < tempList.size(); i++) {
-                    if ((tempList.get(i).getStudent()+" - "+tempList.get(i).getTeacher()).toLowerCase().contains(filterString)) {
+                    if ((tempList.get(i).getStudent() + " - " + tempList.get(i).getTeacher()).toLowerCase().contains(filterString)) {
                         Meeting meeting1 = new Meeting(tempList.get(i).getStudent(), tempList.get(i).getTeacher(), "", "");
                         filters.add(meeting1);
                     }

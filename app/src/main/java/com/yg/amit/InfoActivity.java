@@ -39,23 +39,18 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 public class InfoActivity extends AppCompatActivity implements View.OnClickListener {
 
+    DatabaseReference mFirebaseRef2;
     private StorageReference mStorageRef;
     private FirebaseFirestore db;
     private DatabaseReference mFirebaseRef;
     private FirebaseDatabase mFirebaseInstance;
-    DatabaseReference mFirebaseRef2;
-
     private SharedPreferences sharedPreferences;
 
     private String type, name;
@@ -351,9 +346,9 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
                                             lv.setOnItemClickListener((adapterView, view, i, l) -> {
                                                 if ((mode == Utils.MODE_UPCOMING && meetingList.get(i).getTeacher().equals(name))
-                                                || (mode == Utils.MODE_DONE && doneList.get(i).getTeacher().equals(name))
-                                                || (mode == Utils.MODE_FINISHED && finishedList.get(i).getTeacher().equals(name))
-                                                || type.equals(Utils.TYPE_ADMIN)) {
+                                                        || (mode == Utils.MODE_DONE && doneList.get(i).getTeacher().equals(name))
+                                                        || (mode == Utils.MODE_FINISHED && finishedList.get(i).getTeacher().equals(name))
+                                                        || type.equals(Utils.TYPE_ADMIN)) {
                                                     Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
                                                     intent.putExtra("Mode", mode);
                                                     if (mode == Utils.MODE_UPCOMING)
@@ -515,7 +510,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
             Log.e("Exception", "File write failed: " + e.toString());
         }
     }
-
 
 
     /**

@@ -15,12 +15,12 @@
         android:layout_marginRight="45dp"
         android:layout_marginBottom="45dp"
         android:src="@drawable/logo"
-        android:tintMode="multiply"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/colorPrimary" />
+        app:tint="@color/colorPrimary"
+        app:tintMode="multiply" />
 
     <ImageView
         android:id="@+id/imageView"

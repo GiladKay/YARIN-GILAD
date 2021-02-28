@@ -40,22 +40,18 @@ import java.io.InputStreamReader;
 
 public class Menu extends AppCompatActivity implements View.OnClickListener {
 
+    StorageReference mStorageRef;
     private SharedPreferences sharedPreferences;
-
     private Dialog newPass;
     private TextInputLayout ipPassword, ipOldPassword, ipRepeatPassword;
     private TextInputEditText edtPassword, edtOldPassword, edtRepeatPassword;
     private MaterialButton btnNext, btnCancel;
-
     private String name, type;
     private TextView tvTitle;
     private Button btnUpcoming, btnClasses, btnTeachers, btnAccount;
-
-
     private String address = "";
     private String subject = "";
     private String message = "";
-    StorageReference mStorageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

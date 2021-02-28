@@ -48,8 +48,8 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
         android:layout_margin="8dp"
+        android:layout_weight="1"
         app:cardElevation="0dp"
         app:strokeColor="@color/colorPrimary"
         app:strokeWidth="1dp">
@@ -62,13 +62,13 @@
             <TextView
                 android:id="@+id/tvNoMeet"
                 android:layout_width="match_parent"
-                android:textSize="20dp"
-                android:textAlignment="center"
-                android:layout_weight="1"
-                android:text="אין פגישות קרובות"
-                android:gravity="center"
                 android:layout_height="match_parent"
-                android:visibility="gone"/>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="אין פגישות קרובות"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:visibility="gone" />
 
             <ListView
                 android:id="@+id/lv"
@@ -124,13 +124,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0"
+        android:fontFamily="sans-serif"
         android:paddingTop="10dp"
         android:paddingBottom="15dp"
         android:text="קבע פגישה"
         android:textSize="30sp"
-        android:backgroundTint="#15DC65"
-        android:fontFamily="sans-serif"
         android:textStyle="bold"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:backgroundTint="#15DC65" />
 
 </LinearLayout>

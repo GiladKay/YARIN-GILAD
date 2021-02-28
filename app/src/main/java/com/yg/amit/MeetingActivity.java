@@ -98,7 +98,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private String meetingFile;
     private int meetingMode, meetCount;
-    private String  sName, className, pActivity;
+    private String sName, className, pActivity;
 
     private String data;
 
@@ -335,8 +335,9 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     @Override
                                     public void onDataChange(DataSnapshot snapshot) {
                                         String value = snapshot.getValue(String.class);
-                                        mFirebaseRef.setValue((Integer.parseInt(value)-1)+"");
+                                        mFirebaseRef.setValue((Integer.parseInt(value) - 1) + "");
                                     }
+
                                     @Override
                                     public void onCancelled(@NonNull DatabaseError error) {
 
@@ -352,12 +353,12 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
                                         mFirebaseRef2.setValue((Integer.parseInt(value) - 1) + "");
                                     }
+
                                     @Override
                                     public void onCancelled(DatabaseError error) {
 
                                     }
                                 });
-
 
 
                                 if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
@@ -396,13 +397,13 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                         Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
 
                                         Intent intent = null;
-                                        if(pActivity.equals("Info")) {
+                                        if (pActivity.equals("Info")) {
                                             intent = new Intent(MeetingActivity.this, InfoActivity.class);
                                             intent.putExtra("SName", sName);
-                                            intent.putExtra("mCount",meetCount);
-                                            intent.putExtra("classname",className);
+                                            intent.putExtra("mCount", meetCount);
+                                            intent.putExtra("classname", className);
                                         }
-                                        if(pActivity.equals("Meetings"))
+                                        if (pActivity.equals("Meetings"))
                                             intent = new Intent(MeetingActivity.this, MeetingsActivity.class);
 
                                         startActivity(intent);
@@ -517,7 +518,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         long startTime = cal.getTimeInMillis();
         long endTime = startTime + 30 * 60 * 1000;
 
-        if(meetingMode == Utils.MODE_UPCOMING) {
+        if (meetingMode == Utils.MODE_UPCOMING) {
 
             if (type.equals(Utils.TYPE_TEACHER)) {
                 if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
@@ -529,7 +530,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
 
-            if (type.equals(Utils.TYPE_STUDENT) ) {
+            if (type.equals(Utils.TYPE_STUDENT)) {
                 if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
                     if (!eventExistsOnCalendar("פגישה עם " + teacher, startTime, endTime)) {
                         btnAddToCal.setVisibility(View.VISIBLE);
@@ -669,7 +670,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     ipInput.setVisibility(View.GONE);
                                     edtInput.setVisibility(View.GONE);
                                     btnSend.setVisibility(View.GONE);
-                                    if(type.equals(Utils.TYPE_TEACHER)) {
+                                    if (type.equals(Utils.TYPE_TEACHER)) {
                                         btnEdit.setVisibility(View.GONE);
                                         btnAddToCal.setVisibility(View.GONE);
                                         btnDelete.setVisibility(View.GONE);
@@ -810,7 +811,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void RequestStoragePermission2( ) {
+    public void RequestStoragePermission2() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CALENDAR)) {
 
             new AlertDialog.Builder(this)
@@ -922,13 +923,13 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onBackPressed() {
         Intent intent = null;
-        if(pActivity.equals("Info")) {
+        if (pActivity.equals("Info")) {
             intent = new Intent(this, InfoActivity.class);
             intent.putExtra("SName", sName);
-            intent.putExtra("mCount",meetCount);
-            intent.putExtra("classname",className);
+            intent.putExtra("mCount", meetCount);
+            intent.putExtra("classname", className);
         }
-        if(pActivity.equals("Meetings"))
+        if (pActivity.equals("Meetings"))
             intent = new Intent(this, MeetingsActivity.class);
 
         startActivity(intent);

@@ -60,7 +60,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
 
         tvName.setText(temp.getName());
 
-        if(!className.equals("מורים")) {
+        if (!className.equals("מורים")) {
             tvMeetingC.setText(temp.getMeetingCount() + "/2");
 
             if (temp.getMeetingCount() >= 2) {
@@ -77,8 +77,8 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
     @NonNull
     @Override
     public Filter getFilter() {
-        if(cf==null){
-            cf=new CustomFilter();
+        if (cf == null) {
+            cf = new CustomFilter();
         }
         return cf;
     }
@@ -93,7 +93,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
                 filterString = charSequence.toString().toLowerCase();
                 ArrayList<Student> filters = new ArrayList<>();
 
-                for (int i = 0 ; i<tempList.size();i++) {
+                for (int i = 0; i < tempList.size(); i++) {
                     if (tempList.get(i).getName().toLowerCase().contains(filterString)) {
                         Student student1 = new Student(tempList.get(i).getName(), tempList.get(i).getMeetingCount());
                         filters.add(student1);
@@ -102,9 +102,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
 
                 results.count = filters.size();
                 results.values = filters;
-            }
-
-            else {
+            } else {
                 results.count = tempList.size();
                 results.values = tempList;
             }
@@ -113,7 +111,7 @@ public class StudentAdapter extends BaseAdapter implements Filterable {
 
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-            originalList=(ArrayList<Student>)filterResults.values;
+            originalList = (ArrayList<Student>) filterResults.values;
             notifyDataSetChanged();
         }
 

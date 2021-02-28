@@ -6,7 +6,7 @@ public class Class {
 
     public Class(String className) {
 
-        this.className = className.substring(0,className.length()-4);
+        this.className = className.substring(0, className.length() - 4);
     }
 
     public String getClassName() {

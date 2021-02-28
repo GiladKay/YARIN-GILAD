@@ -26,7 +26,7 @@ public class Student {
         this.meetingCount = meetingCount;
     }
 
-    public void incMeetingCount(){
+    public void incMeetingCount() {
         meetingCount++;
     }
 }

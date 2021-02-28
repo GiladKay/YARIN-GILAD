@@ -8,20 +8,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="20dp">
+        android:layout_margin="20dp"
+        android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_margin="20dp"
-            android:text="התחברות"
             android:fontFamily="sans-serif"
             android:shadowColor="@color/black"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="5"
+            android:text="התחברות"
             android:textColor="@color/colorPrimary"
             android:textSize="40sp"
             android:textStyle="bold" />
@@ -32,8 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:hint="אימייל"
-            app:startIconDrawable="@drawable/email"
-            app:errorEnabled="true">
+            app:errorEnabled="true"
+            app:startIconDrawable="@drawable/email">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtEmail"
@@ -51,8 +51,8 @@
             android:layout_margin="4dp"
             android:hint="סיסמה"
             app:endIconMode="password_toggle"
-            app:startIconDrawable="@drawable/password"
-            app:errorEnabled="true">
+            app:errorEnabled="true"
+            app:startIconDrawable="@drawable/password">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtPassword"
@@ -61,7 +61,6 @@
                 android:inputType="textPassword" />
 
         </com.google.android.material.textfield.TextInputLayout>
-
 
 
         <com.google.android.material.button.MaterialButton
@@ -85,8 +84,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:backgroundTint="#1C6519"
                 android:layout_marginLeft="4dp"
+                android:backgroundTint="#1C6519"
                 android:text="הבא" />
 
             <com.google.android.material.button.MaterialButton
@@ -94,11 +93,11 @@
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#16365D"
                 android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
                 android:layout_toRightOf="@id/btnNext"
-                android:text="ביטול" />
+                android:text="ביטול"
+                android:textColor="#16365D" />
 
         </RelativeLayout>
 
