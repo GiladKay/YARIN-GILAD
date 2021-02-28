@@ -394,21 +394,21 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     public void onSuccess(Void aVoid) {
                                         pd.dismiss();
                                         Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
+
+                                        Intent intent = null;
+                                        if(pActivity.equals("Info")) {
+                                            intent = new Intent(MeetingActivity.this, InfoActivity.class);
+                                            intent.putExtra("SName", sName);
+                                            intent.putExtra("mCount",meetCount);
+                                            intent.putExtra("classname",className);
+                                        }
+                                        if(pActivity.equals("Meetings"))
+                                            intent = new Intent(MeetingActivity.this, MeetingsActivity.class);
+
+                                        startActivity(intent);
+                                        finish();
                                     }
                                 });
-
-                                Intent intent = null;
-                                if(pActivity.equals("Info")) {
-                                    intent = new Intent(MeetingActivity.this, InfoActivity.class);
-                                    intent.putExtra("SName", sName);
-                                    intent.putExtra("mCount",meetCount);
-                                    intent.putExtra("classname",className);
-                                }
-                                if(pActivity.equals("Meetings"))
-                                    intent = new Intent(MeetingActivity.this, MeetingsActivity.class);
-
-                                startActivity(intent);
-                                finish();
                             }
                         })
                         .setNegativeButton("לא ", null).show();

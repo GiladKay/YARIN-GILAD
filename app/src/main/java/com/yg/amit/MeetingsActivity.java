@@ -175,41 +175,50 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
 
                                                 Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
                                                 intent.putExtra("Mode", mode);
-                                                String student="";
+                                                String student = "";
                                                 if (mode == Utils.MODE_UPCOMING) {
                                                     intent.putExtra("Meeting", meetingList.get(i).getFileName());
-                                                    student=meetingList.get(i).getStudent();
+                                                    student = meetingList.get(i).getStudent();
                                                 }
                                                 if (mode == Utils.MODE_DONE) {
                                                     intent.putExtra("Meeting", doneList.get(i).getFileName());
-                                                    student=doneList.get(i).getStudent();
+                                                    student = doneList.get(i).getStudent();
                                                 }
                                                 if (mode == Utils.MODE_FINISHED) {
                                                     intent.putExtra("Meeting", finishedList.get(i).getFileName());
-                                                    student =finishedList.get(i).getStudent();
+                                                    student = finishedList.get(i).getStudent();
                                                 }
-                                                DatabaseReference reference;
-                                                reference = FirebaseDatabase.getInstance().getReference();
-                                                reference.orderByChild(student).addListenerForSingleValueEvent(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                        for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                                                            String parent = dataSnapshot.getKey();
-                                                            String keys = childSnapshot.getKey();
-                                                            intent.putExtra("className",keys);
+                                                if (type.equals(Utils.TYPE_TEACHER)) {
+                                                    DatabaseReference reference;
+                                                    reference = FirebaseDatabase.getInstance().getReference();
+                                                    reference.orderByChild(student).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                            for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                                                                String parent = dataSnapshot.getKey();
+                                                                String keys = childSnapshot.getKey();
+                                                                intent.putExtra("className", keys);
+                                                            }
+
+                                                            intent.putExtra("pActivity", "Meetings");
+
+                                                            pd.dismiss();
+                                                            startActivity(intent);
+                                                            finish();
                                                         }
 
-                                                        intent.putExtra("pActivity", "Meetings");
+                                                        @Override
+                                                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                        pd.dismiss();
-                                                        startActivity(intent);
-                                                        finish();
-                                                    }
-                                                    @Override
-                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                                    }
-                                                });
+                                                        }
+                                                    });
+                                                } else {
+                                                    intent.putExtra("className", "class");
+                                                    intent.putExtra("pActivity", "Meetings");
+                                                    pd.dismiss();
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
                                             });
 
                                             pd.dismiss();
@@ -263,8 +272,6 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
             mode = Utils.MODE_FINISHED;
         }
     }
-
-
 
 
 }
