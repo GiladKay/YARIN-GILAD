@@ -107,6 +107,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private int tHour, tMinute;
 
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,17 +118,18 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         mStorageRef = FirebaseStorage.getInstance().getReference();
         db = FirebaseFirestore.getInstance();
 
+        context = this;
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
 
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
 
         Bundle extras = getIntent().getExtras();
-        meetingFile = extras.getString("Meeting");
-        meetingMode = extras.getInt("Mode");
-        className = extras.getString("className");
-        sName = extras.getString("SName");
-        meetCount = extras.getInt("mCount");
-        pActivity = extras.getString("pActivity");
+        meetingFile = extras.getString(Utils.KEY_FILE_NAME);
+        meetingMode = extras.getInt(Utils.KEY_MODE);
+        className = extras.getString(Utils.KEY_CLASS_NAME);
+        sName = extras.getString(Utils.KEY_STUDENT_NAME);
+        meetCount = extras.getInt(Utils.KEY_MEETING_COUNT);
+        pActivity = extras.getString(Utils.KEY_PREVIOUS_ACTIVITY);
 
         diaEdit = new Dialog(this);
         diaEdit.setContentView(R.layout.edit_meeting_dialog);
@@ -187,7 +190,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                sendEmail(document.getId(), eSubject, eMessage);
+                                Utils.sendEmail(context,document.getId(), eSubject, eMessage);
                             }
                         } else {
                             Log.w(Utils.TAG, "Error getting documents.", task.getException());
@@ -381,7 +384,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                                         Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                                        sendEmail(document.getId(), eSubject, eMessage);
+                                                        Utils.sendEmail(context,document.getId(), eSubject, eMessage);
                                                     }
                                                 } else {
                                                     Log.w(Utils.TAG, "Error getting documents.", task.getException());
@@ -397,13 +400,13 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                         Toast.makeText(getApplicationContext(), " הפגישה נמחקה ", Toast.LENGTH_LONG).show();
 
                                         Intent intent = null;
-                                        if (pActivity.equals("Info")) {
+                                        if (pActivity.equals(Utils.ORG_INFO)) {
                                             intent = new Intent(MeetingActivity.this, InfoActivity.class);
-                                            intent.putExtra("SName", sName);
-                                            intent.putExtra("mCount", meetCount - 1);
-                                            intent.putExtra("classname", className);
+                                            intent.putExtra(Utils.KEY_STUDENT_NAME, sName);
+                                            intent.putExtra(Utils.KEY_MEETING_COUNT, meetCount - 1);
+                                            intent.putExtra(Utils.KEY_CLASS_NAME, className);
                                         }
-                                        if (pActivity.equals("Meetings"))
+                                        if (pActivity.equals(Utils.ORG_MEETINGS))
                                             intent = new Intent(MeetingActivity.this, MeetingsActivity.class);
 
                                         startActivity(intent);
@@ -649,7 +652,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                                             Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                                            sendEmail(document.getId(), eSubject, eMessage);
+                                                            Utils.sendEmail(context,document.getId(), eSubject, eMessage);
                                                             pd.dismiss();
                                                             tvHelper.setText("המשוב נשלח בהצלחה!");
                                                             ipInput.setVisibility(View.GONE);
@@ -906,30 +909,18 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         return false;
     }
 
-    /**
-     * sends emails
-     *
-     * @param address = email address of recipient
-     * @param subject = title of email
-     * @param message = contents of email
-     */
-    public void sendEmail(String address, String subject, String message) {
-        javaMailAPI javaMailAPI = new javaMailAPI(this, address, subject, message);
-        javaMailAPI.execute();
 
-        Log.d(Utils.TAG, "email sent");
-    }
 
     @Override
     public void onBackPressed() {
         Intent intent = null;
-        if (pActivity.equals("Info")) {
+        if (pActivity.equals(Utils.ORG_INFO)) {
             intent = new Intent(this, InfoActivity.class);
-            intent.putExtra("SName", sName);
-            intent.putExtra("mCount", meetCount);
-            intent.putExtra("classname", className);
+            intent.putExtra(Utils.KEY_STUDENT_NAME, sName);
+            intent.putExtra(Utils.KEY_MEETING_COUNT, meetCount);
+            intent.putExtra(Utils.KEY_CLASS_NAME, className);
         }
-        if (pActivity.equals("Meetings"))
+        if (pActivity.equals(Utils.ORG_MEETINGS))
             intent = new Intent(this, MeetingsActivity.class);
 
         startActivity(intent);

@@ -131,9 +131,9 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         btnNew.setOnClickListener(this);
 
         Bundle extras = getIntent().getExtras();
-        sName = extras.getString("SName");
-        className = extras.getString("classname");
-        meetCount = extras.getInt("mCount");
+        sName = extras.getString(Utils.KEY_STUDENT_NAME);
+        className = extras.getString(Utils.KEY_CLASS_NAME);
+        meetCount = extras.getInt(Utils.KEY_MEETING_COUNT);
 
 
         Toolbar toolbar = findViewById(R.id.toolbar3);
@@ -350,19 +350,18 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                         || (mode == Utils.MODE_FINISHED && finishedList.get(i).getTeacher().equals(name))
                                                         || type.equals(Utils.TYPE_ADMIN)) {
                                                     Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
-                                                    intent.putExtra("Mode", mode);
+                                                    intent.putExtra(Utils.KEY_MODE, mode);
                                                     if (mode == Utils.MODE_UPCOMING)
-                                                        intent.putExtra("Meeting", meetingList.get(i).getFileName());
+                                                        intent.putExtra(Utils.KEY_FILE_NAME, meetingList.get(i).getFileName());
                                                     if (mode == Utils.MODE_DONE)
-                                                        intent.putExtra("Meeting", doneList.get(i).getFileName());
+                                                        intent.putExtra(Utils.KEY_FILE_NAME, doneList.get(i).getFileName());
                                                     if (mode == Utils.MODE_FINISHED)
-                                                        intent.putExtra("Meeting", finishedList.get(i).getFileName());
+                                                        intent.putExtra(Utils.KEY_FILE_NAME, finishedList.get(i).getFileName());
 
-                                                    intent.putExtra("className", className);
-                                                    intent.putExtra("SName", sName);
-                                                    intent.putExtra("classname", className);
-                                                    intent.putExtra("mCount", meetCount);
-                                                    intent.putExtra("pActivity", "Info");
+                                                    intent.putExtra(Utils.KEY_STUDENT_NAME, sName);
+                                                    intent.putExtra(Utils.KEY_CLASS_NAME, className);
+                                                    intent.putExtra(Utils.KEY_MEETING_COUNT, meetCount);
+                                                    intent.putExtra(Utils.KEY_PREVIOUS_ACTIVITY, "Info");
 
                                                     startActivity(intent);
                                                     finish();
@@ -498,7 +497,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
         String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + mDate + ", בשעה: " + mTime + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
-        sendEmail(email, eSubject, eMessage);
+        Utils.sendEmail(context,email, eSubject, eMessage);
     }
 
     private void writeToFile(String data, Context context, String file) {
@@ -512,19 +511,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    /**
-     * sends emails
-     *
-     * @param address = email address of recipient
-     * @param subject = title of email
-     * @param message = contents of email
-     */
-    public void sendEmail(String address, String subject, String message) {
-        javaMailAPI javaMailAPI = new javaMailAPI(this, address, subject, message);
-        javaMailAPI.execute();
-
-        Log.d(Utils.TAG, "email sent");
-    }
 
     @Override
     protected void onDestroy() {

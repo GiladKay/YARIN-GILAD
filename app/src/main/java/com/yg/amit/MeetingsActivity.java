@@ -174,18 +174,18 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                                 pd.show();
 
                                                 Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
-                                                intent.putExtra("Mode", mode);
+                                                intent.putExtra(Utils.KEY_MODE, mode);
                                                 String student = "";
                                                 if (mode == Utils.MODE_UPCOMING) {
-                                                    intent.putExtra("Meeting", meetingList.get(i).getFileName());
+                                                    intent.putExtra(Utils.KEY_FILE_NAME, meetingList.get(i).getFileName());
                                                     student = meetingList.get(i).getStudent();
                                                 }
                                                 if (mode == Utils.MODE_DONE) {
-                                                    intent.putExtra("Meeting", doneList.get(i).getFileName());
+                                                    intent.putExtra(Utils.KEY_FILE_NAME, doneList.get(i).getFileName());
                                                     student = doneList.get(i).getStudent();
                                                 }
                                                 if (mode == Utils.MODE_FINISHED) {
-                                                    intent.putExtra("Meeting", finishedList.get(i).getFileName());
+                                                    intent.putExtra(Utils.KEY_FILE_NAME, finishedList.get(i).getFileName());
                                                     student = finishedList.get(i).getStudent();
                                                 }
                                                 if (type.equals(Utils.TYPE_TEACHER)) {
@@ -195,12 +195,11 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                                         @Override
                                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                             for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                                                                String parent = dataSnapshot.getKey();
                                                                 String keys = childSnapshot.getKey();
-                                                                intent.putExtra("className", keys);
+                                                                intent.putExtra(Utils.KEY_CLASS_NAME, keys);
                                                             }
 
-                                                            intent.putExtra("pActivity", "Meetings");
+                                                            intent.putExtra(Utils.KEY_PREVIOUS_ACTIVITY,Utils.ORG_MEETINGS);
 
                                                             pd.dismiss();
                                                             startActivity(intent);
@@ -213,8 +212,8 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
                                                         }
                                                     });
                                                 } else {
-                                                    intent.putExtra("className", "class");
-                                                    intent.putExtra("pActivity", "Meetings");
+                                                    intent.putExtra(Utils.KEY_CLASS_NAME, "class");
+                                                    intent.putExtra(Utils.KEY_PREVIOUS_ACTIVITY, Utils.ORG_MEETINGS);
                                                     pd.dismiss();
                                                     startActivity(intent);
                                                     finish();
