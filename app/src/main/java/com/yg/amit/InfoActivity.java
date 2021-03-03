@@ -244,7 +244,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
             if (!time.equals("בחירת שעה") && !Date.equals("בחירת תאריך")) {
 
-                if(meetCount==0){
+                if (meetCount == 0) {
 
                     pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
                     pd.setCancelable(false);
@@ -254,27 +254,24 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                     uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
                     sendNewMail();
 
-                 }
-                else {
+                } else {
 
-                    for(int i=0;i<meetingList.size();i++){
-                        String otherDate="";
-                        String otherTime ="";
-                        if(meetingList.get(i).getTime().equals("0")) {
-                            downloadFile(i, Date,time);
-                        }
-                        else {
+                    for (int i = 0; i < meetingList.size(); i++) {
+                        String otherDate = "";
+                        String otherTime = "";
+                        if (meetingList.get(i).getTime().equals("0")) {
+                            downloadFile(i, Date, time);
+                        } else {
                             otherDate = meetingList.get(i).getDate();
                             otherTime = meetingList.get(i).getTime();
-                            ifDifferentTime(Date, time,otherDate,otherTime);
+                            ifDifferentTime(Date, time, otherDate, otherTime);
                         }
 
                     }
 
 
                 }
-            }
-            else {
+            } else {
                 Toast.makeText(getApplicationContext(), "יש למלא את כל השדות", Toast.LENGTH_LONG).show();
             }
         });
@@ -352,24 +349,22 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                             }
                                             finishedAdapter = new MeetingAdapter(context, finishedList);
 
-                                            if (type.equals(Utils.TYPE_TEACHER)) {
-                                                if (meetingList.size() + doneList.size() + finishedList.size() < 2) {
-                                                    Boolean b = true;
-                                                    for (int i = 0; i < meetingList.size(); i++) {
-                                                        if (meetingList.get(i).getTeacher().equals(name))
-                                                            b = false;
-                                                    }
-                                                    for (int i = 0; i < doneList.size(); i++) {
-                                                        if (doneList.get(i).getTeacher().equals(name))
-                                                            b = false;
-                                                    }
-                                                    for (int i = 0; i < finishedList.size(); i++) {
-                                                        if (finishedList.get(i).getTeacher().equals(name))
-                                                            b = false;
-                                                    }
-                                                    if (b) {
-                                                        btnNew.setVisibility(View.VISIBLE);
-                                                    }
+                                            if (meetingList.size() + doneList.size() + finishedList.size() < 2) {
+                                                Boolean b = true;
+                                                for (int i = 0; i < meetingList.size(); i++) {
+                                                    if (meetingList.get(i).getTeacher().equals(name))
+                                                        b = false;
+                                                }
+                                                for (int i = 0; i < doneList.size(); i++) {
+                                                    if (doneList.get(i).getTeacher().equals(name))
+                                                        b = false;
+                                                }
+                                                for (int i = 0; i < finishedList.size(); i++) {
+                                                    if (finishedList.get(i).getTeacher().equals(name))
+                                                        b = false;
+                                                }
+                                                if (b) {
+                                                    btnNew.setVisibility(View.VISIBLE);
                                                 }
                                             }
 
@@ -513,8 +508,9 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * uploads the meeting file to fire base, and calls the methods that add events to calendar and
      * those that increase the meeting count of users by one in realtime database
+     *
      * @param fileName
-     * @param path location of upload in firebase
+     * @param path     location of upload in firebase
      */
     private void uploadMeeting(String fileName, String path) {
         Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
@@ -539,7 +535,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
         String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + mDate + ", בשעה: " + mTime + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
 
-        Utils.sendEmail(context,email, eSubject, eMessage);
+        Utils.sendEmail(context, email, eSubject, eMessage);
     }
 
     private void writeToFile(String data, Context context, String file) {
@@ -552,7 +548,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void downloadFile(int i,String date, String time) {
+    private void downloadFile(int i, String date, String time) {
         String file = meetingList.get(i).getFileName();
         File localFile = new File(getFilesDir() + "/" + file);
 
@@ -562,8 +558,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                     // Successfully downloaded data to local file
                     Log.d("Download", "onSuccess: Download succeeded");
                     String data = readFromFile(context, file);
-                    meetingList.set(i,new Meeting(data.split("&&")[0],data.split("&&")[1],data.split("&&")[2],data.split("&&")[3]));
-                    ifDifferentTime(date,time,meetingList.get(i).getDate(),meetingList.get(i).getTime());
+                    meetingList.set(i, new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]));
+                    ifDifferentTime(date, time, meetingList.get(i).getDate(), meetingList.get(i).getTime());
                 })
                 .addOnFailureListener(exception -> {
                     // Handle failed download
@@ -610,15 +606,15 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         return ret;
     }
 
-    private void ifDifferentTime(String Date , String time, String otherDate, String otherTime){
-        if(otherDate.equals(Date)){
+    private void ifDifferentTime(String Date, String time, String otherDate, String otherTime) {
+        if (otherDate.equals(Date)) {
             String otherHour = otherTime.split(":")[0];
-            String otherMin =  otherTime.split(":")[1];
+            String otherMin = otherTime.split(":")[1];
 
-            int totalMINs= Integer.parseInt(time.split(":")[0])*60 + Integer.parseInt(time.split(":")[1]);
-            int otherTotalMIns =  Integer.parseInt(otherHour)*60 + Integer.parseInt(otherMin);
+            int totalMINs = Integer.parseInt(time.split(":")[0]) * 60 + Integer.parseInt(time.split(":")[1]);
+            int otherTotalMIns = Integer.parseInt(otherHour) * 60 + Integer.parseInt(otherMin);
 
-            if(Math.abs(totalMINs-otherTotalMIns) > 30){
+            if (Math.abs(totalMINs - otherTotalMIns) > 30) {
                 pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
                 pd.setCancelable(false);
                 pd.show();
@@ -626,12 +622,10 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                 writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
                 uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
                 sendNewMail();
+            } else {
+                Toast.makeText(context, "לתלמיד כבר יש פגישה בזמן הזה, שמתחילה בשעה " + otherTime, Toast.LENGTH_LONG).show();
             }
-            else{
-                Toast.makeText(context, "לתלמיד כבר יש פגישה בזמן הזה, שמתחילה בשעה "+ otherTime , Toast.LENGTH_LONG).show();
-            }
-        }
-        else{
+        } else {
             pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
             pd.setCancelable(false);
             pd.show();
