@@ -91,7 +91,15 @@ public class ClassesActivity extends AppCompatActivity implements AdapterView.On
                 lvClass.setAdapter(cAdapter);
 
                 lvClass.setOnItemClickListener((AdapterView.OnItemClickListener) context);
-                pd.dismiss();
+
+                try {
+                    pd.dismiss();
+                } catch (Exception e) {
+                    // Uh-oh, an error occurred!
+                    Log.w("pd", "onFailure: ", e);
+                    Toast.makeText(getApplicationContext(), "אנא השאר את המסך אנכי", Toast.LENGTH_LONG).show();
+                    finish();
+                }
             }
 
             @Override
