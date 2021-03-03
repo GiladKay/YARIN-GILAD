@@ -39,7 +39,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -238,14 +243,38 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
             String Date = tvDate.getText().toString();
 
             if (!time.equals("בחירת שעה") && !Date.equals("בחירת תאריך")) {
-                pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
-                pd.setCancelable(false);
-                pd.show();
 
-                writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
-                uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
-                sendNewMail();
-            } else {
+                if(meetCount==0){
+
+                    pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
+                    pd.setCancelable(false);
+                    pd.show();
+
+                    writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
+                    uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
+                    sendNewMail();
+
+                 }
+                else {
+
+                    for(int i=0;i<meetingList.size();i++){
+                        String otherDate="";
+                        String otherTime ="";
+                        if(meetingList.get(i).getTime().equals("0")) {
+                            downloadFile(i, Date,time);
+                        }
+                        else {
+                            otherDate = meetingList.get(i).getDate();
+                            otherTime = meetingList.get(i).getTime();
+                            ifDifferentTime(Date, time,otherDate,otherTime);
+                        }
+
+                    }
+
+
+                }
+            }
+            else {
                 Toast.makeText(getApplicationContext(), "יש למלא את כל השדות", Toast.LENGTH_LONG).show();
             }
         });
@@ -474,6 +503,12 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * uploads the meeting file to fire base, and calls the methods that add events to calendar and
+     * those that increase the meeting count of users by one in realtime database
+     * @param fileName
+     * @param path location of upload in firebase
+     */
     private void uploadMeeting(String fileName, String path) {
         Uri file = Uri.fromFile(getBaseContext().getFileStreamPath(fileName));
         StorageReference riversRef = mStorageRef.child(path + fileName);
@@ -510,7 +545,95 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void downloadFile(int i,String date, String time) {
+        String file = meetingList.get(i).getFileName();
+        File localFile = new File(getFilesDir() + "/" + file);
 
+
+        mStorageRef.child("Meetings/Upcoming/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    String data = readFromFile(context, file);
+                    meetingList.set(i,new Meeting(data.split("&&")[0],data.split("&&")[1],data.split("&&")[2],data.split("&&")[3]));
+                    ifDifferentTime(date,time,meetingList.get(i).getDate(),meetingList.get(i).getTime());
+                })
+                .addOnFailureListener(exception -> {
+                    // Handle failed download
+                    Log.w("Download", "onFailure: Download failed", exception);
+                    pd.dismiss();
+                    Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
+                    finish();
+                });
+    }
+
+    /**
+     * reads and outputs the contents of the now local meeting file
+     *
+     * @param context-this
+     * @param file-        name of the meeting file
+     * @return String containing all the data from the file
+     */
+    private String readFromFile(Context context, String file) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(file);
+
+            if (inputStream != null) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ((receiveString = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(receiveString).append("\n");
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        } catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+
+    private void ifDifferentTime(String Date , String time, String otherDate, String otherTime){
+        if(otherDate.equals(Date)){
+            String otherHour = otherTime.split(":")[0];
+            String otherMin =  otherTime.split(":")[1];
+
+            int totalMINs= Integer.parseInt(time.split(":")[0])*60 + Integer.parseInt(time.split(":")[1]);
+            int otherTotalMIns =  Integer.parseInt(otherHour)*60 + Integer.parseInt(otherMin);
+
+            if(Math.abs(totalMINs-otherTotalMIns) > 30){
+                pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
+                pd.setCancelable(false);
+                pd.show();
+
+                writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
+                uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
+                sendNewMail();
+            }
+            else{
+                Toast.makeText(context, "לתלמיד כבר יש פגישה בזמן הזה, שמתחילה בשעה "+ otherTime , Toast.LENGTH_LONG).show();
+            }
+        }
+        else{
+            pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
+            pd.setCancelable(false);
+            pd.show();
+
+            writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
+            uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
+            sendNewMail();
+        }
+    }
 
     @Override
     protected void onDestroy() {
