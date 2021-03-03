@@ -69,7 +69,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private SharedPreferences sharedPreferences;
 
-    private String type;
+    private String type, name;
 
     private Dialog diaEdit;
     private TextView tvTitleEdit;
@@ -120,7 +120,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         context = this;
         sharedPreferences = getSharedPreferences(Utils.AMIT_SP, MODE_PRIVATE);
-
+        name = sharedPreferences.getString(Utils.NAME_KEY, Utils.NAME_KEY);
         type = sharedPreferences.getString(Utils.TYPE_KEY, Utils.TYPE_STUDENT);
 
         Bundle extras = getIntent().getExtras();
@@ -253,7 +253,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
         mTitle.setText("פגישה");
 
-        if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
+        if (meetingMode == Utils.MODE_UPCOMING &&
+                (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name)))) {
             btnEdit = (Button) toolbar.findViewById(R.id.btnEdit);
             btnEdit.setVisibility(View.VISIBLE);
             btnEdit.setOnClickListener(this);
@@ -294,7 +295,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 pd.show();
 
                 btnAddToCal.setVisibility(View.GONE);
-                if (type.equals(Utils.TYPE_TEACHER) && meetingMode == Utils.MODE_UPCOMING) {
+                if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
                     btnEdit.setVisibility(View.GONE);
                     btnDelete.setVisibility(View.GONE);
                 }
@@ -306,7 +307,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     writeToFile(newData, this, meetingFile);
                     uploadFile(meetingFile, "Meetings/Finished/");
                 }
-                if (type.equals(Utils.TYPE_TEACHER)) {
+                if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
                     String newData = data.split("&&")[0] + "&&" + data.split("&&")[1] + "&&" + data.split("&&")[2] + "&&"
                             + data.split("&&")[3] + "&&" + data.split("&&")[4] + "&&" + mashov + "&&";
                     writeToFile(newData, this, meetingFile);
@@ -372,7 +373,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                 } else {
                                     RequestStoragePermission2();
                                 }
-                                String eSubject = "ביטול פגישה - אמ" + "\"" + "ית מודיעין בנים";
+                                String eSubject = "ביטול פגישה - אמי" + "\"" + "ת מודיעין בנים";
                                 String eMessage = "הפגישה שהייתה אמורה להתקיים בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ", בוטלה.";
 
                                 db.collection("users").whereEqualTo("name", student)
@@ -437,7 +438,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 intent.putExtra("beginTime", startTime);
                 intent.putExtra("rrule", "FREQ=YEARLY");
                 intent.putExtra("endTime", endTime);
-                if (type.equals(Utils.TYPE_TEACHER))
+                if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name)))
                     intent.putExtra("title", "פגישה עם " + student);
                 if (type.equals(Utils.TYPE_STUDENT))
                     intent.putExtra("title", "פגישה עם " + teacher);
@@ -469,7 +470,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvDateEdit.setText(date);
         tvTimeEdit.setText(time);
 
-        if (meetingMode == Utils.MODE_UPCOMING && type.equals(Utils.TYPE_TEACHER)) {
+        if (meetingMode == Utils.MODE_UPCOMING &&
+                (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name)))) {
             tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
             ipInput.setVisibility(View.VISIBLE);
             edtInput.setVisibility(View.VISIBLE);
@@ -487,10 +489,14 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 tvHelper.setText("הפגישה התקיימה");
             }
             if (type.equals(Utils.TYPE_ADMIN)) {
-                tvHelper.setVisibility(View.GONE);
-                tMashov.setVisibility(View.VISIBLE);
-                tvTMashov.setVisibility(View.VISIBLE);
-                tvTMashov.setText(data.split("&&")[5]);
+                if(teacher.equals(name)) {
+                    tvHelper.setText("הפגישה התקיימה");
+                } else {
+                    tvHelper.setVisibility(View.GONE);
+                    tMashov.setVisibility(View.VISIBLE);
+                    tvTMashov.setVisibility(View.VISIBLE);
+                    tvTMashov.setText(data.split("&&")[5]);
+                }
             }
         }
 
@@ -499,13 +505,17 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 tvHelper.setText("הפגישה התקיימה");
             }
             if (type.equals(Utils.TYPE_ADMIN)) {
-                tvHelper.setVisibility(View.GONE);
-                sMashov.setVisibility(View.VISIBLE);
-                tvSMashov.setVisibility(View.VISIBLE);
-                tMashov.setVisibility(View.VISIBLE);
-                tvTMashov.setVisibility(View.VISIBLE);
-                tvSMashov.setText(data.split("&&")[4]);
-                tvTMashov.setText(data.split("&&")[5]);
+                if(teacher.equals(name)) {
+                    tvHelper.setText("הפגישה התקיימה");
+                } else {
+                    tvHelper.setVisibility(View.GONE);
+                    sMashov.setVisibility(View.VISIBLE);
+                    tvSMashov.setVisibility(View.VISIBLE);
+                    tMashov.setVisibility(View.VISIBLE);
+                    tvTMashov.setVisibility(View.VISIBLE);
+                    tvSMashov.setText(data.split("&&")[4]);
+                    tvTMashov.setText(data.split("&&")[5]);
+                }
             }
         }
 
@@ -523,7 +533,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         if (meetingMode == Utils.MODE_UPCOMING) {
 
-            if (type.equals(Utils.TYPE_TEACHER)) {
+            if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
                 if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
                     if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
                         btnAddToCal.setVisibility(View.VISIBLE);
@@ -647,8 +657,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             @Override
                             public void onSuccess(Void aVoid) {
                                 // File deleted successfully
-                                if (type.equals(Utils.TYPE_TEACHER)) {
-                                    String eSubject = "משוב על שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
+                                if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
+                                    String eSubject = "משוב על שיחה אישית עם מורה - אמי" + "\"" + "ת מודיעין בנים";
                                     String eMessage = "הנך מתבקש לכתוב משוב קצר על הפגישה שהתקיימה בתאריך: " + date + ", בשעה: " + time + ", עם המורה " + teacher + ".";
 
                                     db.collection("users").whereEqualTo("name", student)
@@ -681,7 +691,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                     ipInput.setVisibility(View.GONE);
                                     edtInput.setVisibility(View.GONE);
                                     btnSend.setVisibility(View.GONE);
-                                    if (type.equals(Utils.TYPE_TEACHER)) {
+                                    if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
                                         btnEdit.setVisibility(View.GONE);
                                         btnAddToCal.setVisibility(View.GONE);
                                         btnDelete.setVisibility(View.GONE);

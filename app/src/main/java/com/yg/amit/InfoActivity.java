@@ -532,8 +532,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void sendNewMail() {
-        String eSubject = " שיחה אישית עם מורה - אמ" + "\"" + "ית מודיעין בנים";
-        String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + mDate + ", בשעה: " + mTime + ".\n כל הפרטים נמצאים באפליקציית אמ\"ית.";
+        String eSubject = " שיחה אישית עם מורה - אמי" + "\"" + "ת מודיעין בנים";
+        String eMessage = "נקבעה לך שיחה אישית עם המורה " + name + ", בתאריך: " + mDate + ", בשעה: " + mTime + ".\n כל הפרטים נמצאים באפליקציית אמי\"ת.";
 
         Utils.sendEmail(context, email, eSubject, eMessage);
     }
