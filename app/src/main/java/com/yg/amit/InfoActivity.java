@@ -349,22 +349,24 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                             }
                                             finishedAdapter = new MeetingAdapter(context, finishedList);
 
-                                            if (meetingList.size() + doneList.size() + finishedList.size() < 2) {
-                                                Boolean b = true;
-                                                for (int i = 0; i < meetingList.size(); i++) {
-                                                    if (meetingList.get(i).getTeacher().equals(name))
-                                                        b = false;
-                                                }
-                                                for (int i = 0; i < doneList.size(); i++) {
-                                                    if (doneList.get(i).getTeacher().equals(name))
-                                                        b = false;
-                                                }
-                                                for (int i = 0; i < finishedList.size(); i++) {
-                                                    if (finishedList.get(i).getTeacher().equals(name))
-                                                        b = false;
-                                                }
-                                                if (b) {
-                                                    btnNew.setVisibility(View.VISIBLE);
+                                            if (!className.equals("Teachers")) {
+                                                if (meetingList.size() + doneList.size() + finishedList.size() < 2) {
+                                                    boolean b = true;
+                                                    for (int i = 0; i < meetingList.size(); i++) {
+                                                        if (meetingList.get(i).getTeacher().equals(name))
+                                                            b = false;
+                                                    }
+                                                    for (int i = 0; i < doneList.size(); i++) {
+                                                        if (doneList.get(i).getTeacher().equals(name))
+                                                            b = false;
+                                                    }
+                                                    for (int i = 0; i < finishedList.size(); i++) {
+                                                        if (finishedList.get(i).getTeacher().equals(name))
+                                                            b = false;
+                                                    }
+                                                    if (b) {
+                                                        btnNew.setVisibility(View.VISIBLE);
+                                                    }
                                                 }
                                             }
 

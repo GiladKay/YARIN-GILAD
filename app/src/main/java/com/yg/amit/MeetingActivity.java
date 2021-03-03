@@ -180,7 +180,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 RequestStoragePermission2();
             }
 
-            String eSubject = "שינוי זמן הפגישה";
+            String eSubject = "שינוי זמן הפגישה - אמי\"ת מודיעין בנים";
             String eMessage = "הפגישה עם המורה " + teacher + ", הועברה לתאריך: " + date + ", בשעה: " + time + ".";
 
             db.collection("users").whereEqualTo("name", student)
@@ -190,7 +190,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                Utils.sendEmail(context,document.getId(), eSubject, eMessage);
+                                Utils.sendEmail(context, document.getId(), eSubject, eMessage);
                             }
                         } else {
                             Log.w(Utils.TAG, "Error getting documents.", task.getException());
@@ -249,21 +249,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             dialog.show();
         });
 
-        Toolbar toolbar = findViewById(R.id.toolbar3);
-        TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
-        mTitle.setText("פגישה");
-
-        if (meetingMode == Utils.MODE_UPCOMING &&
-                (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name)))) {
-            btnEdit = (Button) toolbar.findViewById(R.id.btnEdit);
-            btnEdit.setVisibility(View.VISIBLE);
-            btnEdit.setOnClickListener(this);
-
-            btnDelete = (Button) toolbar.findViewById(R.id.btnBin);
-            btnDelete.setVisibility(View.VISIBLE);
-            btnDelete.setOnClickListener(this);
-        }
-        setSupportActionBar(toolbar);
         tvTitle = findViewById(R.id.tvTitle);
         tvSubTitle = findViewById(R.id.tvSubTitle);
         tvHelper = findViewById(R.id.tvHelper);
@@ -385,7 +370,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                                         Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                                        Utils.sendEmail(context,document.getId(), eSubject, eMessage);
+                                                        Utils.sendEmail(context, document.getId(), eSubject, eMessage);
                                                     }
                                                 } else {
                                                     Log.w(Utils.TAG, "Error getting documents.", task.getException());
@@ -476,6 +461,20 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             ipInput.setVisibility(View.VISIBLE);
             edtInput.setVisibility(View.VISIBLE);
             btnSend.setVisibility(View.VISIBLE);
+
+            Toolbar toolbar = findViewById(R.id.toolbar3);
+            TextView mTitle = (TextView) toolbar.findViewById(R.id.toolbar_title);
+            mTitle.setText(student + " - " + teacher);
+
+            btnEdit = (Button) toolbar.findViewById(R.id.btnEdit);
+            btnEdit.setVisibility(View.VISIBLE);
+            btnEdit.setOnClickListener(this);
+
+            btnDelete = (Button) toolbar.findViewById(R.id.btnBin);
+            btnDelete.setVisibility(View.VISIBLE);
+            btnDelete.setOnClickListener(this);
+
+            setSupportActionBar(toolbar);
         }
 
         if (meetingMode == Utils.MODE_DONE) {
@@ -489,7 +488,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 tvHelper.setText("הפגישה התקיימה");
             }
             if (type.equals(Utils.TYPE_ADMIN)) {
-                if(teacher.equals(name)) {
+                if (teacher.equals(name)) {
                     tvHelper.setText("הפגישה התקיימה");
                 } else {
                     tvHelper.setVisibility(View.GONE);
@@ -505,7 +504,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 tvHelper.setText("הפגישה התקיימה");
             }
             if (type.equals(Utils.TYPE_ADMIN)) {
-                if(teacher.equals(name)) {
+                if (teacher.equals(name)) {
                     tvHelper.setText("הפגישה התקיימה");
                 } else {
                     tvHelper.setVisibility(View.GONE);
@@ -670,7 +669,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                                             Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
-                                                            Utils.sendEmail(context,document.getId(), eSubject, eMessage);
+                                                            Utils.sendEmail(context, document.getId(), eSubject, eMessage);
                                                             pd.dismiss();
                                                             tvHelper.setText("המשוב נשלח בהצלחה!");
                                                             ipInput.setVisibility(View.GONE);
@@ -728,6 +727,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Log.d("Upload", "onSuccess: Upload succeeded");
+                        Toast.makeText(context, "הפגישה עודכנה", Toast.LENGTH_LONG).show();
                         pd.dismiss();
                     }
                 })
@@ -926,7 +926,6 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         cursor.close();
         return false;
     }
-
 
 
     @Override
