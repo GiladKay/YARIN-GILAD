@@ -642,6 +642,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
 
+        if(arrMeeting.isShowing())
+            arrMeeting.dismiss();
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(Utils.SWITCH_STATE, switchCalen.isChecked());
         editor.commit();
