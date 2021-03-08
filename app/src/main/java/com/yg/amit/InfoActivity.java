@@ -157,6 +157,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         doneList = new ArrayList<>();
         finishedList = new ArrayList<>();
 
+        email = "";
         db.collection("users").whereEqualTo("name", sName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
