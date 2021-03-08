@@ -252,7 +252,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
                     writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
                     uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
-                    sendNewMail();
+                    if(email.contains("@"))
+                        sendNewMail();
 
                 } else {
 
@@ -623,7 +624,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
                 writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
                 uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
-                sendNewMail();
+                if(email.contains("@"))
+                    sendNewMail();
             } else {
                 Toast.makeText(context, "לתלמיד כבר יש פגישה בזמן הזה, שמתחילה בשעה " + otherTime, Toast.LENGTH_LONG).show();
             }
@@ -634,7 +636,8 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
             writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
             uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
-            sendNewMail();
+            if(email.contains("@"))
+                sendNewMail();
         }
     }
 

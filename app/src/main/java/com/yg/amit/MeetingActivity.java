@@ -670,31 +670,27 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                                                             Log.d(Utils.TAG, document.getId() + " => " + document.getData());
 
                                                             Utils.sendEmail(context, document.getId(), eSubject, eMessage);
-                                                            pd.dismiss();
-                                                            tvHelper.setText("המשוב נשלח בהצלחה!");
-                                                            ipInput.setVisibility(View.GONE);
-                                                            edtInput.setVisibility(View.GONE);
-                                                            btnSend.setVisibility(View.GONE);
-                                                            btnEdit.setVisibility(View.GONE);
-                                                            btnDelete.setVisibility(View.GONE);
-                                                            btnAddToCal.setVisibility(View.GONE);
                                                         }
                                                     } else {
                                                         Log.w(Utils.TAG, "Error getting documents.", task.getException());
                                                     }
                                                 }
                                             });
+
+                                    pd.dismiss();
+                                    tvHelper.setText("המשוב נשלח בהצלחה!");
+                                    ipInput.setVisibility(View.GONE);
+                                    edtInput.setVisibility(View.GONE);
+                                    btnSend.setVisibility(View.GONE);
+                                    btnEdit.setVisibility(View.GONE);
+                                    btnDelete.setVisibility(View.GONE);
+                                    btnAddToCal.setVisibility(View.GONE);
                                 } else {
                                     pd.dismiss();
                                     tvHelper.setText("המשוב נשלח בהצלחה!");
                                     ipInput.setVisibility(View.GONE);
                                     edtInput.setVisibility(View.GONE);
                                     btnSend.setVisibility(View.GONE);
-                                    if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
-                                        btnEdit.setVisibility(View.GONE);
-                                        btnAddToCal.setVisibility(View.GONE);
-                                        btnDelete.setVisibility(View.GONE);
-                                    }
                                 }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
