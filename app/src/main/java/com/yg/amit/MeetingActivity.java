@@ -536,7 +536,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         if (meetingMode == Utils.MODE_UPCOMING) {
 
-            if (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
+            if ((type.equals(Utils.TYPE_TEACHER) && teacher.equals(name)) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name))) {
                 if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
                     if (!eventExistsOnCalendar("פגישה עם " + student, startTime, endTime)) {
                         btnAddToCal.setVisibility(View.VISIBLE);
