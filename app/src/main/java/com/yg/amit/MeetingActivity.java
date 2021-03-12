@@ -268,6 +268,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         pd.setCancelable(false);
         pd.show();
         downloadFile(meetingFile);
+
+
     }
 
     @Override
@@ -448,6 +450,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         date = data.split("&&")[2];
         time = data.split("&&")[3];
 
+
+
         tvTitle.setText(student + " - " + teacher);
         tvSubTitle.setText(data.split("&&")[2] + " - " + data.split("&&")[3]);
 
@@ -455,8 +459,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         tvDateEdit.setText(date);
         tvTimeEdit.setText(time);
 
-        if (meetingMode == Utils.MODE_UPCOMING &&
-                (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN) && teacher.equals(name)))) {
+        if (meetingMode == Utils.MODE_UPCOMING && ( (type.equals(Utils.TYPE_TEACHER) || (type.equals(Utils.TYPE_ADMIN)) ) && teacher.equals(name))) {
             tvHelper.setText("אנא הזן משוב על הפגישה. (אם אינך מעוניין שלח את המשוב ריק).");
             ipInput.setVisibility(View.VISIBLE);
             edtInput.setVisibility(View.VISIBLE);
@@ -476,6 +479,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
             setSupportActionBar(toolbar);
         }
+
 
         if (meetingMode == Utils.MODE_DONE) {
             if (type.equals(Utils.TYPE_STUDENT)) {

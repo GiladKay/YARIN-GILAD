@@ -373,10 +373,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                             }
 
                                             lv.setOnItemClickListener((adapterView, view, i, l) -> {
-                                                if ((mode == Utils.MODE_UPCOMING && meetingList.get(i).getTeacher().equals(name))
-                                                        || (mode == Utils.MODE_DONE && doneList.get(i).getTeacher().equals(name))
-                                                        || (mode == Utils.MODE_FINISHED && finishedList.get(i).getTeacher().equals(name))
-                                                        || type.equals(Utils.TYPE_ADMIN)) {
                                                     Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
                                                     intent.putExtra(Utils.KEY_MODE, mode);
                                                     if (mode == Utils.MODE_UPCOMING)
@@ -393,7 +389,6 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
                                                     startActivity(intent);
                                                     finish();
-                                                }
                                             });
 
                                             try {
