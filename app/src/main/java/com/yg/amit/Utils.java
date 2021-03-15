@@ -46,6 +46,7 @@ public class Utils {
     public static final String KEY_PREVIOUS_ACTIVITY = "pActivity"; // get the name of the activity that sent the user to MeetingActivity
     public static final String KEY_MODE = "Mode"; // get the mode the user was currently on when clicking on meeting (Upcoming, Done,Finished)
     public static final String KEY_FILE_NAME = "Meeting"; //get the name of the meeting file
+    public static final String KEY_MEETING_ARR = "meetingArray";
 
     // Meeting Origin (the two extra options for KEY_PREVIOUS_ACTIVITY)
     public static final String ORG_MEETINGS= "Meetings";
@@ -60,10 +61,11 @@ public class Utils {
      * @param message = contents of email
      */
     public static void sendEmail(Context context, String address, String subject, String message) {
+        if(1==2){
         javaMailAPI javaMailAPI = new javaMailAPI(context, address, subject, message);
         javaMailAPI.execute();
 
-    }
+    }}
 
 
 }

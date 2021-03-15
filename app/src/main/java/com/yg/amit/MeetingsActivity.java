@@ -175,6 +175,8 @@ public class MeetingsActivity extends AppCompatActivity implements View.OnClickL
 
                                                 Intent intent = new Intent(getApplicationContext(), MeetingActivity.class);
                                                 intent.putExtra(Utils.KEY_MODE, mode);
+                                                intent.putExtra(Utils.KEY_MEETING_ARR, new String[]{"no"});
+
                                                 String student = "";
                                                 if (mode == Utils.MODE_UPCOMING) {
                                                     intent.putExtra(Utils.KEY_FILE_NAME, meetingList.get(i).getFileName());

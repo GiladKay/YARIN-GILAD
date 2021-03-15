@@ -62,6 +62,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -86,6 +87,8 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private Button btnDelete;
     private Button btnAddToCal;
 
+    private ArrayList<Meeting> meetingList;
+    private String[] tempArr;
 
     private DatabaseReference mFirebaseRef;
     private FirebaseDatabase mFirebaseInstance;
@@ -107,7 +110,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
     private int tHour, tMinute;
 
-    Context context;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +133,9 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         sName = extras.getString(Utils.KEY_STUDENT_NAME);
         meetCount = extras.getInt(Utils.KEY_MEETING_COUNT);
         pActivity = extras.getString(Utils.KEY_PREVIOUS_ACTIVITY);
+        tempArr= extras.getStringArray(Utils.KEY_MEETING_ARR);
+        meetingList = new ArrayList<>();
+
 
         diaEdit = new Dialog(this);
         diaEdit.setContentView(R.layout.edit_meeting_dialog);
@@ -147,11 +153,26 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     .setIcon(R.drawable.error)
                     .setPositiveButton("כן", new DialogInterface.OnClickListener() {
                                 @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
+                                public void onClick(DialogInterface dialogInterface, int j) {
 
 
+                                    String tempDate=tvDateEdit.getText().toString();
+                                    String tempTime= tvTimeEdit.getText().toString();
+                                    if(meetCount==0&&pActivity.equals(Utils.ORG_INFO)) {
                                         editMethod();
+                                    }else{
+                                        for (int i = 0; i < meetingList.size(); i++) {
+                                            if (meetingList.get(i).getTime().equals("0")) {
+                                                downloadMeetingFile(i, tempDate, tempTime);
+                                            } else {
+                                                String otherDate = meetingList.get(i).getDate();
+                                                String otherTime = meetingList.get(i).getTime();
+                                                ifDifferentTime(tempDate, tempTime, otherDate, otherTime);
 
+                                                //potential error with more than one meeting(creates/ edits the meeting the second the first checked meeting is not on the same time)
+                                            }
+                                        }
+                                    }
                                 }
                             })
                     .setNegativeButton("לא ", null).show();
@@ -409,6 +430,32 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         time = data.split("&&")[3];
 
 
+        if(tempArr.length>0) {
+            if(tempArr[0].equals("no")){
+                mStorageRef.child("Meetings/").child("Upcoming/").listAll()
+                        .addOnSuccessListener(listResult -> {
+                            for (StorageReference item : listResult.getItems()) {
+                                // All the items under listRef.
+                                if (item.getName().contains(student)) {
+                                    if (!item.getName().contains(teacher)) {
+                                        meetingList.add(new Meeting(item.getName().split("&")[0], item.getName().split("&")[1].replace(".txt", ""), "0", "0"));
+                                    }
+                                }
+                            }
+
+                        })
+                        .addOnFailureListener(e -> {
+                            // Uh-oh, an error occurred!
+                            Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
+                        });
+
+            }else {
+                for (int i = 0; i < tempArr.length; i++) {
+                    if (!tempArr[i].equals("null"))
+                        meetingList.add(new Meeting(tempArr[i].split("&")[0], tempArr[i].split("&")[1].replace(".txt", ""), "0", "0"));
+                }
+            }
+        }
 
         tvTitle.setText(student + " - " + teacher);
         tvSubTitle.setText(data.split("&&")[2] + " - " + data.split("&&")[3]);
@@ -943,8 +990,48 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 });
 
-        updateFile(fileName, "Meetings/Upcoming/");}
+        updateFile(fileName, "Meetings/Upcoming/");
+    }
 
+    private void downloadMeetingFile(int i, String date, String time) {
+        String file = meetingList.get(i).getFileName();
+        File localFile = new File(getFilesDir() + "/" + file);
+
+
+        mStorageRef.child("Meetings/Upcoming/" + file).getFile(localFile)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Successfully downloaded data to local file
+                    Log.d("Download", "onSuccess: Download succeeded");
+                    String data = readFromFile(context, file);
+                    meetingList.set(i, new Meeting(data.split("&&")[0], data.split("&&")[1], data.split("&&")[2], data.split("&&")[3]));
+                    ifDifferentTime(date, time, meetingList.get(i).getDate(), meetingList.get(i).getTime());
+                })
+                .addOnFailureListener(exception -> {
+                    // Handle failed download
+                    Log.w("Download", "onFailure: Download failed", exception);
+                    pd.dismiss();
+                    Toast.makeText(getApplicationContext(), "אירעה שגיאה", Toast.LENGTH_LONG).show();
+                    finish();
+                });
+    }
+
+    private void ifDifferentTime(String Date, String time, String otherDate, String otherTime) {
+        if (otherDate.equals(Date)) {
+            String otherHour = otherTime.split(":")[0];
+            String otherMin = otherTime.split(":")[1];
+
+            int totalMINs = Integer.parseInt(time.split(":")[0]) * 60 + Integer.parseInt(time.split(":")[1]);
+            int otherTotalMIns = Integer.parseInt(otherHour) * 60 + Integer.parseInt(otherMin);
+
+            if (Math.abs(totalMINs - otherTotalMIns) > 30) {
+                editMethod();
+            } else {
+                Toast.makeText(context, "לתלמיד כבר יש פגישה בזמן הזה, שמתחילה בשעה " + otherTime, Toast.LENGTH_LONG).show();
+            }
+        } else {
+           editMethod();
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -960,5 +1047,11 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        diaEdit.dismiss();
     }
 }

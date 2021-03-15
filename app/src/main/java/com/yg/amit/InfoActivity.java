@@ -390,10 +390,19 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                                     if (mode == Utils.MODE_FINISHED)
                                                         intent.putExtra(Utils.KEY_FILE_NAME, finishedList.get(i).getFileName());
 
+                                                    String[] intentArr = new String[meetingList.size()];
+                                                    for(int j=0;j<meetingList.size();j++){
+                                                        if(j!=i)
+                                                            intentArr[j]=meetingList.get(j).getFileName();
+                                                        else
+                                                            intentArr[j]="null";
+                                                    }
+                                                    intent.putExtra(Utils.KEY_MEETING_ARR,intentArr);
                                                     intent.putExtra(Utils.KEY_STUDENT_NAME, sName);
                                                     intent.putExtra(Utils.KEY_CLASS_NAME, className);
                                                     intent.putExtra(Utils.KEY_MEETING_COUNT, meetCount);
-                                                    intent.putExtra(Utils.KEY_PREVIOUS_ACTIVITY, "Info");
+                                                    intent.putExtra(Utils.KEY_PREVIOUS_ACTIVITY, Utils.ORG_INFO);
+
 
                                                     startActivity(intent);
                                                     finish();
