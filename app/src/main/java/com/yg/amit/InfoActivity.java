@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -27,6 +28,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -245,34 +247,42 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
 
             if (!time.equals("בחירת שעה") && !Date.equals("בחירת תאריך")) {
 
-                if (meetCount == 0) {
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("יצירת פגישה")
+                        .setMessage("האם אתה בטוח שאתה רוצה ליצור פגישה בתאריך "+Date + " בשעה "+time+"?")
+                        .setIcon(R.drawable.error)
+                        .setPositiveButton("כן", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int j) {
+                                if (meetCount == 0) {
 
-                    pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
-                    pd.setCancelable(false);
-                    pd.show();
+                                    pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
+                                    pd.setCancelable(false);
+                                    pd.show();
 
-                    writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
-                    uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
-                    if(email.contains("@"))
-                        sendNewMail();
+                                    writeToFile(sName + "&&" + name + "&&" + mDate + "&&" + mTime + "&&&&&&", context, sName + "&" + name + ".txt");
+                                    uploadMeeting(sName + "&" + name + ".txt", "Meetings/Upcoming/");
+                                    if(email.contains("@"))
+                                        sendNewMail();
 
-                } else {
+                                } else {
 
-                    for (int i = 0; i < meetingList.size(); i++) {
-                        String otherDate = "";
-                        String otherTime = "";
-                        if (meetingList.get(i).getTime().equals("0")) {
-                            downloadFile(i, Date, time);
-                        } else {
-                            otherDate = meetingList.get(i).getDate();
-                            otherTime = meetingList.get(i).getTime();
-                            ifDifferentTime(Date, time, otherDate, otherTime);
-                        }
+                                    for (int i = 0; i < meetingList.size(); i++) {
+                                        String otherDate = "";
+                                        String otherTime = "";
+                                        if (meetingList.get(i).getTime().equals("0")) {
+                                            downloadFile(i, Date, time);
+                                        } else {
+                                            otherDate = meetingList.get(i).getDate();
+                                            otherTime = meetingList.get(i).getTime();
+                                            ifDifferentTime(Date, time, otherDate, otherTime);
+                                        }
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton("לא ", null).show();
 
-                    }
-
-
-                }
             } else {
                 Toast.makeText(getApplicationContext(), "יש למלא את כל השדות", Toast.LENGTH_LONG).show();
             }
