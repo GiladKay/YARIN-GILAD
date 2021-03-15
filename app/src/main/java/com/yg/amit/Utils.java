@@ -63,7 +63,6 @@ public class Utils {
         javaMailAPI javaMailAPI = new javaMailAPI(context, address, subject, message);
         javaMailAPI.execute();
 
-        Log.d(Utils.TAG, "email sent");
     }
 
 

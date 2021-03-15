@@ -268,13 +268,11 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
                                 } else {
 
                                     for (int i = 0; i < meetingList.size(); i++) {
-                                        String otherDate = "";
-                                        String otherTime = "";
                                         if (meetingList.get(i).getTime().equals("0")) {
                                             downloadFile(i, Date, time);
                                         } else {
-                                            otherDate = meetingList.get(i).getDate();
-                                            otherTime = meetingList.get(i).getTime();
+                                            String otherDate = meetingList.get(i).getDate();
+                                            String otherTime = meetingList.get(i).getTime();
                                             ifDifferentTime(Date, time, otherDate, otherTime);
                                         }
                                     }

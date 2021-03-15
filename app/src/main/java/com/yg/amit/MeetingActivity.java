@@ -76,7 +76,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
     private TextView tvTimeEdit, tvDateEdit;
     private Button btnUpdateEdit;
 
-    private String student, teacher, date, time;
+    private String student, teacher, date, time;//data from the meeting file sent to the activity
 
     private TextView tvTitle, tvSubTitle, tvHelper;
     private TextInputLayout ipInput;
@@ -140,72 +140,18 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         btnUpdateEdit = (Button) diaEdit.findViewById(R.id.btnUpdate);
 
         btnUpdateEdit.setOnClickListener(view -> {
-            time = tvTimeEdit.getText().toString();
-            date = tvDateEdit.getText().toString();
+
             new MaterialAlertDialogBuilder(this)
                     .setTitle("עריכת פגישה")
-                    .setMessage("האם אתה בטוח שאתה רוצה לשנות את הפגישה לתאריך "+date + " בשעה "+time +"?")
+                    .setMessage("האם אתה בטוח שאתה רוצה לשנות את הפגישה לתאריך "+tvDateEdit.getText().toString() + " בשעה "+tvTimeEdit.getText().toString() +"?")
                     .setIcon(R.drawable.error)
                     .setPositiveButton("כן", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    pd = ProgressDialog.show(context, "עדכון פגישה", "מעדכן פגישה...", true);
-                                    pd.setCancelable(false);
-                                    pd.show();
-
-                                    time = tvTimeEdit.getText().toString();
-                                    date = tvDateEdit.getText().toString();
 
 
-                                    String data = student + "&&" + teacher + "&&" + date + "&&" + time + "&&&&&&";
+                                        editMethod();
 
-                                    String fileName = student + "&" + teacher + ".txt";
-                                    writeToFile(data, getApplicationContext(), fileName);
-
-                                    tvSubTitle.setText(date + " - " + time);
-
-                                    diaEdit.dismiss();
-
-                                    Calendar cal = Calendar.getInstance();
-                                    long endTime;
-                                    long startTime;
-                                    cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
-                                    cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
-                                    cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
-                                    cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
-                                    cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
-
-                                    startTime = cal.getTimeInMillis();
-                                    endTime = startTime + 30 * 60 * 1000;
-
-                                    if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
-                                        int id = ListSelectedCalendars("פגישה עם " + student);
-                                        UpdateCalendarEntry(id, startTime, endTime);
-
-                                    } else if (!(ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED)) {
-                                        RequestStoragePermission1();
-                                    } else {
-                                        RequestStoragePermission2();
-                                    }
-
-                                    String eSubject = "שינוי זמן הפגישה - אמי\"ת מודיעין בנים";
-                                    String eMessage = "הפגישה עם המורה " + teacher + ", הועברה לתאריך: " + date + ", בשעה: " + time + ".";
-
-                                    db.collection("users").whereEqualTo("name", student)
-                                            .get()
-                                            .addOnCompleteListener(task -> {
-                                                if (task.isSuccessful()) {
-                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                                        Log.d(Utils.TAG, document.getId() + " => " + document.getData());
-
-                                                        Utils.sendEmail(context, document.getId(), eSubject, eMessage);
-                                                    }
-                                                } else {
-                                                    Log.w(Utils.TAG, "Error getting documents.", task.getException());
-                                                }
-                                            });
-
-                                    updateFile(fileName, "Meetings/Upcoming/");
                                 }
                             })
                     .setNegativeButton("לא ", null).show();
@@ -938,6 +884,66 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         cursor.close();
         return false;
     }
+
+
+
+    public void editMethod() {
+        pd = ProgressDialog.show(context, "עדכון פגישה", "מעדכן פגישה...", true);
+        pd.setCancelable(false);
+        pd.show();
+
+        time = tvTimeEdit.getText().toString();
+        date = tvDateEdit.getText().toString();
+
+        String data = student + "&&" + teacher + "&&" + date + "&&" + time + "&&&&&&";
+
+        String fileName = student + "&" + teacher + ".txt";
+        writeToFile(data, getApplicationContext(), fileName);
+
+        tvSubTitle.setText(date + " - " + time);
+
+        diaEdit.dismiss();
+
+        Calendar cal = Calendar.getInstance();
+        long endTime;
+        long startTime;
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[0]));
+        cal.set(Calendar.MINUTE, Integer.parseInt(tvTimeEdit.getText().toString().split(":")[1]));
+        cal.set(Calendar.YEAR, Integer.parseInt(tvDateEdit.getText().toString().split("/")[2]));
+        cal.set(Calendar.MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[1]) - 1);
+        cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
+
+        startTime = cal.getTimeInMillis();
+        endTime = startTime + 30 * 60 * 1000;
+
+        if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            int id = ListSelectedCalendars("פגישה עם " + student);
+            UpdateCalendarEntry(id, startTime, endTime);
+
+        } else if (!(ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED)) {
+            RequestStoragePermission1();
+        } else {
+            RequestStoragePermission2();
+        }
+
+        String eSubject = "שינוי זמן הפגישה - אמי\"ת מודיעין בנים";
+        String eMessage = "הפגישה עם המורה " + teacher + ", הועברה לתאריך: " + date + ", בשעה: " + time + ".";
+
+        db.collection("users").whereEqualTo("name", student)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Log.d(Utils.TAG, document.getId() + " => " + document.getData());
+
+                            Utils.sendEmail(context, document.getId(), eSubject, eMessage);
+                        }
+                    } else {
+                        Log.w(Utils.TAG, "Error getting documents.", task.getException());
+                    }
+                });
+
+        updateFile(fileName, "Meetings/Upcoming/");}
 
 
     @Override
