@@ -52,6 +52,8 @@ public class Utils {
     public static final String ORG_MEETINGS= "Meetings";
     public static final String ORG_INFO = "Info";
 
+    public static final int MEETING_LENGTH = 20; //in minutes
+
 
     /**
      * sends emails
@@ -61,11 +63,10 @@ public class Utils {
      * @param message = contents of email
      */
     public static void sendEmail(Context context, String address, String subject, String message) {
-        if(1==2){
         javaMailAPI javaMailAPI = new javaMailAPI(context, address, subject, message);
         javaMailAPI.execute();
 
-    }}
+    }
 
 
 }

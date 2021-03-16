@@ -397,7 +397,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
                 cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
 
                 startTime = cal.getTimeInMillis();
-                endTime = startTime + 30 * 60 * 1000;
+                endTime = startTime + Utils.MEETING_LENGTH * 60 * 1000;
 
                 Intent intent = new Intent(Intent.ACTION_EDIT);
                 intent.setType("vnd.android.cursor.item/event");
@@ -537,7 +537,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
 
 
         long startTime = cal.getTimeInMillis();
-        long endTime = startTime + 30 * 60 * 1000;
+        long endTime = startTime + Utils.MEETING_LENGTH * 60 * 1000;
 
         if (meetingMode == Utils.MODE_UPCOMING) {
 
@@ -961,7 +961,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
         cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(tvDateEdit.getText().toString().split("/")[0]));
 
         startTime = cal.getTimeInMillis();
-        endTime = startTime + 30 * 60 * 1000;
+        endTime = startTime + Utils.MEETING_LENGTH * 60 * 1000;
 
         if (ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.WRITE_CALENDAR) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(MeetingActivity.this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
             int id = ListSelectedCalendars("פגישה עם " + student);
@@ -1023,7 +1023,7 @@ public class MeetingActivity extends AppCompatActivity implements View.OnClickLi
             int totalMINs = Integer.parseInt(time.split(":")[0]) * 60 + Integer.parseInt(time.split(":")[1]);
             int otherTotalMIns = Integer.parseInt(otherHour) * 60 + Integer.parseInt(otherMin);
 
-            if (Math.abs(totalMINs - otherTotalMIns) > 30) {
+            if (Math.abs(totalMINs - otherTotalMIns) > Utils.MEETING_LENGTH) {
                 editMethod();
             } else {
                 Toast.makeText(context, "לתלמיד כבר יש פגישה בזמן הזה, שמתחילה בשעה " + otherTime, Toast.LENGTH_LONG).show();

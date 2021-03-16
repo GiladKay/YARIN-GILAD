@@ -505,7 +505,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
         cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(mDate.split("/")[0]));
 
         startTime = cal.getTimeInMillis();
-        endTime = startTime + 30 * 60 * 1000;
+        endTime = startTime + Utils.MEETING_LENGTH * 60 * 1000;
         String title = "פגישה עם " + sName;
 
         Intent intent = new Intent(Intent.ACTION_EDIT);
@@ -630,7 +630,7 @@ public class InfoActivity extends AppCompatActivity implements View.OnClickListe
             int totalMINs = Integer.parseInt(time.split(":")[0]) * 60 + Integer.parseInt(time.split(":")[1]);
             int otherTotalMIns = Integer.parseInt(otherHour) * 60 + Integer.parseInt(otherMin);
 
-            if (Math.abs(totalMINs - otherTotalMIns) > 30) {
+            if (Math.abs(totalMINs - otherTotalMIns) > Utils.MEETING_LENGTH) {
                 pd = ProgressDialog.show(context, "יצירת פגישה", "יוצר את הפגישה...", true);
                 pd.setCancelable(false);
                 pd.show();
