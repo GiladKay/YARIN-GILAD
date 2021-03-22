@@ -65,7 +65,6 @@ public class Utils {
     public static void sendEmail(Context context, String address, String subject, String message) {
         javaMailAPI javaMailAPI = new javaMailAPI(context, address, subject, message);
         javaMailAPI.execute();
-
     }
 
 
