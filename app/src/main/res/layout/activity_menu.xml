@@ -68,4 +68,27 @@
         android:textStyle="bold"
         app:backgroundTint="#07A5FF" />
 
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnReset"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:paddingTop="10dp"
+        android:paddingBottom="15dp"
+        android:text="איפוס פגישות"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:backgroundTint="#ADB9D5"/>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 </LinearLayout>

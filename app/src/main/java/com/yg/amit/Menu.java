@@ -42,13 +42,13 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
 
     StorageReference mStorageRef;
     private SharedPreferences sharedPreferences;
-    private Dialog newPass;
+    private Dialog newPass, authReset;
     private TextInputLayout ipPassword, ipOldPassword, ipRepeatPassword;
     private TextInputEditText edtPassword, edtOldPassword, edtRepeatPassword;
     private MaterialButton btnNext, btnCancel;
     private String name, type;
     private TextView tvTitle;
-    private Button btnUpcoming, btnClasses, btnTeachers, btnAccount;
+    private Button btnUpcoming, btnClasses, btnTeachers, btnReset, btnAccount;
     private String address = "";
     private String subject = "";
     private String message = "";
@@ -71,10 +71,12 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
         btnUpcoming = (MaterialButton) findViewById(R.id.btnUpcoming);
         btnClasses = (MaterialButton) findViewById(R.id.btnClasses);
         btnTeachers = (MaterialButton) findViewById(R.id.btnTeachers);
+        btnReset = (MaterialButton) findViewById(R.id.btnReset);
         btnAccount = (Button) findViewById(R.id.btnAccount);
         btnUpcoming.setOnClickListener(this);
         btnClasses.setOnClickListener(this);
         btnTeachers.setOnClickListener(this);
+        btnReset.setOnClickListener(this);
         btnAccount.setOnClickListener(this);
 
         name = sharedPreferences.getString(Utils.NAME_KEY, "name");
@@ -197,8 +199,63 @@ public class Menu extends AppCompatActivity implements View.OnClickListener {
                 sharedPreferences.edit().putString(Utils.CLASS_NAME_KEY, "Teachers").commit();
                 startActivity(new Intent(getBaseContext(), StudentsActivity.class));
                 break;
+
+            case (R.id.btnReset):
+                initResetDia();
+                break;
         }
 
+    }
+
+
+    private void initResetDia(){
+        authReset =  new Dialog(this);
+        authReset.setContentView(R.layout.reset_database_dialog);
+        TextInputLayout ipAuthPassword , ipAuthEmail;
+        TextInputEditText edtAuthPassword, edtAuthEmail;
+        ipAuthPassword = (TextInputLayout) authReset.findViewById(R.id.ipPassword);
+        edtAuthPassword = (TextInputEditText) authReset.findViewById(R.id.edtPassword);
+
+        ipAuthEmail =(TextInputLayout) authReset.findViewById(R.id.ipEmail);
+        edtAuthEmail = (TextInputEditText) authReset.findViewById(R.id.edtEmail);
+
+        MaterialButton btnNext = (MaterialButton) authReset.findViewById(R.id.btnNext);
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = edtAuthEmail.getText().toString().trim();
+                String passWord = edtAuthPassword.getText().toString().trim();
+
+                ipAuthPassword.setError(null);
+                ipAuthEmail.setError(null);
+
+                //TODO check if email and password are correct
+
+                new MaterialAlertDialogBuilder(getApplicationContext())
+                        .setTitle("איפוס מאגר נתונים")
+                        .setMessage("האם אתה בטוח שברצונך לאפס את מאגר הנתונים? דבר זה ימחק את כל הפגישות שנקבעו ויאפס את מספרי הפגישות של המורים והתלמידים")
+                        .setNeutralButton("לא", null)
+                        .setPositiveButton("כן", ((dialog, which) -> {
+                            authReset.dismiss();
+                            resetDataBase();
+                        }));
+
+
+            }
+        });
+        MaterialButton btnCancel = (MaterialButton) authReset.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                authReset.dismiss();
+            }
+        });
+
+    }
+
+    public void resetDataBase(){
+        //TODO reset dataBase
+        Toast.makeText(this, "מאגר מידע אופס (לא באמת)", Toast.LENGTH_LONG).show();
     }
 
     @Override
