@@ -17,7 +17,6 @@ public class ReadExcelData {
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
 
-    private FormulaEvaluator formulaEvaluator;
 
     public ReadExcelData(String filePath){
         try {
