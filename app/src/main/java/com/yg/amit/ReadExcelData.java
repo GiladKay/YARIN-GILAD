@@ -1,8 +1,8 @@
 package com.yg.amit;
 
+
 import android.util.Log;
 
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -31,7 +31,7 @@ public class ReadExcelData {
     }
 
     public void setSheet(String sheetName){
-        sheet = workbook.getSheet(sheetName);
+            sheet = workbook.getSheet(sheetName);
     }
 
     public int getRowCount(){
@@ -39,7 +39,7 @@ public class ReadExcelData {
     }
 
     public String getCellData(int row , int col){
-        return getCellData(row,col);
+        return sheet.getRow(row).getCell(col).getStringCellValue();
     }
 
 }
